@@ -1,0 +1,25 @@
+[project]
+name = "ucc-bench"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Brad Chase", email = "bachase@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "cirq>=1.4.1",
+    "pytket>=2.0.1",
+    "qbraid>=0.9.4",
+    "qiskit>=1.4.2",
+    "ucc>=0.4.3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+]

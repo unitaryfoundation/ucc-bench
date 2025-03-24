@@ -1,0 +1,107 @@
+import pytest
+from ucc_bench.compilers import (
+    QiskitCompiler,
+    CirqCompiler,
+    PytketPeepCompiler,
+    UCCCompiler,
+)
+from ucc_bench.compilers.cirq_compiler import BenchmarkTargetGateset
+
+from qiskit import QuantumCircuit
+import cirq
+from pytket.circuit import Circuit as PytketCircuit
+
+
+@pytest.fixture
+def qasm_code():
+    return """
+    OPENQASM 2.0;
+    include "qelib1.inc";
+    qreg q[2];
+    creg c[2];
+    h q[0];
+    cx q[0],q[1];
+    """
+
+
+@pytest.mark.parametrize(
+    "compiler_class,expected_circuit_type,expected_id",
+    [
+        (QiskitCompiler, QuantumCircuit, "qiskit"),
+        (CirqCompiler, cirq.Circuit, "cirq"),
+        (PytketPeepCompiler, PytketCircuit, "pytket-peep"),
+        (UCCCompiler, QuantumCircuit, "ucc"),
+    ],
+)
+def test_compiler(compiler_class, expected_circuit_type, expected_id, qasm_code):
+    """
+    Basic tests that all compilers have the expected methods and return types.
+    Does *not* test the correctness of compilation.
+    """
+    compiler = compiler_class()
+
+    # Test id and version
+    assert compiler.id() == expected_id
+    assert isinstance(compiler.version(), str)
+
+    # Test qasm_to_native
+    circuit = compiler.qasm_to_native(qasm_code)
+    assert isinstance(circuit, expected_circuit_type)
+
+    # Test compile
+    compiled_circuit = compiler.compile(circuit)
+    assert isinstance(compiled_circuit, expected_circuit_type)
+
+    # Test count_multi_qubit_gates of original circuit (to ignore compilation effects)
+    multi_qubit_gates = compiler.count_multi_qubit_gates(circuit)
+    assert isinstance(multi_qubit_gates, int)
+    assert multi_qubit_gates == 1
+
+
+def test_cirq_benchmark_target_gateset_simple_circuit():
+    """
+    Tests the custom BenchmarkTargetGateset compiles a simple circuit
+    to the desired target gateset and has equivalent functionality
+    """
+
+    import cirq
+
+    q = cirq.LineQubit.range(2)
+    c_orig = cirq.Circuit(
+        cirq.T(q[0]),
+        cirq.SWAP(*q),
+        cirq.T(q[0]),
+        cirq.SWAP(*q),
+        cirq.SWAP(*q),
+        cirq.T.on_each(*q),
+    )
+
+    c_new = cirq.optimize_for_target_gateset(c_orig, gateset=BenchmarkTargetGateset())
+
+    cirq.testing.assert_circuits_with_terminal_measurements_are_equivalent(
+        c_orig, c_new, atol=1e-6
+    )
+
+    expected_gates = cirq.Gateset(cirq.CNOT, cirq.Rx, cirq.Ry, cirq.Rz, cirq.H)
+    assert expected_gates.validate(c_new), "Cirq compilation had unsupported gatges"
+
+
+def test_cirq_benchmark_target_gateset_random_circuit():
+    """
+    Tests the custom BenchmarkTargetGateset compiles a random circuit
+    to the desired target gateset and has equivalent functionality
+    """
+
+    from cirq.testing import random_circuit
+
+    c_orig = random_circuit(qubits=4, n_moments=6, op_density=0.8, random_state=1234)
+
+    c_new = cirq.optimize_for_target_gateset(c_orig, gateset=BenchmarkTargetGateset())
+
+    # Check that circuits are equivalent
+    cirq.testing.assert_circuits_with_terminal_measurements_are_equivalent(
+        c_orig, c_new, atol=1e-6
+    )
+    # Check if the compiled circuit uses only the expected gates
+    expected_gates = cirq.Gateset(cirq.CNOT, cirq.Rx, cirq.Ry, cirq.Rz, cirq.H)
+    assert expected_gates.validate(c_new), "Cirq compilation had unsupported gatges"

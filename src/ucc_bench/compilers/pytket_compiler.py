@@ -1,0 +1,42 @@
+from .base_compiler import CompilerABC
+from pytket import __version__ as pytket_version
+from pytket.passes import (
+    SequencePass,
+    AutoRebase,
+    FullPeepholeOptimise,
+)
+from pytket.predicates import CompilationUnit
+from pytket.circuit import OpType
+from pytket import Circuit as PytketCircuit
+from qbraid import transpile
+
+
+class PytketPeepCompiler(CompilerABC[PytketCircuit]):
+    """
+    Wrapper for benchmarking pytket compiler.
+
+    Uses FullPeepholeOptimise and AutoRebase for compilation.
+    """
+
+    @classmethod
+    def id(cls) -> str:
+        return "pytket-peep"
+
+    @classmethod
+    def version(cls) -> str:
+        return pytket_version
+
+    def qasm_to_native(self, qasm: str) -> PytketCircuit:
+        return transpile(qasm, "pytket")
+
+    def compile(self, circuit: PytketCircuit) -> PytketCircuit:
+        compilation_unit = CompilationUnit(circuit)
+        passes = [
+            FullPeepholeOptimise(),
+            AutoRebase({OpType.Rx, OpType.Ry, OpType.Rz, OpType.CX, OpType.H}),
+        ]
+        SequencePass(passes).apply(compilation_unit)
+        return compilation_unit.circuit
+
+    def count_multi_qubit_gates(self, circuit: PytketCircuit) -> int:
+        return circuit.n_gates - circuit.n_1qb_gates()

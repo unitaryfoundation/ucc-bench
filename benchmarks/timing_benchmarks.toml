@@ -1,0 +1,31 @@
+# Version of the specification language/format, to manage future changes
+spec_version = "1.0"
+# Version of this particular benchmark suite, to manage any important changes
+suite_version = "0.1"
+# Unique identifier for this benchmark suite
+id = "timing_benchmarks"
+# Human readable description
+description = "Base set of quantum compiler benchmarks for UCC project"
+
+# --------- Compilers ----------
+# The set of compilers to benchmark
+# For now, this is just the compiler id, but this format # could be extended to set settings for each compiler
+[[compilers]]
+id = "ucc"
+[[compilers]]
+id = "pytket"
+[[compilers]]
+id = "ucc"
+[[compilers]]
+id = "cirq"
+
+# --------- Benchmarks ----------
+# Define the set of individual benchmarks
+
+[[benchmarks]]
+# Unique identifier for this benchmark
+id = "qft"
+# Human readable description
+description = "Quantum Fourier Transform with 100 qubits"
+# Path to the QASM file containing the benchmark
+qasm_file = "circuits/qasm/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm"
