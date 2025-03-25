@@ -1,4 +1,5 @@
 import argparse
+from .suite import BenchmarkSuite
 
 
 def main() -> None:
@@ -10,6 +11,10 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+
+    suite = BenchmarkSuite.load(args.spec_path)
+    suite.validate()
+    run(suite)
 
     # Load specification, validate it
     # Dispatch runner to run the benchmarks and generate results
