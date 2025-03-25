@@ -52,6 +52,11 @@ class CompilerABC(ABC, Generic[CircuitType]):
         pass
 
 
+def is_compiler_registered(name: str) -> bool:
+    # Check if a compiler is registered by name
+    return name in _compiler_registry
+
+
 def lookup_compiler(name: str) -> CompilerABC:
     # Lookup compiler by name in the registry
     return _compiler_registry[name]

@@ -11,6 +11,10 @@ def main() -> None:
 
     args = parser.parse_args()
 
+    # Load specification, validate it
+    # Dispatch runner to run the benchmarks and generate results
+    # Save results to directory
+
 
 if __name__ == "__main__":
     main()

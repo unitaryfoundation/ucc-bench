@@ -13,7 +13,7 @@ description = "Base set of quantum compiler benchmarks for UCC project"
 [[compilers]]
 id = "ucc"
 [[compilers]]
-id = "pytket"
+id = "pytket-peep"
 [[compilers]]
 id = "ucc"
 [[compilers]]
@@ -24,8 +24,33 @@ id = "cirq"
 
 [[benchmarks]]
 # Unique identifier for this benchmark
-id = "qft"
+id = "qaoa"
 # Human readable description
-description = "Quantum Fourier Transform with 100 qubits"
-# Path to the QASM file containing the benchmark
-qasm_file = "circuits/qasm/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm"
+description = "Quantum Approximate Optimization Algorithm of Barabási–Albert graph"
+# Path to the QASM file containing the benchmark (relative to this file)
+qasm_file = "circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm"
+
+[[benchmarks]]
+id = "qv"
+description = "Quantum Volume"
+qasm_file = "circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm"
+
+[[benchmarks]]
+id = "qft"
+description = "Quantum Fourier Transform"
+qasm_file = "circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm"
+
+[[benchmarks]]
+id="square_heisenberg"
+description = "Heisenberg spin model on square lattice"
+qasm_file = "circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm"
+
+[[benchmarks]]
+id="prep_select"
+description = "GHZ state preparation"
+qasm_file = "circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm"
+
+[[benchmarks]]
+id="qcnn"
+description="Quantum Convolutional Neural Network"
+qasm_file="circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm"
