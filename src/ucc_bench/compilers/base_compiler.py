@@ -10,7 +10,7 @@ _compiler_registry = {}
 CircuitType = TypeVar("CircuitType")
 
 
-class CompilerABC(ABC, Generic[CircuitType]):
+class BaseCompiler(ABC, Generic[CircuitType]):
     """
     Abstract base class representing a compiler for use in benchmaking.
     In order for a compiler to be used in the benchmarking framework, it must
@@ -57,6 +57,6 @@ def is_compiler_registered(name: str) -> bool:
     return name in _compiler_registry
 
 
-def lookup_compiler(name: str) -> CompilerABC:
+def lookup_compiler(name: str) -> BaseCompiler:
     # Lookup compiler by name in the registry
     return _compiler_registry[name]

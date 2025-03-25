@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from ucc_bench.suite import Suite, Compiler, Benchmark
+from ucc_bench.suite import BenchmarkSuite, CompilerSpec, BenchmarkSpec
 
 
 def test_validate_valid_suite():
@@ -11,15 +11,17 @@ def test_validate_valid_suite():
         qasm_file.touch()  # Create an empty QASM file
 
         # Pydantic will validate during initialization
-        suite = Suite(
+        suite = BenchmarkSuite(
             spec_path=temp_path / "suite.toml",
             spec_version="1.0",
             suite_version="1.0",
             id="suite1",
             description="A valid suite",
-            compilers=[Compiler(id="ucc")],
+            compilers=[CompilerSpec(id="ucc")],
             benchmarks=[
-                Benchmark(id="bench1", description="Benchmark 1", qasm_file=qasm_file)
+                BenchmarkSpec(
+                    id="bench1", description="Benchmark 1", qasm_file=qasm_file
+                )
             ],
         )
 
@@ -34,18 +36,18 @@ def test_validate_duplicate_benchmark_ids():
         qasm_file.touch()
 
         with pytest.raises(ValueError, match="Duplicate benchmark id: bench1"):
-            Suite(
+            BenchmarkSuite(
                 spec_path=temp_path / "suite.toml",
                 spec_version="1.0",
                 suite_version="1.0",
                 id="suite1",
                 description="A suite with duplicate benchmark IDs",
-                compilers=[Compiler(id="ucc")],
+                compilers=[CompilerSpec(id="ucc")],
                 benchmarks=[
-                    Benchmark(
+                    BenchmarkSpec(
                         id="bench1", description="Benchmark 1", qasm_file=qasm_file
                     ),
-                    Benchmark(
+                    BenchmarkSpec(
                         id="bench1", description="Benchmark 2", qasm_file=qasm_file
                     ),
                 ],
@@ -59,15 +61,15 @@ def test_validate_unregistered_compiler():
         qasm_file.touch()
 
         with pytest.raises(ValueError, match="Unknown compiler id: unknown_compiler"):
-            Suite(
+            BenchmarkSuite(
                 spec_path=temp_path / "suite.toml",
                 spec_version="1.0",
                 suite_version="1.0",
                 id="suite1",
                 description="A suite with unregistered compiler",
-                compilers=[Compiler(id="unknown_compiler")],
+                compilers=[CompilerSpec(id="unknown_compiler")],
                 benchmarks=[
-                    Benchmark(
+                    BenchmarkSpec(
                         id="bench1", description="Benchmark 1", qasm_file=qasm_file
                     )
                 ],
@@ -84,15 +86,15 @@ def test_validate_invalid_qasm_file_path():
             ValueError,
             match=f"qasm_file for benchmark 'bench1' does not point to a valid file: {resolved_path}",
         ):
-            Suite(
+            BenchmarkSuite(
                 spec_path=temp_path / "suite.toml",
                 spec_version="1.0",
                 suite_version="1.0",
                 id="suite1",
                 description="A suite with invalid QASM file path",
-                compilers=[Compiler(id="ucc")],
+                compilers=[CompilerSpec(id="ucc")],
                 benchmarks=[
-                    Benchmark(
+                    BenchmarkSpec(
                         id="bench1",
                         description="Benchmark 1",
                         qasm_file=temp_path / "nonexistent.qasm",

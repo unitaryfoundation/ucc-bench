@@ -3,10 +3,11 @@ from pathlib import Path
 from pydantic import BaseModel
 from pydantic import Field, model_validator, field_validator
 from typing import List
+
 from .compilers import is_compiler_registered
 
 
-class Compiler(BaseModel):
+class CompilerSpec(BaseModel):
     """
     Represents a compiler to benchmark against
 
@@ -24,9 +25,9 @@ class Compiler(BaseModel):
         return value
 
 
-class Benchmark(BaseModel):
+class BenchmarkSpec(BaseModel):
     """
-    Represents a specific benchmark circuit to run.
+    Represents a specific benchmark (circuit+metrics) to run.
 
     Attributes:
         id: The id of the benchmark, used to identify the benchmark
@@ -39,7 +40,7 @@ class Benchmark(BaseModel):
     qasm_file: Path
 
 
-class Suite(BaseModel):
+class BenchmarkSuite(BaseModel):
     """
     Represents a specification of a benchmark suite.
 
@@ -58,16 +59,16 @@ class Suite(BaseModel):
     suite_version: str
     id: str
     description: str
-    compilers: List[Compiler] = Field(default_factory=list)
-    benchmarks: List[Benchmark] = Field(default_factory=list)
+    compilers: List[CompilerSpec] = Field(default_factory=list)
+    benchmarks: List[BenchmarkSpec] = Field(default_factory=list)
 
     @classmethod
-    def load(cls, path: str) -> "Suite":
+    def load(cls, path: str) -> "BenchmarkSuite":
         """Load a specification from a TOML file at the specified path."""
         with open(path, "rb") as f:
             raw = tomllib.load(f)
             raw["spec_path"] = Path(path)
-            return Suite.model_validate(raw)
+            return BenchmarkSuite.model_validate(raw)
 
     @model_validator(mode="after")
     def check_benchmarks_unique(self):
@@ -76,6 +77,15 @@ class Suite(BaseModel):
             if benchmark.id in set_ids:
                 raise ValueError(f"Duplicate benchmark id: {benchmark.id}")
             set_ids.add(benchmark.id)
+        return self
+
+    @model_validator(mode="after")
+    def check_compilers_unique(self):
+        set_ids = set()
+        for compiler in self.compilers:
+            if compiler.id in set_ids:
+                raise ValueError(f"Duplicate compiler: {compiler.id}")
+            set_ids.add(compiler.id)
         return self
 
     @model_validator(mode="after")

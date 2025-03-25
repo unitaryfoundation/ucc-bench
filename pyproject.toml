@@ -4,11 +4,12 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [
-    { name = "Brad Chase", email = "bachase@gmail.com" }
+    { name = "Brad Chase", email = "brad@unitary.foundation" }
 ]
 requires-python = ">=3.12"
 dependencies = [
     "cirq>=1.4.1",
+    "psutil>=7.0.0",
     "pydantic>=2.10.6",
     "pytket>=2.0.1",
     "qbraid>=0.9.4",
@@ -24,3 +25,5 @@ build-backend = "hatchling.build"
 dev = [
     "pytest>=8.3.5",
 ]
+[project.scripts]
+ucc-bench = 'ucc_bench.main:main'

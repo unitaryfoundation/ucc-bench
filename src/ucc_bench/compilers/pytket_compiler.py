@@ -1,4 +1,4 @@
-from .base_compiler import CompilerABC
+from .base_compiler import BaseCompiler
 from pytket import __version__ as pytket_version
 from pytket.passes import (
     SequencePass,
@@ -11,7 +11,7 @@ from pytket import Circuit as PytketCircuit
 from qbraid import transpile
 
 
-class PytketPeepCompiler(CompilerABC[PytketCircuit]):
+class PytketPeepCompiler(BaseCompiler[PytketCircuit]):
     """
     Wrapper for benchmarking pytket compiler.
 

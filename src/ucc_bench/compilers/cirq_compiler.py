@@ -1,4 +1,4 @@
-from .base_compiler import CompilerABC
+from .base_compiler import BaseCompiler
 import cirq
 from typing import List
 from qbraid import transpile
@@ -91,7 +91,7 @@ class BenchmarkTargetGateset(cirq.TwoQubitCompilationTargetGateset):
         return "BenchmarkTargetGateset()"
 
 
-class CirqCompiler(CompilerABC[cirq.Circuit]):
+class CirqCompiler(BaseCompiler[cirq.Circuit]):
     """
     Wrapper for benchmarking cirq compiler.
 

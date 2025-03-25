@@ -1,13 +1,14 @@
-from .base_compiler import CompilerABC
+from .base_compiler import BaseCompiler
 from qiskit import (
     QuantumCircuit,
     transpile as qiskit_transpile,
     __version__ as qiskit_version,
 )
+
 from qbraid import transpile
 
 
-class QiskitCompiler(CompilerABC[QuantumCircuit]):
+class QiskitCompiler(BaseCompiler[QuantumCircuit]):
     """
     Wrapper for benchmarking qiskit compiler.
 

@@ -1,4 +1,4 @@
-from .base_compiler import CompilerABC
+from .base_compiler import BaseCompiler
 from ucc import __version__ as ucc_version
 from ucc import compile
 
@@ -8,7 +8,7 @@ from qiskit import QuantumCircuit
 from qbraid import transpile
 
 
-class UCCCompiler(CompilerABC[QuantumCircuit]):
+class UCCCompiler(BaseCompiler[QuantumCircuit]):
     """
     Wrapper for benchmarking ucc compiler.
     """

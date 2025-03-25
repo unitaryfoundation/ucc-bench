@@ -1,2 +1,3 @@
-def hello() -> str:
-    return "Hello from ucc-bench!"
+from importlib.metadata import version
+
+__version__ = version("ucc_bench")
