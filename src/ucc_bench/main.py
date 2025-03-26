@@ -7,10 +7,10 @@ import platform
 from pathlib import Path
 import psutil
 
-from .suite import BenchmarkSuite
-from .runner import run_suite
-from .results import SuiteResults, RunnerInfo, Metadata, save_results
-from . import __version__
+from ucc_bench.suite import BenchmarkSuite
+from ucc_bench.runner import run_suite
+from ucc_bench.results import SuiteResults, RunnerInfo, Metadata, save_results
+from ucc_bench import __version__
 
 # qBraid is setting up logging in a way that is incompatible with the logging setup in this file.
 # To avoid conflicts, we will clear the existing handlers and configure logging here.
@@ -22,39 +22,48 @@ logger = logging.getLogger(__name__)
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Command line utility to run UCC compiler benchmark comparison"
+        description="Command-line utility to run UCC compiler benchmark comparisons."
     )
     parser.add_argument(
-        "spec_path", help="The TOML file that specifies the benchmark suite to run"
+        "spec_path",
+        help="Path to the TOML file specifying the benchmark suite to run.",
     )
     parser.add_argument(
         "--uid",
-        help="Unique identifier for the run. When not provided, a random UUID is generated. When running official results, this should be the git hash of the git commit to run against.",
+        help="Unique identifier for the run. If not provided, a random UUID is generated. For official results, use the git hash of the commit being tested.",
     )
     parser.add_argument(
         "--uid_timestamp",
-        help="Timestamp to use for the unique identifier. When not provided, the current time is used. When running official results, this should be the timestamp of the git commit we are running against.",
+        help="Timestamp for the unique identifier. If not provided, the current time is used. For official results, use the timestamp of the git commit being tested.",
     )
     parser.add_argument(
         "-o",
         "--out",
         default=".local_results",
-        help="Root directory to save results. Defaults to .local_results.",
+        help="Root directory to save results. Defaults to '.local_results'. Individual run results are stored in a hierarchy within this directory.",
     )
     parser.add_argument(
         "--runner_name",
         default=platform.node(),
-        help="Name of runner machine; should be stable across runs you want to compare. Defaults to the hostname of current machine.",
+        help="Name of the runner machine. Should remain consistent across runs for comparison. Defaults to the current machine's hostname.",
     )
     parser.add_argument(
         "-j",
         "--parallel",
-        help="Number of benchmarks to run in parallel. If unspecified, set to the number of physical cores on the machine",
+        help="Number of benchmarks to run in parallel. Defaults to the number of physical CPU cores if not specified.",
     )
     parser.add_argument(
         "--log_level",
         default="WARNING",
-        help="Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
+        help="Logging level for the application. Options: DEBUG, INFO, WARNING, ERROR, CRITICAL. Defaults to 'WARNING'.",
+    )
+    parser.add_argument(
+        "--only_compiler",
+        help="Run benchmarks only for the specified compiler.",
+    )
+    parser.add_argument(
+        "--only_benchmark",
+        help="Run only the specified benchmark.",
     )
 
     args = parser.parse_args()
@@ -73,7 +82,12 @@ def main() -> None:
     logger.info(
         f"Running benchmark suite '{suite.id}' with {num_parallel} parallel tasks"
     )
-    benchmark_results = run_suite(suite, num_parallel)
+    benchmark_results = run_suite(
+        suite,
+        num_parallel,
+        only_compiler=args.only_compiler,
+        only_benchmark=args.only_benchmark,
+    )
     run_end = datetime.now()
 
     results = SuiteResults(
@@ -93,3 +107,7 @@ def main() -> None:
     logger.info(f"Finished running benchmark suite '{suite.id}'")
 
     save_results(results, Path(args.out))
+
+
+if "__main__" == __name__:
+    main()

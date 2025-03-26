@@ -1,11 +1,11 @@
-from .suite import BenchmarkSuite, BenchmarkSpec
-from .compilers import lookup_compiler, BaseCompiler
-from .results import BenchmarkResult, CompilerInfo, CompilationMetrics
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 import logging
 from logging import LoggerAdapter
 from concurrent.futures import ProcessPoolExecutor
+from .suite import BenchmarkSuite, BenchmarkSpec
+from .compilers import lookup_compiler, BaseCompiler
+from .results import BenchmarkResult, CompilerInfo, CompilationMetrics
 
 
 def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResult:
@@ -68,7 +68,12 @@ def configure_worker_logging(log_level):
     )
 
 
-def run_suite(suite: BenchmarkSuite, num_parallel: int) -> List[BenchmarkResult]:
+def run_suite(
+    suite: BenchmarkSuite,
+    num_parallel: int,
+    only_compiler: Optional[str] = None,
+    only_benchmark: Optional[str] = None,
+) -> List[BenchmarkResult]:
     """
     Run an entire benchmark suite against all compilers specified in the suite and return the results.
     """
@@ -81,8 +86,12 @@ def run_suite(suite: BenchmarkSuite, num_parallel: int) -> List[BenchmarkResult]
         initargs=(logging.getLogger().level,),
     ) as executor:
         for compiler in suite.compilers:
+            if only_compiler and compiler.id != only_compiler:
+                continue
             compiler_cls = lookup_compiler(compiler.id)
             for benchmark in suite.benchmarks:
+                if only_benchmark and benchmark.id != only_benchmark:
+                    continue
                 # Submit tasks to the executor
                 tasks.append(executor.submit(run_task, compiler_cls(), benchmark))
 
