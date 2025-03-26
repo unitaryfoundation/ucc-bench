@@ -1,11 +1,11 @@
 import argparse
 import logging
-import shlex
 import sys
 from datetime import datetime
 import uuid
 import platform
 from pathlib import Path
+import psutil
 
 from .suite import BenchmarkSuite
 from .runner import run_suite
@@ -40,7 +40,9 @@ def main() -> None:
         help="Name of runner machine; should be stable and reflect machine used across multiple runs",
     )
     parser.add_argument(
-        "-j", "--parallel", help="Number of benchmarks to run in parallel", default=1
+        "-j",
+        "--parallel",
+        help="Number of benchmarks to run in parallel. If unspecified, set to the number of physical cores on the machine",
     )
     parser.add_argument(
         "--log_level",
@@ -55,11 +57,16 @@ def main() -> None:
         format="%(asctime)s [%(levelname)s] %(module)s: %(message)s",
     )
 
-    suite = BenchmarkSuite.load(args.spec_path)
+    suite = BenchmarkSuite.load_toml(args.spec_path)
 
-    logger.info(f"Running benchmark suite '{suite.id}'")
     run_start = datetime.now()
-    benchmark_results = run_suite(suite)
+    num_parallel = (
+        int(args.parallel) if args.parallel else psutil.cpu_count(logical=False)
+    )
+    logger.info(
+        f"Running benchmark suite '{suite.id}' with {num_parallel} parallel tasks"
+    )
+    benchmark_results = run_suite(suite, num_parallel)
     run_end = datetime.now()
 
     results = SuiteResults(
@@ -72,7 +79,7 @@ def main() -> None:
             runner_name=args.runner_name,
             runner_specs=RunnerInfo.from_system(),
             runner_version=__version__,
-            runner_args=" ".join(map(shlex.quote, sys.argv[1:])),
+            runner_args=sys.argv,
         ),
         results=benchmark_results,
     )

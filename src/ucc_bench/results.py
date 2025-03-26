@@ -17,6 +17,7 @@ class RunnerInfo(BaseModel):
 
     @classmethod
     def from_system(cls):
+        """Create an instance of RunnerInfo based on the settings of the current system"""
         import platform
         import psutil
 
@@ -65,6 +66,12 @@ class SuiteResults(BaseModel):
 
 
 def save_results(results: SuiteResults, out_dir: Path) -> None:
+    """
+    Save the benchmark results in JSON format beneath the given root directory.
+
+    Benchmark results are organized by slowly varying dimenions for easier loading
+    and comparison, so will be in the path {out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid.json}
+    """
     out_path = (
         out_dir
         / results.metadata.runner_name
