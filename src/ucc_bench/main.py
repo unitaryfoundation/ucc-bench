@@ -21,23 +21,30 @@ logger = logging.getLogger(__name__)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run benchmark suite")
-    parser.add_argument("spec_path", help="Path to benchmark suite TOML")
+    parser = argparse.ArgumentParser(
+        description="Command line utility to run UCC compiler benchmark comparison"
+    )
+    parser.add_argument(
+        "spec_path", help="The TOML file that specifies the benchmark suite to run"
+    )
     parser.add_argument(
         "--uid",
-        help="Unique identifier for the run. When not provided, a random UUID is generated.",
+        help="Unique identifier for the run. When not provided, a random UUID is generated. When running official results, this should be the git hash of the git commit to run against.",
     )
     parser.add_argument(
         "--uid_timestamp",
-        help="Timestamp to use for the unique identifier. When not provided, the current time is used.",
+        help="Timestamp to use for the unique identifier. When not provided, the current time is used. When running official results, this should be the timestamp of the git commit we are running against.",
     )
     parser.add_argument(
-        "--out", default=".local_results", help="Directory to save results"
+        "-o",
+        "--out",
+        default=".local_results",
+        help="Root directory to save results. Defaults to .local_results.",
     )
     parser.add_argument(
         "--runner_name",
         default=platform.node(),
-        help="Name of runner machine; should be stable and reflect machine used across multiple runs",
+        help="Name of runner machine; should be stable across runs you want to compare. Defaults to the hostname of current machine.",
     )
     parser.add_argument(
         "-j",
