@@ -5,8 +5,6 @@ from qiskit import (
     __version__ as qiskit_version,
 )
 
-from qbraid import transpile
-
 
 class QiskitCompiler(BaseCompiler[QuantumCircuit]):
     """
@@ -22,9 +20,6 @@ class QiskitCompiler(BaseCompiler[QuantumCircuit]):
     @classmethod
     def version(cls) -> str:
         return qiskit_version
-
-    def qasm_to_native(self, qasm: str) -> QuantumCircuit:
-        return transpile(qasm, "qiskit")
 
     def compile(self, circuit: QuantumCircuit) -> QuantumCircuit:
         return qiskit_transpile(

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
+from qbraid import transpile
 
 # A registry of all available compilers for benchmarking, maps from
 # the compiler id to the class for that compiler
@@ -39,7 +40,7 @@ class BaseCompiler(ABC, Generic[CircuitType]):
 
     def qasm_to_native(self, qasm: str) -> CircuitType:
         """Convert a QASM string to the native circuit type of this compiler"""
-        pass
+        return transpile(qasm, self.id())
 
     @abstractmethod
     def compile(self, circuit: CircuitType) -> CircuitType:

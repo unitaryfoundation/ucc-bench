@@ -27,6 +27,7 @@ class PytketPeepCompiler(BaseCompiler[PytketCircuit]):
         return pytket_version
 
     def qasm_to_native(self, qasm: str) -> PytketCircuit:
+        # Specify since pytket id != "pytket"
         return transpile(qasm, "pytket")
 
     def compile(self, circuit: PytketCircuit) -> PytketCircuit:

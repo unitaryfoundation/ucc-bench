@@ -1,4 +1,31 @@
 1. Add expectation value paths/options
+
+   raw_circuit      -> Noise -> observable (property of density matrix or of statevector)
+   compiled_circuit -> Noise -> observable
+     circuit -> save density matrix at end
+
+    observable_metrics(raw_qiskit, compiled_qiskit, sim_settings):
+        raw_qiskit.save_density_matrix()
+        compiled_qiskit.save_density_matrix()
+
+        # no noise
+        raw ->
+        compiled ->
+          # if exp value
+          statevector from circuit
+          # if HOPF/counts of circuit measurement
+          - first heavy bitstrings, statevector sim of circuit, counts/filter
+          - then statevector sim of circuit, count which are heavy from prior
+        # with noise
+        raw
+        compiled
+          # if exp value
+          Aer sim, density matrix,
+           # if HOPF/counts of circuit measurement
+             - first heavy bitstrings, statevector sim of circuit, counts/filter
+            - then statevector sim of circuit with noise, count which are heavy from prior
+
+
 2. Add documention (the how to's in README)
 ------------------
 8. Import legacy data
@@ -10,3 +37,5 @@
 --- Demo here
 6. Add github actions
 7. Run in parallel with main repo, then switch when ready
+
+

@@ -1,0 +1,72 @@
+# Version of the specification language/format, to manage future changes
+spec_version = "1.0"
+# Version of this particular benchmark suite, to manage any important changes
+suite_version = "0.1"
+# Unique identifier for this benchmark suite
+id = "observable_benchmarks"
+# Human readable description
+description = "Benchmarks to measure impact of compiling on circuit-specific observables for UCC project"
+
+# --------- Compilers ----------
+# The set of compilers to benchmark
+# For now, this is just the compiler id, but this format # could be extended to set settings for each compiler
+[[compilers]]
+id = "ucc"
+[[compilers]]
+id = "pytket-peep"
+[[compilers]]
+id = "qiskit"
+[[compilers]]
+id = "cirq"
+
+# --------- Simulators ----------
+# The set of simulators/noise models available when evaluating observables of
+# the compiled circuits
+[[simulators]]
+id = "default-depolarizing"
+type = "depolarizing"
+single_qubit_error_rate = 0.01
+two_qubit_error_rate = 0.03
+
+# --------- Benchmarks ----------
+# Define the set of individual benchmarks
+
+[[benchmarks]]
+# Unique identifier for this benchmark
+id = "qaoa"
+# Human readable description
+description = "Quantum Approximate Optimization Algorithm of Barabási–Albert graph"
+# Path to the QASM file containing the benchmark (relative to this file)
+qasm_file = "circuits/benchpress/qaoa_barabasi_albert_N10_3reps_basis_rz_rx_ry_cx.qasm"
+# Specify the noise model to use for simulation
+simulate.noise_model.id = "depolarizing"
+simulate.noise_model.single_qubit_error_rate = 0.01
+simulate.noise_model.two_qubit_error_rate = 0.03
+# The observable to measure post simulation
+simulate.observable = "qaoa"
+
+
+[[benchmarks]]
+id = "qv"
+description = "Quantum Volume"
+qasm_file = "circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm"
+
+[[benchmarks]]
+id = "qft"
+description = "Quantum Fourier Transform"
+qasm_file = "circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm"
+
+[[benchmarks]]
+id="square_heisenberg"
+description = "Heisenberg spin model on square lattice"
+qasm_file = "circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm"
+
+[[benchmarks]]
+id="prep_select"
+description = "GHZ state preparation"
+qasm_file = "circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm"
+
+[[benchmarks]]
+id="qcnn"
+description="Quantum Convolutional Neural Network"
+qasm_file="circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm"

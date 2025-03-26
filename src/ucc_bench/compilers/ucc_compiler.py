@@ -3,7 +3,7 @@ from ucc import __version__ as ucc_version
 from ucc import compile
 
 # UCC uses qiskit internally
-## TODO: ucc should expose a circuit type vs. assuming
+## TODO: ucc should expose a circuit type vs. assuming always qiskit?
 from qiskit import QuantumCircuit
 from qbraid import transpile
 
@@ -22,6 +22,7 @@ class UCCCompiler(BaseCompiler[QuantumCircuit]):
         return ucc_version
 
     def qasm_to_native(self, qasm: str) -> QuantumCircuit:
+        # Need to manually specifiy since id != "qiskit"
         return transpile(qasm, "qiskit")
 
     def compile(self, circuit: QuantumCircuit) -> QuantumCircuit:

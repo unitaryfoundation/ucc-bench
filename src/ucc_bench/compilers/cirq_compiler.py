@@ -1,7 +1,6 @@
 from .base_compiler import BaseCompiler
 import cirq
 from typing import List
-from qbraid import transpile
 
 
 class BenchmarkTargetGateset(cirq.TwoQubitCompilationTargetGateset):
@@ -105,9 +104,6 @@ class CirqCompiler(BaseCompiler[cirq.Circuit]):
     @classmethod
     def version(cls) -> str:
         return cirq.__version__
-
-    def qasm_to_native(self, qasm: str) -> cirq.Circuit:
-        return transpile(qasm, "cirq")
 
     def compile(self, circuit: cirq.Circuit) -> cirq.Circuit:
         return cirq.optimize_for_target_gateset(

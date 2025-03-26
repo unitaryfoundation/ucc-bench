@@ -39,12 +39,13 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
     logger.info(f"Begin compiling '{benchmark.qasm_file}'")
 
     start_compile = datetime.now()
-    compiled_circuit = raw_circuit  # compiler.compile(raw_circuit)
+    compiled_circuit = compiler.compile(raw_circuit)
     end_compile = datetime.now()
 
     logger.info(
         f"Finished compiling. Duration: {(end_compile - start_compile).total_seconds()} seconds."
     )
+
     return BenchmarkResult(
         compiler=CompilerInfo(id=compiler.id(), version=compiler.version()),
         benchmark_id=benchmark.id,
