@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from pydantic import Field, model_validator, field_validator
 from typing import List, Optional
 
-from .compilers import is_compiler_registered
+from .compilers import BaseCompiler
 
 
 class CompilerSpec(BaseModel):
@@ -20,7 +20,7 @@ class CompilerSpec(BaseModel):
     @field_validator("id", mode="after")
     @classmethod
     def is_valid_compiler(cls, value: str) -> str:
-        if not is_compiler_registered(value):
+        if not BaseCompiler.is_registered(value):
             raise ValueError(f"Unknown compiler id: {value}")
         return value
 

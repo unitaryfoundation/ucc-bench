@@ -25,6 +25,13 @@
              - first heavy bitstrings, statevector sim of circuit, counts/filter
             - then statevector sim of circuit with noise, count which are heavy from prior
 
+        1. CREATE results type
+        2. Consider whether to use decorator vs ABC for registering -- seems its always single function? Better to keep pattern
+        3. Cleanup HOPF nested functions, its messy
+        4. Add unit tests
+        5. Decide on toml schema and validation
+        6. Add to runner and results
+
 
 2. Add documention (the how to's in README)
 ------------------

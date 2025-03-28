@@ -4,29 +4,45 @@ from qiskit_aer.noise import NoiseModel, depolarizing_error
 from qiskit_aer import AerSimulator
 import numpy as np
 import math
-from typing import Set
+from typing import Set, Tuple
+from abc import ABC, abstractmethod
 
 SINGLE_QUBIT_ERROR_RATE = 0.01
 TWO_QUBIT_ERROR_RATE = 0.03
 
 
-class Observable:
-    def calc_observable(
-        raw_circuit: QuantumCircuit, compiled_circuit: QuantumCircuit, noise_model
-    ) -> float:
+class NoiseModelFactory(ABC):
+    """Abstract base class for noise model factories."""
+
+    _registry = {}
+
+    def __init_subclass__(cls, **kwargs):
+        # When creating subclasses, register them in the registry by id
+        super().__init_subclass__(**kwargs)
+        cls._registry[cls.id()] = cls
+
+    @classmethod
+    def is_registered(cls, name: str) -> bool:
+        return name in cls._registry
+
+    @classmethod
+    def lookup(cls, name: str) -> "NoiseModelFactory":
+        return cls._registry[name]
+
+    @classmethod
+    @abstractmethod
+    def id(cls) -> str:
+        """Return the identifier (name) of the noise model"""
+        pass
+
+    @abstractmethod
+    def create(circuit: QuantumCircuit) -> NoiseModel:
+        """Creates a noise model."""
         pass
 
 
 def get_n_qubit_gateset(circuit: QuantumCircuit, num_qubits: int) -> set[str]:
-    """Extracts the set of gates of size num_qubits from a quantum circuit.
-
-    Args:
-        circuit: Quantum circuit.
-        num_qubits: The size of the gates to get.
-
-    Returns:
-        Set of string names of <num_qubits>-qubit gates.
-    """
+    """Extracts the set of gates of size num_qubits from a quantum circuit."""
     return {
         instr.operation.name
         for instr in circuit.data
@@ -35,117 +51,132 @@ def get_n_qubit_gateset(circuit: QuantumCircuit, num_qubits: int) -> set[str]:
     }
 
 
-def create_depolarizing_noise_model(
-    circuit: QuantumCircuit,
-    single_qubit_error_rate: float = 0.01,
-    two_qubit_error_rate: float = 0.03,
-) -> NoiseModel:
-    """Depolarizing noise model with error rates applied to the single and
-    two-qubit gates of the circuit.
-
-    Args:
-        circuit: Quantum circuit to apply the model to.
-        single_qubit_error_rate: Error rate for a single qubit gate.
-        two_qubit_error_rate: Error rate for a two qubit gate.
-
-    Returns:
-        Depolarizing noise model.
+class DepolarizingNoiseModelFactory(NoiseModelFactory):
+    """Creates a depolarizing noise model for a quantum circuit with specified error rates
+    for single and two qubit gates.
     """
-    single_qubit_gates = get_n_qubit_gateset(circuit, num_qubits=1)
-    two_qubit_gates = get_n_qubit_gateset(circuit, num_qubits=2)
 
-    noise_model = NoiseModel()
-    noise_model.add_all_qubit_quantum_error(
-        depolarizing_error(single_qubit_error_rate, 1),
-        list(single_qubit_gates),
-    )
-    noise_model.add_all_qubit_quantum_error(
-        depolarizing_error(two_qubit_error_rate, 2), list(two_qubit_gates)
-    )
+    def __init__(
+        self,
+        single_qubit_error_rate: float = SINGLE_QUBIT_ERROR_RATE,
+        two_qubit_error_rate: float = TWO_QUBIT_ERROR_RATE,
+    ):
+        self.single_qubit_error_rate = single_qubit_error_rate
+        self.two_qubit_error_rate = two_qubit_error_rate
 
-    return noise_model
+    @classmethod
+    def id(cls) -> str:
+        return "depolarizing"
+
+    def create(self, circuit: QuantumCircuit) -> NoiseModel:
+        """Creates a depolarizing noise model."""
+
+        single_qubit_gates = get_n_qubit_gateset(circuit, num_qubits=1)
+        two_qubit_gates = get_n_qubit_gateset(circuit, num_qubits=2)
+
+        noise_model = NoiseModel()
+        noise_model.add_all_qubit_quantum_error(
+            depolarizing_error(self.single_qubit_error_rate, 1),
+            list(single_qubit_gates),
+        )
+        noise_model.add_all_qubit_quantum_error(
+            depolarizing_error(self.two_qubit_error_rate, 2), list(two_qubit_gates)
+        )
+        return noise_model
 
 
-def simulate_density_matrix(circuit: QuantumCircuit) -> np.ndarray:
-    """Simulates the given quantum circuit using a density matrix simulator
-    with depolarizing noise.
-
-    Args:
-        circuit: The quantum circuit to simulate.
-
-    Returns:
-        The resulting density matrix from the simulation.
-    """
-    depolarizing_noise = create_depolarizing_noise_model(
-        circuit, SINGLE_QUBIT_ERROR_RATE, TWO_QUBIT_ERROR_RATE
-    )
+def simulate_density_matrix_with_noise(
+    circuit: QuantumCircuit, noise_model: NoiseModel
+) -> np.ndarray:
+    """Simulates the given quantum circuit using a density matrix simulator with a specified noise model."""
     simulator = AerSimulator(
         method="density_matrix",
-        noise_model=depolarizing_noise,
+        noise_model=noise_model,
         max_parallel_threads=1,
     )
     return simulator.run(circuit).result().data()["density_matrix"]
 
 
-class ComputationalBasisObservable:
+class Observable(ABC):
+    """Abstract base class for observables."""
+
+    _registry = {}
+
+    def __init_subclass__(cls, **kwargs):
+        # When creating subclasses, register them in the registry by id
+        super().__init_subclass__(**kwargs)
+        cls._registry[cls.id()] = cls
+
+    @classmethod
+    def is_registered(cls, name: str) -> bool:
+        return name in cls._registry
+
+    @classmethod
+    def lookup(cls, name: str) -> "Observable":
+        return cls._registry[name]
+
+    @classmethod
+    @abstractmethod
+    def id(cls) -> str:
+        """Return the identifier (name) of the observable"""
+        pass
+
+    @abstractmethod
     def get_observable(self, num_qubits: int) -> Operator:
-        """
-        Returns the computational basis operator for the given number of qubits.
-        """
-        return Operator.from_label("Z" * num_qubits)
+        pass
 
     def calc_observable(
-        self, uncompiled_circuit: QuantumCircuit, compiled_circuit: QuantumCircuit
-    ) -> float:
+        self,
+        uncompiled_circuit: QuantumCircuit,
+        compiled_circuit: QuantumCircuit,
+        noise_model: NoiseModel,
+    ) -> Tuple[float, float, float, float]:
+        """Calculates the ideal and noisy observables for uncompiled and compiled circuits."""
         # Ensure circuits save density matrices
         uncompiled_circuit.save_density_matrix()
         compiled_circuit.save_density_matrix()
 
         observable = self.get_observable(uncompiled_circuit.num_qubits)
 
-        uncompiled_circuit_state = Statevector.from_instruction(uncompiled_circuit)
-        uncompiled_ideal_observable = np.real(
-            uncompiled_circuit_state.expectation_value(observable)
+        # Ideal observables
+        uncompiled_state = Statevector.from_instruction(uncompiled_circuit)
+        compiled_state = Statevector.from_instruction(compiled_circuit)
+        uncompiled_ideal = np.real(uncompiled_state.expectation_value(observable))
+        compiled_ideal = np.real(compiled_state.expectation_value(observable))
+
+        uncompiled_density_matrix = simulate_density_matrix_with_noise(
+            uncompiled_circuit, noise_model
         )
-
-        compiled_circuit_state = Statevector.from_instruction(compiled_circuit)
-        compiled_ideal_observable = np.real(
-            compiled_circuit_state.expectation_value(observable)
+        compiled_density_matrix = simulate_density_matrix_with_noise(
+            compiled_circuit, noise_model
         )
-
-        # do noise simulations
-        uncompiled_circuit_density_matrix = simulate_density_matrix(uncompiled_circuit)
-        uncompiled_noisy_observable = np.real(
-            uncompiled_circuit_density_matrix.expectation_value(observable)
+        uncompiled_noisy = np.real(
+            uncompiled_density_matrix.expectation_value(observable)
         )
+        compiled_noisy = np.real(compiled_density_matrix.expectation_value(observable))
 
-        compiled_circuit_density_matrix = simulate_density_matrix(compiled_circuit)
-        compiled_noisy_observable = np.real(
-            compiled_circuit_density_matrix.expectation_value(observable)
-        )
-
-        return (
-            uncompiled_ideal_observable,
-            compiled_ideal_observable,
-            uncompiled_noisy_observable,
-            compiled_noisy_observable,
-        )
+        return uncompiled_ideal, compiled_ideal, uncompiled_noisy, compiled_noisy
 
 
-class QaoaObservable:
+class ComputationalBasisObservable(Observable):
+    """Observable for the computational basis."""
+
+    @classmethod
+    def id(cls) -> str:
+        return "computational_basis"
+
     def get_observable(self, num_qubits: int) -> Operator:
-        """Generates the problem Hamiltonian as the observable for the QAOA
-        benchmarking circuits, based on the binary encoding described in
-        Franz G. Fuchs, Herman Øie Kolden, Niels Henrik Aase, and Giorgio
-        Sartor "Efficient encoding of the weighted MAX k-CUT on a quantum computer
-        using QAOA". (2020) arXiv 2009.01095 (https://arxiv.org/abs/2009.01095).
-        The weights of the edges between vertices and of the resulting unitary
-        evolution come from the 10-vertex Barabasi-Albert graph in Fig 4(c)
-        of the paper.
-        """
+        return Operator.from_label("Z" * num_qubits)
 
-        pauli_strings = []
-        # Weights of edges between vertices and of the resulting unitary evolution
+
+class QaoaObservable(Observable):
+    """Observable for QAOA benchmarking circuits."""
+
+    @classmethod
+    def id(cls) -> str:
+        return "qaoa"
+
+    def get_observable(self, num_qubits: int) -> SparsePauliOp:
         weighted_edges = [
             (0, 1, 6.720),
             (0, 2, 3.246),
@@ -172,126 +203,63 @@ class QaoaObservable:
             (7, 9, 4.265),
             (8, 9, 1.690),
         ]
-        for i, j, _ in weighted_edges:
-            # Start with identity string
+        pauli_strings = []
+        coeffs = []
+        for i, j, weight in weighted_edges:
             pauli_string = ["I"] * num_qubits
-            # Place Z operators on the chosen qubits
             pauli_string[i] = "Z"
             pauli_string[j] = "Z"
-            # Convert to PauliSumOp
             pauli_strings.append("".join(pauli_string))
-        coeffs = [weight for _, _, weight in weighted_edges]
-        observable = SparsePauliOp(pauli_strings, coeffs)
-        return observable
-
-        def calc_observable(
-            self, uncompiled_circuit: QuantumCircuit, compiled_circuit: QuantumCircuit
-        ) -> float:
-            # Ensure circuits save density matrices
-            uncompiled_circuit.save_density_matrix()
-            compiled_circuit.save_density_matrix()
-
-            observable = self.get_observable(uncompiled_circuit.num_qubits)
-
-            uncompiled_circuit_state = Statevector.from_instruction(uncompiled_circuit)
-            uncompiled_ideal_observable = np.real(
-                uncompiled_circuit_state.expectation_value(observable)
-            )
-
-            compiled_circuit_state = Statevector.from_instruction(compiled_circuit)
-            compiled_ideal_observable = np.real(
-                compiled_circuit_state.expectation_value(observable)
-            )
-
-            # do noise simulations
-            uncompiled_circuit_density_matrix = simulate_density_matrix(
-                uncompiled_circuit
-            )
-            uncompiled_noisy_observable = np.real(
-                uncompiled_circuit_density_matrix.expectation_value(observable)
-            )
-
-            compiled_circuit_density_matrix = simulate_density_matrix(compiled_circuit)
-            compiled_noisy_observable = np.real(
-                compiled_circuit_density_matrix.expectation_value(observable)
-            )
-
-            return (
-                uncompiled_ideal_observable,
-                compiled_ideal_observable,
-                uncompiled_noisy_observable,
-                compiled_noisy_observable,
-            )
+            coeffs.append(weight)
+        return SparsePauliOp(pauli_strings, coeffs)
 
 
-def get_heavy_bitstrings(circuit: QuantumCircuit) -> Set[str]:
-    """ "Determine the heavy bitstrings of the circuit."""
-    simulator = AerSimulator(method="statevector", max_parallel_threads=1)
-    result = simulator.run(circuit, shots=1024).result()
-    counts = list(result.get_counts().items())
-    median = np.median([c for (_, c) in counts])
-    return set(bitstring for (bitstring, p) in counts if p > median)
+class HOPFObservable(Observable):
+    """Observable for the Heavy Output Probability Fidelity (HOPF)."""
 
+    @classmethod
+    def id(cls) -> str:
+        return "hopf"
 
-def estimate_heavy_output_prob(circuit: QuantumCircuit, noisy: bool = True) -> float:
-    """Sample the heavy bitstrings on the backend and estimate the heavy output
-    probability from the counts of the heavy bitstrings.
-
-    Args:
-        circuit: The circuit for which to compute the heavy output metric.
-        qv_1q_err: The single qubit error rate for the backend noise model.
-        qv_2q_err: The two-qubit error rate for the backend noise model.
-
-    Returns:
-        The heavy output probability as a float.
-    """
-    heavy_bitstrings = get_heavy_bitstrings(circuit)
-
-    if noisy:
-        simulator = AerSimulator(
-            method="statevector",
-            noise_model=create_depolarizing_noise_model(
-                circuit, SINGLE_QUBIT_ERROR_RATE, TWO_QUBIT_ERROR_RATE
-            ),
-            max_parallel_threads=1,
-        )
-    else:
-        simulator = AerSimulator(method="statevector", max_parallel_threads=1)
-    result = simulator.run(circuit).result()
-
-    heavy_counts = sum(
-        result.get_counts().get(bitstring, 0) for bitstring in heavy_bitstrings
-    )
-    nshots = 1024
-    hop = (
-        heavy_counts - 2 * math.sqrt(heavy_counts * (nshots - heavy_counts))
-    ) / nshots
-    return hop
-
-
-class HOPFObservable:
+    # Because this is not an expectation value calculation, we cannot leverage the
+    # common base class implementation
     def calc_observable(
-        self, uncompiled_circuit: QuantumCircuit, compiled_circuit: QuantumCircuit
-    ) -> float:
-        # Ensure circuits save density matrices
-        uncompiled_circuit.save_density_matrix()
-        compiled_circuit.save_density_matrix()
+        self,
+        uncompiled_circuit: QuantumCircuit,
+        compiled_circuit: QuantumCircuit,
+        noise_model: NoiseModel = None,
+    ) -> Tuple[float, float, float, float]:
+        def estimate_heavy_output_prob(
+            circuit: QuantumCircuit, noise_model: NoiseModel
+        ) -> float:
+            heavy_bitstrings = self.get_heavy_bitstrings(circuit)
+            simulator = AerSimulator(
+                method="statevector",
+                noise_model=noise_model,
+                max_parallel_threads=1,
+            )
+            result = simulator.run(circuit).result()
+            heavy_counts = sum(
+                result.get_counts().get(bitstring, 0) for bitstring in heavy_bitstrings
+            )
+            nshots = 1024
+            return (
+                heavy_counts - 2 * math.sqrt(heavy_counts * (nshots - heavy_counts))
+            ) / nshots
 
         uncompiled_circuit.measure_all()
         compiled_circuit.measure_all()
 
-        uncompiled_ideal_observable = estimate_heavy_output_prob(
-            uncompiled_circuit, False
-        )
-        compiled_ideal_observable = estimate_heavy_output_prob(compiled_circuit, False)
-        uncompiled_noisy_observable = estimate_heavy_output_prob(
-            uncompiled_circuit, True
-        )
-        compiled_noisy_observable = estimate_heavy_output_prob(compiled_circuit, True)
+        uncompiled_ideal = estimate_heavy_output_prob(uncompiled_circuit, None)
+        compiled_ideal = estimate_heavy_output_prob(compiled_circuit, None)
+        uncompiled_noisy = estimate_heavy_output_prob(uncompiled_circuit, noise_model)
+        compiled_noisy = estimate_heavy_output_prob(compiled_circuit, noise_model)
 
-        return (
-            uncompiled_ideal_observable,
-            compiled_ideal_observable,
-            uncompiled_noisy_observable,
-            compiled_noisy_observable,
-        )
+        return uncompiled_ideal, compiled_ideal, uncompiled_noisy, compiled_noisy
+
+    def get_heavy_bitstrings(self, circuit: QuantumCircuit) -> Set[str]:
+        simulator = AerSimulator(method="statevector", max_parallel_threads=1)
+        result = simulator.run(circuit, shots=1024).result()
+        counts = list(result.get_counts().items())
+        median = np.median([c for (_, c) in counts])
+        return set(bitstring for (bitstring, p) in counts if p > median)

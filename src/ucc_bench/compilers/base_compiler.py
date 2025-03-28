@@ -2,10 +2,6 @@ from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 from qbraid import transpile
 
-# A registry of all available compilers for benchmarking, maps from
-# the compiler id to the class for that compiler
-_compiler_registry = {}
-
 # Define a generic type variable for a circuit, that concrete implementations
 # will define for each library type
 CircuitType = TypeVar("CircuitType")
@@ -13,18 +9,24 @@ CircuitType = TypeVar("CircuitType")
 
 class BaseCompiler(ABC, Generic[CircuitType]):
     """
-    Abstract base class representing a compiler for use in benchmaking.
-    In order for a compiler to be used in the benchmarking framework, it must
-    implement this interface.
-
-    The CircuitType type variable is used to specify the type of the circuit
-    object that the compiler will be working with.
+    Abstract base class representing a compiler for use in benchmarking.
     """
 
+    # Class-level registry for compiler subclasses
+    _registry = {}
+
     def __init_subclass__(cls, **kwargs):
-        # When implementing this class, register it in the compiler registry
+        # When creating subclasses, register them in the registry by id
         super().__init_subclass__(**kwargs)
-        _compiler_registry[cls.id()] = cls
+        cls._registry[cls.id()] = cls
+
+    @classmethod
+    def is_registered(cls, name: str) -> bool:
+        return name in cls._registry
+
+    @classmethod
+    def lookup(cls, name: str) -> "BaseCompiler":
+        return cls._registry[name]
 
     @classmethod
     @abstractmethod
@@ -51,13 +53,3 @@ class BaseCompiler(ABC, Generic[CircuitType]):
     def count_multi_qubit_gates(self, circuit: CircuitType) -> int:
         """Count the number of multi-qubit gates in the circuit"""
         pass
-
-
-def is_compiler_registered(name: str) -> bool:
-    # Check if a compiler is registered by name
-    return name in _compiler_registry
-
-
-def lookup_compiler(name: str) -> BaseCompiler:
-    # Lookup compiler by name in the registry
-    return _compiler_registry[name]

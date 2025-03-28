@@ -4,7 +4,7 @@ import logging
 from logging import LoggerAdapter
 from concurrent.futures import ProcessPoolExecutor
 from .suite import BenchmarkSuite, BenchmarkSpec
-from .compilers import lookup_compiler, BaseCompiler
+from .compilers import BaseCompiler
 from .results import BenchmarkResult, CompilerInfo, CompilationMetrics
 
 
@@ -89,7 +89,7 @@ def run_suite(
         for compiler in suite.compilers:
             if only_compiler and compiler.id != only_compiler:
                 continue
-            compiler_cls = lookup_compiler(compiler.id)
+            compiler_cls = BaseCompiler.lookup(compiler.id)
             for benchmark in suite.benchmarks:
                 if only_benchmark and benchmark.id != only_benchmark:
                     continue
