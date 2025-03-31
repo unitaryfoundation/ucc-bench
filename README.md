@@ -150,6 +150,39 @@ def calculate_my_metric(
 
 You can now use ```"my-metric-id"``` as the measurement value in the `[benchmarks.simulate]` section of your TOML file.
 
+#### Modifying an official benchmark
+TODO - Comment on when the version should change and other updates to consider
+
+#### Delete official results
+TODO -- Comment on when to delete official results/what to do
+
+#### Upgrading compiler version (non-UCC)
+TODO -- How to upgrade the version of a non-ucc compiler; although should benefit from dependabot
+
+## Standard UCC benchmark results
+
+This repository also houses the standard results for UCC development. These are stored in
+the top-level `results` directory and are run on a dedicated GitHub runner for consistency
+between runs. The `ucc-bench` application generally stores benchmark results as JSON files in path `{out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.json`.
+
+For these standard results, we follow the following convention:
+
+* `out_dir` is `results` (this directory)
+* `runner_name` is `ucc-benchmarks-8-core-U22.0`, the name of the GitHub runner used
+* `benchmark_suite` is the benchmark suite id in the corresponding TOML file. Today this is either `timing_benchmarks` or `observable_benchmarks`
+* The `uid` is the git hash of the `ucc-bench` repository reflecting the set of configurations when the benchmark was run. `uid_date` is the date for that git hash.
+
+Thus the main subtetly here is using the git hash of `ucc-bench`. This was chosen so that we can always identify the exact configuration used in that run.
+This includes the version of `ucc-bench` code, the version of the dependencies as reflected in `uv.lock`, the specific circuits and benchmark versions. Although we could identify versions in each directly, the git hash is a nice way to boil it all down to one identifier.
+
+In order to benchmark pre-release versions of `ucc`, we will install it directly from git, versus via PyPI (as those versions are not published yet). This is done via
+
+```bash
+uv add git+https://github.com/unitaryfoundation/ucc@<rev_hash>
+```
+
+See the [`uv` docs](https://docs.astral.sh/uv/concepts/projects/dependencies/#git) for more details, and the workflows section below for how these are managed in practice. The upshot of this is that we can track pre-release `ucc` just like any other library dependency.
+
 ## Architecture
 * `main.py`: Handles command-line argument parsing, logging setup, loading the suite specification, initiating the run, and saving results.
 * `runner.py`: Orchestrates the execution of benchmark tasks using concurrent.futures.ProcessPoolExecutor for parallelism. It calls run_task for each compiler/benchmark combination. run_task performs transpilation, compilation, optional simulation, and gathers results.
