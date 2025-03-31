@@ -43,7 +43,7 @@
 +5. Example how to run locally for debug/comparing
 ----------
 4. Example, how to delete results
-6. Example how to add/update a benchmark
+6. Updating a benchmark
     When to change the version?
 7. How to update compiler versions
 ----------
@@ -67,3 +67,29 @@
 7. Run in parallel with main repo, then switch when ready
 
 
+
+------- work out versionion and hash ------------
+
+benchmark results -> per set of compilers
+  hash of ucc-bench PR => set of compilers
+
+So at any point in time, ucc-bench is pointing to specific hash/tag release for UCC dependency
+1. When merge to main in UCC -> downstream kicks-off PR to update benchmark results to hash of that version, auto-commits results
+2. When open a PR in UCC -> nothing is commited back, but downstream runs comparision, assumes ancestor hash is in ucc-bench results history
+   Does diff -> how to look up ancestor hash?
+3. When open a PR in ucc-bench, e.g. upgrade another compiler version -> opens PR (for review) that includes benchmark changes
+
+What is ordering for plots over time
+  date
+What is most recent/latest?
+
+any other change to benchmarks (adding circuit, output) is a new version/set of results
+
+
+ucc-bench <> not ok to fail
+hash (commit on main)-> compiler versions, benchmark configs, etc.
+ -> properly time-ordered, can do by time
+
+ucc PR <> ok if fails
+only have ucc hash/versions, how do I lookup my ancestor PR
+  -> secondary index? ucc version hash -> version of ucc-bench with those results
