@@ -1,12 +1,165 @@
-TODO:
-1. Add code in order.
-2. Example, how to add a compiler
-3. Example, how to remove a compiler
-4. Example, how to delete results
-5. Example how to run locally for debug/comparing
-6. Example how to add/update a benchmark
-    When to change the version?
-7. How to update compiler versions
-8. How to add an expectation value observable
-9. How to add a metric observable
-10. How to add a noise model
+# UCC Bench: Quantum Compiler Benchmarking Suite
+
+## Overview
+
+`ucc-bench` is a command-line utility designed to benchmark and compare the performance of various quantum compilers, with a particular focus on the [`ucc` compiler](https://github.com/unitaryfoundation/ucc). It allows users to define benchmark suites consisting of quantum circuits (provided as QASM files) and run them against a configurable set of compilers (e.g., UCC, Qiskit, Cirq, PyTket).
+
+The suite measures key performance indicators such as compilation time and the number of multi-qubit gates in the compiled circuits. Optionally, it can simulate the circuits (both original and compiled versions) under idealized and noisy conditions (using a depolarizing noise model) to evaluate the impact of compilation on execution fidelity.
+
+Results, including system metadata, runner information, compilation metrics, and simulation metrics, are saved in a structured JSON format for easy analysis and comparison across different runs or machines.
+
+This repository houses both the code to run the benchmarks, the specification files for the official benchmarks, and the results for official benchmarks.
+
+## Installation/Development
+
+At this time, `ucc-bench` is not published as a python package. Instead, users interested
+should clone this repository, and setup an environment using `uv` to develop via
+
+```bash
+$ uv sync
+```
+
+See the [`uv` docs](https://docs.astral.sh/uv/) for information on installing `uv`.
+
+## Usage (Running a benchmark suite)
+
+Benchmarks are defined as a TOML file. The top-level `benchmarks` directory contains
+benchmark specifications.
+
+Benchmark suites are run using the `ucc-bench` utility (which is an entry to `ucc_bench.main:main`). To
+see invocation options, you can run the command below
+
+```bash
+$ uv run ucc-bench -h
+```
+
+Official tests are run on dedicated hardware via GitHub actions.
+
+To run the benchmarks locally
+
+```bash
+$ uv run ucc-bench <path_to/specification.toml>
+```
+
+which by default will generate the results to the `.local_results` directory and parallelize using the number
+of cores available on your machine.
+
+To run a specific benchmark or a specific compiler only (useful for debugging), run
+
+```bash
+$ uv run ucc-bench <path_to/specification.toml> --only_compiler <compiler_id> --only_benchmark <benchmark_id>
+```
+
+By default, the results are stored as JSON files in path `{out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.json`.
+
+Here, if not specified as a command line argument, `uid` is randomly generated UUID and `uid_date` is the current date.
+
+When run as a GitHub action for official results, we expect this to be the Git hash of the and Git hash date of the corresponding
+commit.
+
+### Common Workflows
+
+#### Adding a New Compiler
+To make a new compiler available for benchmarking:
+1. Run `uv add <package>` to add the corresponding package to the environment
+2. Create a new file in `ucc_bench/compilers/`, e.g., `my_compiler.py`.
+3. Implement a class that inherits from `ucc_bench.compilers.BaseCompiler` and implement
+the necesssary abstract methods, and register the compiler using the decorator:
+
+```python
+from ..registry import register
+from .base_compiler import BaseCompiler
+# Import packages
+# YourCircuitType = CircuitType
+
+@register.compiler("my-compiler-id")
+class MyCompiler(BaseCompiler[YourCircuitType]):
+    @classmethod
+    def version(cls) -> str:
+        # Return compiler version
+        pass
+
+    def qasm_to_native(self, qasm: str) -> YourCircuitType:
+        # Convert QASM string to your native circuit type
+        # (Often using qbraid.transpile)
+        pass
+
+    def compile(self, circuit: YourCircuitType) -> YourCircuitType:
+        # Implement the compilation logic
+        pass
+
+    def count_multi_qubit_gates(self, circuit: YourCircuitType) -> int:
+        # Count multi-qubit gates in your circuit type
+        pass
+```
+
+You can now use ```"my-compiler-id"``` in your TOML suite specification.
+
+#### Adding a New Observable
+Observables can be used to calculate some expectaiton value on a circuit before/after compilation,
+and optionally under the presence of noise. Observables are implemented as functions that return an Operator based on
+the number of qubits in the circuit. To add a new observable:
+
+1. Define a function that takes the number of qubits and returns a `qiskit.quantum_info.Operator`.
+2. Register it using the `@register.observable` decorator in a suitable module (e.g., `ucc_bench/simulation/observables.py` or a new file imported there).
+
+```python
+from ..registry import register
+from qiskit.quantum_info import Operator
+
+@register.observable("my-observable-id")
+def create_my_observable(num_qubits: int) -> Operator:
+    # Logic to create the Qiskit Operator
+    pass
+```
+You can now use ```"my-observable-id"``` as the measurement value in the `[benchmarks.simulate]` section of your TOML file.
+
+#### Adding a New Output Metric
+
+Output metrics are more general measures you can calculate on a circuit after compilation and simulation. They take in the raw circuits and noise model,
+and are responsible for calculating the corresponding simulation metrics. To add a new output metric:
+
+1. Define a function that takes the uncompiled `Qiskit` circuit, compiled `Qiskit` circuit, and the noise model, and returns a `SimulationMetrics` object.
+2. Register it using the `@register.output_metric` decorator in a suitable module (e.g., a new file imported in `ucc_bench/simulation/__init__.py`).
+
+```python
+from ..registry import register
+from ..results import SimulationMetrics
+from qiskit import QuantumCircuit
+from qiskit_aer.noise import NoiseModel
+
+@register.output_metric("my-metric-id")
+def calculate_my_metric(
+    uncompiled_circuit: QuantumCircuit,
+    compiled_circuit: QuantumCircuit,
+    noise_model: NoiseModel,
+) -> SimulationMetrics:
+    # Logic to calculate ideal/noisy values for both circuits
+    uncompiled_ideal_val = ...
+    compiled_ideal_val = ...
+    uncompiled_noisy_val = ...
+    compiled_noisy_val = ...
+
+    return SimulationMetrics(
+        uncompiled_ideal=uncompiled_ideal_val,
+        compiled_ideal=compiled_ideal_val,
+        uncompiled_noisy=uncompiled_noisy_val,
+        compiled_noisy=compiled_noisy_val,
+    )
+```
+
+You can now use ```"my-metric-id"``` as the measurement value in the `[benchmarks.simulate]` section of your TOML file.
+
+## Architecture
+* `main.py`: Handles command-line argument parsing, logging setup, loading the suite specification, initiating the run, and saving results.
+* `runner.py`: Orchestrates the execution of benchmark tasks using concurrent.futures.ProcessPoolExecutor for parallelism. It calls run_task for each compiler/benchmark combination. run_task performs transpilation, compilation, optional simulation, and gathers results.
+suite.py: Defines Pydantic models (BenchmarkSuite, BenchmarkSpec, CompilerSpec, SimulationSpec) for parsing and validating the TOML configuration file. Handles path resolution for QASM files.
+* `results.py`: Defines Pydantic models for structuring the output results (SuiteResults, BenchmarkResult, Metadata, CompilationMetrics, SimulationMetrics, etc.) and includes the save_results function.
+* `registry.py`: Implements the Registry class and register instance. Provides decorators (@register.compiler, @register.observable, @register.output_metric) to dynamically register new components.
+* `compilers/`: Contains modules for specific compiler implementations.
+* * `base_compiler.py`: Defines the abstract BaseCompiler class interface.
+* * `_compiler.py`: Concrete implementations for Qiskit, Cirq, PyTket, and UCC, inheriting from BaseCompiler and registered using the decorator.
+* `simulation/`: Contains modules related to circuit simulation.
+* * `noise_models.py`: Defines functions to create noise models (currently a standard depolarizing model).
+* * `observables.py`: Provides functions to calculate expectation values and includes implementations of registered observables (computational_basis, qaoa).
+* * `heavy_output_prob.py`: Implements the Heavy Output Probability metric as a registered output metric.

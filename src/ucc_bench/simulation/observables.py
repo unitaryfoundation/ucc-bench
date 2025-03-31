@@ -24,7 +24,7 @@ from ..results import SimulationMetrics
 
 def simulate_density_matrix_with_noise(
     circuit: QuantumCircuit, noise_model: NoiseModel
-) -> np.ndarray:
+):
     """Simulates the given quantum circuit using a density matrix simulator with a specified noise model."""
     simulator = AerSimulator(
         method="density_matrix",

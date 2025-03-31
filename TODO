@@ -34,14 +34,35 @@
 
 
 2. Add documention (the how to's in README)
+
+
+
++2. Example, how to add a compiler
++8. How to add an expectation value observable
++9. How to add a metric observable
++5. Example how to run locally for debug/comparing
+----------
+4. Example, how to delete results
+6. Example how to add/update a benchmark
+    When to change the version?
+7. How to update compiler versions
+----------
+
 ------------------
 8. Import legacy data
 -----------------
-3. Add reporter that converts to flat view of performance
 4. Add plotter helpers
-5. Add PR helper
+
+5. Add PR helper -> do not persist results
+   Two types of PRs
+    PR in ucc-bench repo (updating something about benchmark code)
+      run benchmarks on changest in PR and compare to results for prior commit
+    PR in ucc repo (updating something about UCC)
+      create a version of this repo that uses pre-release version of UCC (specific hash)
+      do the same as above
 
 --- Demo here
+3. Add reporter that converts to flat view of performance
 6. Add github actions
 7. Run in parallel with main repo, then switch when ready
 
