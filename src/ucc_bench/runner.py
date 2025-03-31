@@ -6,6 +6,10 @@ from concurrent.futures import ProcessPoolExecutor
 from .suite import BenchmarkSuite, BenchmarkSpec
 from .compilers import BaseCompiler
 from .results import BenchmarkResult, CompilerInfo, CompilationMetrics
+from .registry import register
+from .simulation.observables import calc_expectation_value
+from .simulation.noise_models import create_depolarizing_noise_model
+from qbraid import transpile
 
 
 def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResult:
@@ -46,6 +50,41 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
         f"Finished compiling. Duration: {(end_compile - start_compile).total_seconds()} seconds."
     )
 
+    simulation_metrics = None
+    if benchmark.simulate:
+        logger.info(f"Running simulation '{benchmark.simulate}'")
+
+        # convert to qiskit form for simulation
+        raw_circuit_qiskit = transpile(raw_circuit, "qiskit")
+        compiled_circuit_qiskit = transpile(compiled_circuit, "qiskit")
+
+        # Use the single/standard depolarizing noise model for now
+        noise_model = create_depolarizing_noise_model(
+            raw_circuit_qiskit, compiled_circuit_qiskit
+        )
+
+        if register.has_observable(benchmark.simulate.measurement):
+            observable = register.get_observable(benchmark.simulate.measurement)
+            simulation_metrics = calc_expectation_value(
+                observable(raw_circuit_qiskit.num_qubits),
+                raw_circuit_qiskit,
+                compiled_circuit_qiskit,
+                noise_model,
+            )
+            simulation_metrics.measurement_id = observable._id
+        elif register.has_output_metric(benchmark.simulate.measurement):
+            output_metric = register.get_output_metric(benchmark.simulate.measurement)
+            simulation_metrics = output_metric(
+                raw_circuit_qiskit,
+                compiled_circuit_qiskit,
+                noise_model,
+            )
+            simulation_metrics.measurement_id = output_metric._id
+        else:
+            raise ValueError(
+                f"Unknown measurement '{benchmark.simulate.measurement}' for benchmark '{benchmark.id}'"
+            )
+
     return BenchmarkResult(
         compiler=CompilerInfo(id=compiler.id(), version=compiler.version()),
         benchmark_id=benchmark.id,
@@ -56,6 +95,7 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
             raw_multiq_gates=compiler.count_multi_qubit_gates(raw_circuit),
             compiled_multiq_gates=compiler.count_multi_qubit_gates(compiled_circuit),
         ),
+        simulation_metrics=simulation_metrics,
     )
 
 
@@ -89,7 +129,7 @@ def run_suite(
         for compiler in suite.compilers:
             if only_compiler and compiler.id != only_compiler:
                 continue
-            compiler_cls = BaseCompiler.lookup(compiler.id)
+            compiler_cls = register.get_compiler(compiler.id)
             for benchmark in suite.benchmarks:
                 if only_benchmark and benchmark.id != only_benchmark:
                     continue

@@ -1,0 +1,48 @@
+from qiskit import QuantumCircuit
+from ucc_bench.simulation.noise_models import get_n_qubit_gateset
+
+
+def test_get_n_qubit_gateset_single_qubit_gates():
+    circuit = QuantumCircuit(1)
+    circuit.h(0)  # Add a single-qubit gate (Hadamard)
+    circuit.x(0)  # Add another single-qubit gate (Pauli-X)
+
+    result = get_n_qubit_gateset(circuit, num_qubits=1)
+    assert result == {"h", "x"}, "Should return single-qubit gate names"
+
+
+def test_get_n_qubit_gateset_two_qubit_gates():
+    circuit = QuantumCircuit(2)
+    circuit.cx(0, 1)  # Add a two-qubit gate (CNOT)
+    circuit.cz(0, 1)  # Add another two-qubit gate (CZ)
+
+    result = get_n_qubit_gateset(circuit, num_qubits=2)
+    assert result == {"cx", "cz"}, "Should return two-qubit gate names"
+
+
+def test_get_n_qubit_gateset_mixed_gates():
+    circuit = QuantumCircuit(2)
+    circuit.h(0)  # Single-qubit gate
+    circuit.cx(0, 1)  # Two-qubit gate
+
+    single_qubit_result = get_n_qubit_gateset(circuit, num_qubits=1)
+    two_qubit_result = get_n_qubit_gateset(circuit, num_qubits=2)
+
+    assert single_qubit_result == {"h"}, "Should return only single-qubit gate names"
+    assert two_qubit_result == {"cx"}, "Should return only two-qubit gate names"
+
+
+def test_get_n_qubit_gateset_no_gates():
+    circuit = QuantumCircuit(1)  # Empty circuit
+
+    result = get_n_qubit_gateset(circuit, num_qubits=1)
+    assert result == set(), "Should return an empty set for no gates"
+
+
+def test_get_n_qubit_gateset_ignores_measurements():
+    circuit = QuantumCircuit(1)
+    circuit.h(0)  # Single-qubit gate
+    circuit.measure_all()  # Add measurement
+
+    result = get_n_qubit_gateset(circuit, num_qubits=1)
+    assert result == {"h"}, "Should ignore measurement operations"

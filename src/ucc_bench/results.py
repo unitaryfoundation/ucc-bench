@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 from pathlib import Path
 from .suite import BenchmarkSuite
@@ -51,12 +51,21 @@ class CompilationMetrics(BaseModel):
     compiled_multiq_gates: int
 
 
+class SimulationMetrics(BaseModel):
+    measurement_id: Optional[str] = None
+    uncompiled_ideal: float
+    compiled_ideal: float
+    uncompiled_noisy: float
+    compiled_noisy: float
+
+
 class BenchmarkResult(BaseModel):
     compiler: CompilerInfo
     benchmark_id: str
     run_start: datetime
     run_end: datetime
     compilation_metrics: CompilationMetrics
+    simulation_metrics: Optional[SimulationMetrics] = None
 
 
 class SuiteResults(BaseModel):

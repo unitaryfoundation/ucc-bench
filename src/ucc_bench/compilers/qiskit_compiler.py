@@ -4,18 +4,16 @@ from qiskit import (
     transpile as qiskit_transpile,
     __version__ as qiskit_version,
 )
+from ..registry import register
 
 
+@register.compiler("qiskit")
 class QiskitCompiler(BaseCompiler[QuantumCircuit]):
     """
     Wrapper for benchmarking qiskit compiler.
 
     Uses optimization_level 3 and compiles to the RX,RY,RZ,H,CX basis gates.
     """
-
-    @classmethod
-    def id(cls) -> str:
-        return "qiskit"
 
     @classmethod
     def version(cls) -> str:

@@ -13,6 +13,7 @@ dependencies = [
     "pydantic>=2.10.6",
     "pytket>=2.0.1",
     "qbraid>=0.9.4",
+    "qiskit-aer>=0.17.0",
     "qiskit>=1.4.2",
     "ucc>=0.4.3",
 ]
@@ -23,6 +24,7 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "mypy>=1.15.0",
     "pytest>=8.3.5",
 ]
 [project.scripts]

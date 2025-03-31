@@ -12,26 +12,11 @@ class BaseCompiler(ABC, Generic[CircuitType]):
     Abstract base class representing a compiler for use in benchmarking.
     """
 
-    # Class-level registry for compiler subclasses
-    _registry = {}
-
-    def __init_subclass__(cls, **kwargs):
-        # When creating subclasses, register them in the registry by id
-        super().__init_subclass__(**kwargs)
-        cls._registry[cls.id()] = cls
-
-    @classmethod
-    def is_registered(cls, name: str) -> bool:
-        return name in cls._registry
-
-    @classmethod
-    def lookup(cls, name: str) -> "BaseCompiler":
-        return cls._registry[name]
-
     @classmethod
     @abstractmethod
     def id(cls) -> str:
-        """Return the identifier (name) of the compiler"""
+        """Return the id of the compiler; this will automatically be implemented
+        if the class is registered using the @registry.compiler method"""
         pass
 
     @classmethod
@@ -40,6 +25,7 @@ class BaseCompiler(ABC, Generic[CircuitType]):
         """Return the version of the compiler"""
         pass
 
+    @abstractmethod
     def qasm_to_native(self, qasm: str) -> CircuitType:
         """Convert a QASM string to the native circuit type of this compiler"""
         return transpile(qasm, self.id())

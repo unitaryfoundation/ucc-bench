@@ -9,18 +9,16 @@ from pytket.predicates import CompilationUnit
 from pytket.circuit import OpType
 from pytket import Circuit as PytketCircuit
 from qbraid import transpile
+from ..registry import register
 
 
+@register.compiler("pytket-peep")
 class PytketPeepCompiler(BaseCompiler[PytketCircuit]):
     """
     Wrapper for benchmarking pytket compiler.
 
     Uses FullPeepholeOptimise and AutoRebase for compilation.
     """
-
-    @classmethod
-    def id(cls) -> str:
-        return "pytket-peep"
 
     @classmethod
     def version(cls) -> str:

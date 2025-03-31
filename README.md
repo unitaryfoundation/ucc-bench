@@ -7,3 +7,6 @@ TODO:
 6. Example how to add/update a benchmark
     When to change the version?
 7. How to update compiler versions
+8. How to add an expectation value observable
+9. How to add a metric observable
+10. How to add a noise model

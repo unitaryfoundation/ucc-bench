@@ -6,16 +6,14 @@ from ucc import compile
 ## TODO: ucc should expose a circuit type vs. assuming always qiskit?
 from qiskit import QuantumCircuit
 from qbraid import transpile
+from ..registry import register
 
 
+@register.compiler("ucc")
 class UCCCompiler(BaseCompiler[QuantumCircuit]):
     """
     Wrapper for benchmarking ucc compiler.
     """
-
-    @classmethod
-    def id(cls) -> str:
-        return "ucc"
 
     @classmethod
     def version(cls) -> str:

@@ -19,17 +19,14 @@ id = "qiskit"
 [[compilers]]
 id = "cirq"
 
-# --------- Simulators ----------
-# The set of simulators/noise models available when evaluating observables of
-# the compiled circuits
-[[simulators]]
-id = "default-depolarizing"
-type = "depolarizing"
-single_qubit_error_rate = 0.01
-two_qubit_error_rate = 0.03
-
 # --------- Benchmarks ----------
 # Define the set of individual benchmarks
+# This benchmarks add a simulation stage to calculate some observable or metric
+# on the pre-post compiled circuits with and without noise to see the impact of the
+# compiler on performance.
+# For now, we use a common depolarizing noise model that is defined entirely in the code.
+# In the future, we could expand to make the noise model, or its parameters, configurable
+# as well.
 
 [[benchmarks]]
 # Unique identifier for this benchmark
@@ -38,35 +35,36 @@ id = "qaoa"
 description = "Quantum Approximate Optimization Algorithm of Barabási–Albert graph"
 # Path to the QASM file containing the benchmark (relative to this file)
 qasm_file = "circuits/benchpress/qaoa_barabasi_albert_N10_3reps_basis_rz_rx_ry_cx.qasm"
-# Specify the noise model to use for simulation
-simulate.noise_model.id = "depolarizing"
-simulate.noise_model.single_qubit_error_rate = 0.01
-simulate.noise_model.two_qubit_error_rate = 0.03
 # The observable to measure post simulation
-simulate.observable = "qaoa"
+simulate.measurement = "qaoa"
 
 
 [[benchmarks]]
 id = "qv"
 description = "Quantum Volume"
-qasm_file = "circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm"
+qasm_file = "circuits/benchpress/qv_N010_12345_basis_rz_rx_ry_cx.qasm"
+simulate.measurement = "heavy_output"
 
 [[benchmarks]]
 id = "qft"
 description = "Quantum Fourier Transform"
-qasm_file = "circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm"
+qasm_file = "circuits/benchpress/qft_N010_basis_rz_rx_ry_cx.qasm"
+simulate.measurement = "computational_basis"
 
 [[benchmarks]]
 id="square_heisenberg"
 description = "Heisenberg spin model on square lattice"
-qasm_file = "circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm"
+qasm_file = "circuits/benchpress/square_heisenberg_N9_basis_rz_rx_ry_cx.qasm"
+simulate.measurement = "computational_basis"
 
 [[benchmarks]]
 id="prep_select"
 description = "GHZ state preparation"
-qasm_file = "circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm"
+qasm_file = "circuits/ucc/prep_select_N10_ghz_basis_rz_rx_ry_h_cx.qasm"
+simulate.measurement = "computational_basis"
 
 [[benchmarks]]
 id="qcnn"
 description="Quantum Convolutional Neural Network"
-qasm_file="circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm"
+qasm_file="circuits/ucc/qcnn_N10_4layers_basis_rz_rx_ry_h_cx.qasm"
+simulate.measurement = "computational_basis"

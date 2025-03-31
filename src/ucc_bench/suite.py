@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from pydantic import Field, model_validator, field_validator
 from typing import List, Optional
 
-from .compilers import BaseCompiler
+from .registry import register
 
 
 class CompilerSpec(BaseModel):
@@ -20,8 +20,19 @@ class CompilerSpec(BaseModel):
     @field_validator("id", mode="after")
     @classmethod
     def is_valid_compiler(cls, value: str) -> str:
-        if not BaseCompiler.is_registered(value):
+        if not register.has_compiler(value):
             raise ValueError(f"Unknown compiler id: {value}")
+        return value
+
+
+class SimulationSpec(BaseModel):
+    measurement: str
+
+    @field_validator("measurement", mode="after")
+    @classmethod
+    def is_valid_measurement(cls, value: str) -> str:
+        if not register.has_observable(value) and not register.has_output_metric(value):
+            raise ValueError(f"Unknown measurement id: {value}")
         return value
 
 
@@ -39,6 +50,7 @@ class BenchmarkSpec(BaseModel):
     description: str
     qasm_file: Path
     resolved_qasm_file: Optional[Path] = None
+    simulate: Optional[SimulationSpec] = None
 
 
 class BenchmarkSuite(BaseModel):

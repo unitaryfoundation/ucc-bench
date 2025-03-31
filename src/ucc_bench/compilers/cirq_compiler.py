@@ -1,6 +1,7 @@
 from .base_compiler import BaseCompiler
 import cirq
 from typing import List
+from ..registry import register
 
 
 class BenchmarkTargetGateset(cirq.TwoQubitCompilationTargetGateset):
@@ -90,16 +91,13 @@ class BenchmarkTargetGateset(cirq.TwoQubitCompilationTargetGateset):
         return "BenchmarkTargetGateset()"
 
 
+@register.compiler("cirq")
 class CirqCompiler(BaseCompiler[cirq.Circuit]):
     """
     Wrapper for benchmarking cirq compiler.
 
     Uses the above BenchmarkTargetGateset for compilation.
     """
-
-    @classmethod
-    def id(cls) -> str:
-        return "cirq"
 
     @classmethod
     def version(cls) -> str:
