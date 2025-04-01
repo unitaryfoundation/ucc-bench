@@ -8,12 +8,12 @@ The suite measures key performance indicators such as compilation time and the n
 
 Results, including system metadata, runner information, compilation metrics, and simulation metrics, are saved in a structured JSON format for easy analysis and comparison across different runs or machines.
 
-This repository houses both the code to run the benchmarks, the specification files for the official benchmarks, and the results for official benchmarks.
+This repository houses both the code to run the benchmarks, the specification files for the official benchmarks, and the results for official benchmarks. However to be clear, this repo is a companion to the main `ucc` [repository](https://github.com/unitaryfoundation/ucc). That repository is where all ongoing `ucc` work occurs.
 
-## Installation/Development
+## Running or Development
 
-At this time, `ucc-bench` is not published as a python package. Instead, users interested
-should clone this repository, and setup an environment using `uv` to develop via
+At this time, `ucc-bench` is not published as a python package as it is very specific to the `ucc` project,
+Instead, users interested should clone this repository, and setup an environment using `uv` to run or develop via
 
 ```bash
 $ uv sync
@@ -32,8 +32,6 @@ see invocation options, you can run the command below
 ```bash
 $ uv run ucc-bench -h
 ```
-
-Official tests are run on dedicated hardware via GitHub actions.
 
 To run the benchmarks locally
 
@@ -54,8 +52,7 @@ By default, the results are stored as JSON files in path `{out_dir}/{runner_name
 
 Here, if not specified as a command line argument, `uid` is randomly generated UUID and `uid_date` is the current date.
 
-When run as a GitHub action for official results, we expect this to be the Git hash of the and Git hash date of the corresponding
-commit.
+When run as a GitHub action for the standard results, we expect this to be the Git hash of the and Git hash date of the corresponding commit.
 
 ### Common Workflows
 
@@ -154,11 +151,12 @@ TODO -- Comment on when to delete official results/what to do
 #### Upgrading compiler version (non-UCC)
 TODO -- How to upgrade the version of a non-ucc compiler; although should benefit from dependabot
 
-## Standard UCC benchmark results
+## Standard UCC Benchmark Results
 
 This repository also houses the standard results for UCC development. These are stored in
 the top-level `results` directory and are run on a dedicated GitHub runner for consistency
-between runs. The `ucc-bench` application generally stores benchmark results as JSON files in path `{out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.json`.
+between runs. The `ucc-bench` application generally stores benchmark results as JSON files
+in path `{out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.json`.
 
 For these standard results, we follow the following convention:
 
@@ -170,13 +168,57 @@ For these standard results, we follow the following convention:
 Thus the main subtetly here is using the git hash of `ucc-bench`. This was chosen so that we can always identify the exact configuration used in that run.
 This includes the version of `ucc-bench` code, the version of the dependencies as reflected in `uv.lock`, the specific circuits and benchmark versions. Although we could identify versions in each directly, the git hash is a nice way to boil it all down to one identifier.
 
-In order to benchmark pre-release versions of `ucc`, we will install it directly from git, versus via PyPI (as those versions are not published yet). This is done via
+## Standard Benchmark Automation
+In generating the results as just describeb, we want:
 
-```bash
-uv add git+https://github.com/unitaryfoundation/ucc@<rev_hash>
+1. Each `ucc` merge to main to have a corresponding benchmark result in the `results` directory of `ucc-bench`
+2. Any change to benchmark configurations or compiler versions to have a corresponding benchmark result in the `results` directory of `ucc-bench`
+3. A PR opened in `ucc` or `ucc-bench` with `main` as a target should get a PR comment showing the expected performance impact as compared to the most recent ancestor benchmark result in the corresponding `main` repository (more below).
+
+The overall flow is then depicted below
+```mermaid
+flowchart TD
+    A>"(1) open ucc PR to main"]
+    B>"(2) ucc merge to main"]
+    A --> B
+    C>"(3) open ucc-bench PR to main"]
+    D>"(4) ucc-bench merge to main"]
+    H>"(5) ucc-bench benchmark run"]
+    G["(6) ucc-bench modification"]
+    B -..->|auto opens ucc upgrade| C
+    C -..->|automerge if bench PR| D
+    C -..->|manual otherwise| D
+    G -..-> C
+    D -..-> H
 ```
 
-See the [`uv` docs](https://docs.astral.sh/uv/concepts/projects/dependencies/#git) for more details, and the workflows section below for how these are managed in practice. The upshot of this is that we can track pre-release `ucc` just like any other library dependency.
+For `ucc` initiated changes,
+1. PR is opened in `ucc` repo to merge changes from a feature branch into `main`.
+2. After review and feedback, this PR merges the changes into `main` in a commit with hash `H_ucc`
+3. A GitHub action automatically creates a PR for `ucc-bench`, which upgrades the version of `ucc` to that specific hash, e.g. `$ uv add git+https://github.com/unitaryfoundation/ucc@<H_ucc>` (see the [uv docs](https://docs.astral.sh/uv/concepts/projects/dependencies/#git) for more details on installing from git hash).
+4. If all the automated checks pass for `ucc-bench`, this PR is automerged in to `ucc-bench` with hash `H_uccbench`
+5. This in turn triggers an offical benchmark run in `ucc-bench`, using the configuration in `H_uccbench`, which commits the result files outlined in the previous section back to `ucc-bench`.
+
+For `ucc-bench` initiated changes (adding benchmark circuits, upgrading a non-`ucc` compiler version), the workflow is similar, but starts from (6). In this case, the PR for `ucc-bench` is *not* automatically merged and will require manual review. But after merging, step (5) automatically runs (as its triggered by a merge to `ucc-bench` main).
+
+As a result of this, the `ucc-bench` git history will look like
+```mermaid
+gitGraph
+    commit id: "ade23.."
+    commit id: "[bench(ade23..)]"
+    commit id: "34aa2.."
+    commit id: "90ac4.."
+    commit id: "[bench(34aa2..)]"
+    commit id: "[bench(90ac4..)]"
+```
+where `[bench(...)]` are benchmark results commits and reflect back to the hash
+of the non-benchmark commit with the configuration to benchmark. As shown in the
+graph, a benchmark run may not be committed immediately after its configuration
+commit. But that is fine, since it run explicitly on that set of commits.
+
+Note:
+* `[bench(...)]` commits themselves do not trigger a benchmark run.
+* The hashes in `[bench(...)]` commit message correspond to commits in `ucc-bench`, even if that commit was originally triggered by a commit to `ucc`. That `ucc` git hash will be in the `pyproject.toml` and `uv.lock` file. For convenience, we also store it as metadata in the benchmark results.
 
 ## Architecture
 * `main.py`: Handles command-line argument parsing, logging setup, loading the suite specification, initiating the run, and saving results.
