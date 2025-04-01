@@ -30,6 +30,7 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
     logger = ContextualLogger(
         logger, extra={"benchmark_id": benchmark.id, "compiler_id": compiler.id()}
     )
+    print(f"Running benchmark '{benchmark.id}' with compiler '{compiler.id()}'")
 
     start_transpile = datetime.now()
     raw_circuit = compiler.qasm_to_native(
@@ -84,6 +85,8 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
             raise ValueError(
                 f"Unknown measurement '{benchmark.simulate.measurement}' for benchmark '{benchmark.id}'"
             )
+
+    print(f"Completed benchmark '{benchmark.id}' with compiler '{compiler.id()}'")
 
     return BenchmarkResult(
         compiler=CompilerInfo(id=compiler.id(), version=compiler.version()),

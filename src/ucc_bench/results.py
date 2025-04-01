@@ -4,10 +4,6 @@ from datetime import datetime
 from pathlib import Path
 from .suite import BenchmarkSuite
 
-import logging
-
-logger = logging.getLogger(__name__)
-
 
 class RunnerInfo(BaseModel):
     os: str
@@ -91,7 +87,7 @@ def save_results(results: SuiteResults, out_dir: Path) -> None:
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    logger.info(f"Saving results to {out_path}")
+    print(f"Saving results to {out_path}")
 
     with open(out_path, "w") as f:
         f.write(results.model_dump_json(indent=2))

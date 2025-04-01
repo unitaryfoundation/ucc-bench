@@ -79,9 +79,7 @@ def main() -> None:
     num_parallel = (
         int(args.parallel) if args.parallel else psutil.cpu_count(logical=False)
     )
-    logger.info(
-        f"Running benchmark suite '{suite.id}' with {num_parallel} parallel tasks"
-    )
+    print(f"Running benchmark suite '{suite.id}' with {num_parallel} parallel tasks")
     benchmark_results = run_suite(
         suite,
         num_parallel,
