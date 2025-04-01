@@ -27,7 +27,12 @@ class BaseCompiler(ABC, Generic[CircuitType]):
 
     @abstractmethod
     def qasm_to_native(self, qasm: str) -> CircuitType:
-        """Convert a QASM string to the native circuit type of this compiler"""
+        """
+        Convert a QASM string to the native circuit type of this compiler
+
+        The default implementation calls qbraid.transpile with a target that is the compiler id.
+        Compiler instances that don't use the cannonical name for transpilation target should override this method.
+        """
         return transpile(qasm, self.id())
 
     @abstractmethod

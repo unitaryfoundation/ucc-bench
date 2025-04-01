@@ -79,11 +79,6 @@ class MyCompiler(BaseCompiler[YourCircuitType]):
         # Return compiler version
         pass
 
-    def qasm_to_native(self, qasm: str) -> YourCircuitType:
-        # Convert QASM string to your native circuit type
-        # (Often using qbraid.transpile)
-        pass
-
     def compile(self, circuit: YourCircuitType) -> YourCircuitType:
         # Implement the compilation logic
         pass
