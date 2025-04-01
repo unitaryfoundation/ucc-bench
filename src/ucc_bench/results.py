@@ -77,12 +77,13 @@ def save_results(results: SuiteResults, out_dir: Path) -> None:
     Benchmark results are organized by slowly varying dimenions for easier loading
     and comparison, so will be in the path {out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid.json}
     """
+    uid_timestamp = results.metadata.uid_timestamp
     out_path = (
         out_dir
         / results.metadata.runner_name
         / results.suite_specification.id
-        / results.metadata.uid_timestamp.strftime("%Y%m%d")
-        / f"{results.metadata.uid}.json"
+        / uid_timestamp.strftime("%Y%m%d")
+        / f"{uid_timestamp.strftime('%Y%m%d%H%M%S')}.{results.metadata.uid}.json"
     )
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
