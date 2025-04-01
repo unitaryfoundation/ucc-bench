@@ -1675,6 +1675,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "cirq" },
+    { name = "pandas" },
     { name = "psutil" },
     { name = "pydantic" },
     { name = "pytket" },
@@ -1694,6 +1695,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "cirq", specifier = ">=1.4.1" },
+    { name = "pandas", specifier = ">=2.2.3" },
     { name = "psutil", specifier = ">=7.0.0" },
     { name = "pydantic", specifier = ">=2.10.6" },
     { name = "pytket", specifier = ">=2.0.1" },

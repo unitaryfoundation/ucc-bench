@@ -9,7 +9,13 @@ import psutil
 
 from ucc_bench.suite import BenchmarkSuite
 from ucc_bench.runner import run_suite
-from ucc_bench.results import SuiteResults, RunnerInfo, Metadata, save_results
+from ucc_bench.results import (
+    SuiteResults,
+    RunnerInfo,
+    Metadata,
+    save_results_json,
+    save_results_csv,
+)
 from ucc_bench import __version__
 
 # qBraid is setting up logging in a way that is incompatible with the logging setup in this file.
@@ -104,7 +110,8 @@ def main() -> None:
     )
     logger.info(f"Finished running benchmark suite '{suite.id}'")
 
-    save_results(results, Path(args.out))
+    save_results_json(results, Path(args.out))
+    save_results_csv(results, Path(args.out))
 
 
 if "__main__" == __name__:

@@ -156,7 +156,8 @@ TODO -- How to upgrade the version of a non-ucc compiler; although should benefi
 This repository also houses the standard results for UCC development. These are stored in
 the top-level `results` directory and are run on a dedicated GitHub runner for consistency
 between runs. The `ucc-bench` application generally stores benchmark results as JSON files
-in path `{out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.json`.
+in path `{out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.json`. There are also sibling
+CSV files showing a summary of performance data.
 
 For these standard results, we follow the following convention:
 
@@ -169,11 +170,11 @@ Thus the main subtetly here is using the git hash of `ucc-bench`. This was chose
 This includes the version of `ucc-bench` code, the version of the dependencies as reflected in `uv.lock`, the specific circuits and benchmark versions. Although we could identify versions in each directly, the git hash is a nice way to boil it all down to one identifier.
 
 ## Standard Benchmark Automation
-In generating the results as just describeb, we want:
+In generating the results as just described, we want:
 
 1. Each `ucc` merge to main to have a corresponding benchmark result in the `results` directory of `ucc-bench`
 2. Any change to benchmark configurations or compiler versions to have a corresponding benchmark result in the `results` directory of `ucc-bench`
-3. A PR opened in `ucc` or `ucc-bench` with `main` as a target should get a PR comment showing the expected performance impact as compared to the most recent ancestor benchmark result in the corresponding `main` repository (more below).
+3. A PR opened in `ucc` or `ucc-bench` with `main` as a target should get a PR comment showing the expected performance impact as compared to the most recent ancestor benchmark result in the corresponding `main` repository.
 
 The overall flow is then depicted below
 ```mermaid
