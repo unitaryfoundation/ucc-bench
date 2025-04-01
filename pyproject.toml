@@ -26,6 +26,7 @@ build-backend = "hatchling.build"
 dev = [
     "mypy>=1.15.0",
     "pytest>=8.3.5",
+    "ruff>=0.11.2",
 ]
 [project.scripts]
 ucc-bench = 'ucc_bench.main:main'
