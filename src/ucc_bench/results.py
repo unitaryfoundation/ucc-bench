@@ -3,6 +3,7 @@ from typing import List, Optional
 from datetime import datetime
 from pathlib import Path
 from .suite import BenchmarkSuite
+import pandas as pd
 
 
 class RunnerInfo(BaseModel):
@@ -70,25 +71,88 @@ class SuiteResults(BaseModel):
     results: List[BenchmarkResult]
 
 
-def save_results(results: SuiteResults, out_dir: Path) -> None:
+def out_path_for_results(
+    suite_results: SuiteResults, root_dir: Path, file_suffix: str
+) -> Path:
+    """
+    Get the output directory for the benchmark results.
+
+    The output directory is organized by slowly varying dimensions for easier loading
+    and comparison, so will be in the path {out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.{file_suffix}
+    """
+    uid_timestamp = suite_results.metadata.uid_timestamp
+    out_dir = (
+        root_dir
+        / suite_results.metadata.runner_name
+        / suite_results.suite_specification.id
+        / uid_timestamp.strftime("%Y%m%d")
+        / f"{uid_timestamp.strftime('%Y%m%d%H%M%S')}.{suite_results.metadata.uid}.{file_suffix}"
+    )
+    return out_dir
+
+
+def save_results_json(suite_results: SuiteResults, root_dir: Path) -> None:
     """
     Save the benchmark results in JSON format beneath the given root directory.
 
     Benchmark results are organized by slowly varying dimenions for easier loading
-    and comparison, so will be in the path {out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid.json}
+    and comparison, so will be in the path {out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.json
     """
-    uid_timestamp = results.metadata.uid_timestamp
-    out_path = (
-        out_dir
-        / results.metadata.runner_name
-        / results.suite_specification.id
-        / uid_timestamp.strftime("%Y%m%d")
-        / f"{uid_timestamp.strftime('%Y%m%d%H%M%S')}.{results.metadata.uid}.json"
-    )
-
+    out_path = out_path_for_results(suite_results, root_dir, "json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    print(f"Saving results to {out_path}")
+    print(f"Saving JSON results to {out_path}")
 
     with open(out_path, "w") as f:
-        f.write(results.model_dump_json(indent=2))
+        f.write(suite_results.model_dump_json(indent=2))
+
+
+def save_results_csv(suite_results: SuiteResults, root_dir: Path) -> None:
+    """
+    Save the benchmark results in CSV format beneath the given root directory.
+
+    Benchmark results are organized by slowly varying dimensions for easier loading
+    and comparison, so will be in the path {out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.compilation.csv
+    or {out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.simulation.csv
+    """
+
+    out_path = out_path_for_results(suite_results, root_dir, "compilation.csv")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    print(f"Saving timing results to {out_path}")
+    timing_data = [
+        {
+            "compiler": result.compiler.id,
+            "benchmark_id": result.benchmark_id,
+            "raw_multiq_gates": result.compilation_metrics.raw_multiq_gates,
+            "compile_time_ms": result.compilation_metrics.compilation_time_ms,
+            "compiled_multiq_gates": result.compilation_metrics.compiled_multiq_gates,
+        }
+        for result in suite_results.results
+    ]
+    # Create a Pandas DataFrame and write it to a CSV file
+    df = pd.DataFrame(timing_data)
+    df.to_csv(out_path, index=False)
+
+    measurement_data = [
+        {
+            "compiler": result.compiler.id,
+            "benchmark_id": result.benchmark_id,
+            "measurement_id": result.simulation_metrics.measurement_id,
+            "uncompiled_ideal": result.simulation_metrics.uncompiled_ideal,
+            "compiled_ideal": result.simulation_metrics.compiled_ideal,
+            "uncompiled_noisy": result.simulation_metrics.uncompiled_noisy,
+            "compiled_noisy": result.simulation_metrics.compiled_noisy,
+        }
+        for result in suite_results.results
+        if result.simulation_metrics
+    ]
+
+    if len(measurement_data) > 0:
+        out_path = out_path_for_results(suite_results, root_dir, "simulation.csv")
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+
+        print(f"Saving simulation results to {out_path}")
+        # Create a Pandas DataFrame and write it to a CSV file
+        df = pd.DataFrame(measurement_data)
+        df.to_csv(out_path, index=False)
