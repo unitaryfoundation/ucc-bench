@@ -71,6 +71,14 @@ def main() -> None:
         "--only_benchmark",
         help="Run only the specified benchmark.",
     )
+    parser.add_argument(
+        "--upstream_hash",
+        help="Hash of upstream commit of UCC being tested. This is used to track the version of UCC being benchmarked.",
+    )
+    parser.add_argument(
+        "--upstream_timestamp",
+        help="Timestamp of upstream commit of UCC being tested. This is used to track the version of UCC being benchmarked.",
+    )
 
     args = parser.parse_args()
 
@@ -105,6 +113,8 @@ def main() -> None:
             runner_specs=RunnerInfo.from_system(),
             runner_version=__version__,
             runner_args=sys.argv,
+            upstream_hash=args.upstream_hash,
+            upstream_timestamp=args.upstream_timestamp,
         ),
         results=benchmark_results,
     )
