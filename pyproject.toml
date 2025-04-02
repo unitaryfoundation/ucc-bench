@@ -29,5 +29,8 @@ dev = [
     "pytest>=8.3.5",
     "ruff>=0.11.2",
 ]
+
+[tool.uv.sources]
+ucc = { git = "https://github.com/unitaryfoundation/ucc", rev = "65e6bdbfd1f30a015375e58c40b359d4a816ba5d" }
 [project.scripts]
 ucc-bench = 'ucc_bench.main:main'
