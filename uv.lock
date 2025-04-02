@@ -1654,8 +1654,8 @@ wheels = [
 
 [[package]]
 name = "ucc"
-version = "0.4.3"
-source = { registry = "https://pypi.org/simple" }
+version = "0.4.4"
+source = { git = "https://github.com/unitaryfoundation/ucc?rev=65e6bdbfd1f30a015375e58c40b359d4a816ba5d#65e6bdbfd1f30a015375e58c40b359d4a816ba5d" }
 dependencies = [
     { name = "cirq-core" },
     { name = "ply" },
@@ -1663,10 +1663,6 @@ dependencies = [
     { name = "qbraid" },
     { name = "qiskit" },
     { name = "qiskit-qasm3-import" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/7a/3b/d5de88056a7211d92f70df32386bd8423852d64325fe0ca6283a9e3e4483/ucc-0.4.3.tar.gz", hash = "sha256:918e0d404e0792b9b134c0ce1ed56a21554b655c207c9125b38b7957f61d2511", size = 17448 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/65/2a/224ec839e5a15899cee79a42a5c1c82d8f52a152ce2d2e4ef4beac221ffd/ucc-0.4.3-py3-none-any.whl", hash = "sha256:8267e50f3d45a01d836f072c1b57e6fe71f3063e68aa595d37fd3d6da201406c", size = 19386 },
 ]
 
 [[package]]
@@ -1702,7 +1698,7 @@ requires-dist = [
     { name = "qbraid", specifier = ">=0.9.4" },
     { name = "qiskit", specifier = ">=1.4.2" },
     { name = "qiskit-aer", specifier = ">=0.17.0" },
-    { name = "ucc", specifier = ">=0.4.3" },
+    { name = "ucc", git = "https://github.com/unitaryfoundation/ucc?rev=65e6bdbfd1f30a015375e58c40b359d4a816ba5d" },
 ]
 
 [package.metadata.requires-dev]
