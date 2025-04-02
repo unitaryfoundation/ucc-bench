@@ -1,0 +1,74 @@
+# This workflows runs and commits the standard benchmark results.
+# This workflow will install Python dependencies, run benchmarks and then publish the results to github
+name: Run Benchmarks
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to run benchmarks on'
+        required: false
+        default: 'main'
+
+permissions:
+  contents: write  # 👈 Required to push code
+
+# Ensure only one instance of the workflow is running at a time
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  run-benchmarks:
+    runs-on: ucc-benchmarks-8-core-U22.04
+    # DO not run benchmarks on commits that were themselves benchmark results
+    if: ${{ github.repository == 'unitaryfoundation/ucc-bench' && !contains(github.event.head_commit.message, '[benchmark chore]') }}
+
+    steps:
+        - uses: actions/checkout@v4
+          with:
+            persist-credentials: false
+
+        - name: Install uv
+          uses: astral-sh/setup-uv@v5
+
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version-file: ".python-version"
+
+        - name: Install the project
+          run: uv sync --all-extras --dev
+
+        - name: Run benchmarks
+          run: ./scripts/run_benchmarks.sh ${{ github.sha }} ${{ runner.name }}
+
+        # Configure git to use the name/email of github-actions[bot] so it renders
+        # as a bot commit in the GitHub UI
+        - name: Configure Git
+          run: |
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+        # diff-index only succeeds if there are changes to commit
+        # use truncated sha in commit message
+        - name: Commit changes
+          env:
+            SHORT_SHA: ${{ github.sha }}
+          run: |
+            git add results/*
+            git diff-index --quiet HEAD || git commit -m "[benchmark chore] Update benchmark results for ${{ github.repository }}@${SHORT_SHA:0:7}"
+
+        # Do a quick pull with rebase to ensure we are up to date with the main branch
+        - name: Pull with rebase
+          run: |
+            git pull --rebase origin main
+
+        - name: Push changes
+          env:
+            TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run: |
+            git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }} HEAD:main
+

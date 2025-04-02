@@ -81,3 +81,74 @@ hash (commit on main)-> compiler versions, benchmark configs, etc.
 ucc PR <> ok if fails
 only have ucc hash/versions, how do I lookup my ancestor PR
   -> secondary index? ucc version hash -> version of ucc-bench with those results
+
+---------------------------------------------
+ucc-bench after merge to main with tip hash H
+Trigger - commit to main that is not chore
+No cancelling, always run
+//
+1. Checkout code @ H
+2. Run both types of benchmarks (using uid of that H and that hash time)
+3. Store results
+5. Commit back to repo as a bench(H)
+----------------------------------------------
+update plots every X hours
+trigger - cron
+No cancelling, always run
+1. Checkout tip of ucc-bench
+2. Generate plots from most recent hash (ignoring the chore commits)
+----------------------------------------------
+ucc-merge to main with tip hash H -> open a ucc-bench PR to main
+Trigger - ucc-merge to main (for now, non chore/benchark commits)
+No cancelling, always run, but only run for that final commit, not all commits along the way
+//
+1. ucc-bench checkout tip of main
+2. uv upgrades to ucc to version H on branch auto-benchmark-H
+3. create commit, include ucc-bench H in commit message
+4. set commit to auto-merge if checks are successful
+-----------------------------------------------
+PR on open ucc-bench PR to main
+Trigger - PR open, PR updated (change to commits)
+Cancel existing job if retriggered for same PR
+//
+1. IF is auto-benchmark/labeled (so was already benchmarked), just add a comment with link to ucc PR
+2. If is not, then
+   - Checkout code
+   - Run benchmarks
+   - Do a diff against benchmark results for ancestor on main
+     - Note this is the most recent NON-chore commit to main, e.g. a commit that
+       reflects a true change.
+     - If none exists, bail
+   - Add comment
+------------------------------------------------
+PR on ucc to main
+Trigger - PR open, PR updated (change to commits) in *ucc*
+Cancel existing job if retriggered for same PR
+//
+1. Checkout ucc-bench code
+2. Upgrade to the tip commit of ucc branch/hash
+3. run benchmarks
+4. Compare to common ancestor results on ucc main branch
+    Should be the ucc-bench commit that wasn't a chore
+    How do we find this??? Do we store in bench(foo,bar)?
+    Do we add a mapping file/metadata to the ucc-bench run, if it was triggered
+    by ucc commit? (Yes, seems better)
+
+Failure modes
+1. PR comparison breaks, annoying but can live with it
+2. ucc -> ucc-bench trigger breaks, annoying, but can manually kick them off
+3. ucc-bench -> out of order results,  impactes
+              REVIEW - plots by time --- any other data to re-order? use ucc git commit date, when subset on just UCC data
+                  Use auxiliary ucc uid date/hash to order the UCC results, and use other date for non-ucc results
+                  Make this explicit (annoying but ok)
+              "most recent ancestor" in PR diff (ok, just ignore if can't explicitly find)
+
+ucc-benchmark results aren't necessarily time ordered (e.g. multiple commits come in)
+Always make the plots for latest/over-time time ordered based on what is in the queue?
+
+So
+1. Add auxiliary data to simulation results, command line to specify
+2. Build github actions in order above (ucc-bench, trigger ucc-bench, cron for plots, PRs)
+
+
+
