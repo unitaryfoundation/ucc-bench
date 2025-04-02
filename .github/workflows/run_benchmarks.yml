@@ -43,7 +43,7 @@ jobs:
           run: uv sync --all-extras --dev
 
         - name: Run benchmarks
-          run: ./scripts/run_benchmarks.sh ${{ github.sha }} ${{ runner.name }}
+          run: ./scripts/run_benchmarks.sh ${{ github.sha }} ${{ runner.name }} ./results
 
         # Configure git to use the name/email of github-actions[bot] so it renders
         # as a bot commit in the GitHub UI
