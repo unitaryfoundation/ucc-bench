@@ -13,8 +13,9 @@ on:
         required: false
         default: 'main'
 
+# Ensure we can push changes back
 permissions:
-  contents: write  # 👈 Required to push code
+  contents: write
 
 # Ensure only one instance of the workflow is running at a time
 concurrency:
@@ -23,7 +24,7 @@ concurrency:
 jobs:
   run-benchmarks:
     runs-on: ucc-benchmarks-8-core-U22.04
-    # DO not run benchmarks on commits that were themselves benchmark results
+    # DO not run benchmarks on forks, or on commits that were themselves benchmark results
     if: ${{ github.repository == 'unitaryfoundation/ucc-bench' && !contains(github.event.head_commit.message, '[benchmark chore]') }}
 
     steps:
@@ -42,6 +43,7 @@ jobs:
         - name: Install the project
           run: uv sync --all-extras --dev
 
+        # Run the benchmarks for the commit that triggered this workflow
         - name: Run benchmarks
           run: ./scripts/run_benchmarks.sh ${{ github.sha }} ${{ runner.name }} ./results
 
@@ -58,10 +60,11 @@ jobs:
           env:
             SHORT_SHA: ${{ github.sha }}
           run: |
-            git add results/*
+            git add ./results/*
             git diff-index --quiet HEAD || git commit -m "[benchmark chore] Update benchmark results for ${{ github.repository }}@${SHORT_SHA:0:7}"
 
         # Do a quick pull with rebase to ensure we are up to date with the main branch
+        # for example if another commit was pushed to main while this workflow was running
         - name: Pull with rebase
           run: |
             git pull --rebase origin main

@@ -35,6 +35,8 @@ class Metadata(BaseModel):
     runner_specs: RunnerInfo
     runner_version: str
     runner_args: List[str]
+    upstream_hash: Optional[str] = None
+    upstream_timestamp: Optional[datetime] = None
 
 
 class CompilerInfo(BaseModel):
