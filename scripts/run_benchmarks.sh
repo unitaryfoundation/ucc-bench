@@ -1,32 +1,86 @@
 #!/bin/bash
-set -e
+set -euo pipefail
+
+# This script runs benchmarks for the UCC project and logs the results,
+# using the commit hash and commit time as the uid and uid_time for the benchmark results.
+# It also fetch upstream commit hash/time for the version of UCC in pyreproject.toml.
+# This enables us to map the benchmark results to a specific commit in the UCC repository.
+#!/bin/bash
+
 
 # Ensure this script is run from the root of the repository
-if [ ! -f "scripts/run_benchmarks.sh" ]; then
+if [[ ! -f "scripts/run_benchmarks.sh" ]]; then
   echo "Please run this script from the root of the repository."
   exit 1
 fi
-# The first argument to the script is the commit hash
-if [ -z "$1" ]; then
-  echo "Usage: $0 <commit-hash>"
+
+# Parse arguments
+if [[ $# -lt 3 ]]; then
+  echo "Usage: $0 <commit-hash> <runner-name> <out-dir>"
   exit 1
 fi
-commit_hash=$1
 
-# The second argument to the script is the runner name
-if [ -z "$2" ]; then
-  echo "Usage: $0 <commit-hash> <runner-name>"
+commit_hash="$1"
+runner_name="$2"
+out_dir="$3"
+
+# Check that jq is available
+if ! command -v jq > /dev/null; then
+  echo "Error: jq not found. Please install jq to parse JSON."
   exit 1
 fi
-runner_name=$2
 
-# Get timestamp of the commit (in UTC)
-uid_time=$(TZ=UTC git show -s --format=%cI <commit_hash>)
+# Get commit time from GitHub API for the commit to ucc-bench
+uid_time=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+  "https://api.github.com/repos/unitaryfoundation/ucc-bench/commits/${commit_hash}" | \
+  jq -r '.commit.committer.date // empty')
 
-# Figure out the current hash of ucc that is used in this repo by parsing pyproject.toml
-ucc_hash=$(grep -oP '(?<=ucc = ").*(?=")' pyproject.toml)
-# Use the github API to get the commit date of the ucc hash
-ucc_commit_date=$(curl -s -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/unitaryfoundation/ucc/commits/${ucc_hash}" | jq -r '.[0].commit.committer.date')
+if [[ -z "$uid_time" ]]; then
+  echo "Error: Could not fetch commit time for hash ${commit_hash} from GitHub."
+  exit 1
+fi
 
-uv run ucc-bench ./benchmarks/timing_benchmarks.toml --uid '${commit_hash}' --uid_time '${uid_time}' --log_level INFO -o ./results --runner_name '${runner_name}'
-uv run ucc-bench ./benchmarks/simulation_benchmarks.toml --uid '${commit_hash}' --uid_time '${uid_time}' --log_level INFO -o ./results --runner_name '${runner_name}'
+echo "Running benchmarks for ucc-bench@$commit_hash"
+echo "Commit time for ucc-bench@$commit_hash: $uid_time"
+
+# Extract upstream commit information for the version of UCC
+# set in pyproject.toml
+ucc_hash=$(uv run ./scripts/extract_ucc_revision.py ./pyproject.toml || true)
+
+if [[ -n "$ucc_hash" ]]; then
+  echo "ucc in pyproject-toml is ucc@$ucc_hash"
+
+  # Get UCC commit date from GitHub
+  ucc_commit_date=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+    "https://api.github.com/repos/unitaryfoundation/ucc/commits/${ucc_hash}" | \
+    jq -r '.commit.committer.date // empty')
+
+  if [[ -n "$ucc_commit_date" ]]; then
+    echo "Commit time for ucc@$ucc_hash is $ucc_commit_date"
+  else
+    echo "Warning: Could not fetch commit date for UCC hash $ucc_hash"
+    ucc_commit_date=""
+  fi
+else
+  echo "No upstream UCC hash found."
+  ucc_commit_date=""
+  ucc_hash=""
+fi
+
+# Function to run a benchmark config
+run_bench() {
+  local config_file="$1"
+  echo "Running benchmark: $config_file"
+  uv run ucc-bench "$config_file" \
+    --uid "$commit_hash" \
+    --uid_time "$uid_time" \
+    --log_level INFO \
+    -o $out_dir \
+    --runner_name "$runner_name" \
+    ${ucc_hash:+--upstream_hash "$ucc_hash"} \
+    ${ucc_commit_date:+--upstream_time "$ucc_commit_date"}
+}
+
+# Run the benchmarks
+run_bench ./benchmarks/timing_benchmarks.toml
+run_bench ./benchmarks/simulation_benchmarks.toml
