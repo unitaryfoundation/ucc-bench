@@ -26,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
           fetch-depth: 0
 
       - name: Install uv
@@ -60,7 +60,5 @@ jobs:
           git pull --rebase origin ${{ github.ref_name }}
 
       - name: Push changes
-        env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
+          git push origin HEAD:${{ github.ref_name }}
