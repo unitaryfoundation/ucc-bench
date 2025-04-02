@@ -1,5 +1,7 @@
 # This workflows runs and commits the standard benchmark results.
-# This workflow will install Python dependencies, run benchmarks and then publish the results to github
+# Runs automatically on pushes to the main branch (e.g. after a pull request is merged).
+# If triggered manually, runs on the latest commit of that branch, and pushes results back to
+# that branch.
 name: Run Benchmarks
 
 on:
@@ -7,71 +9,58 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch to run benchmarks on'
-        required: false
-        default: 'main'
 
-# Ensure we can push changes back
 permissions:
   contents: write
 
-# Ensure only one instance of the workflow is running at a time
 concurrency:
   group: ${{ github.workflow }}
 
 jobs:
   run-benchmarks:
     runs-on: ucc-benchmarks-8-core-U22.04
-    # DO not run benchmarks on forks, or on commits that were themselves benchmark results
+
+    # Don't run on forks or on commits that are already benchmark results
     if: ${{ github.repository == 'unitaryfoundation/ucc-bench' && !contains(github.event.head_commit.message, '[benchmark chore]') }}
 
     steps:
-        - uses: actions/checkout@v4
-          with:
-            persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
 
-        - name: Install uv
-          uses: astral-sh/setup-uv@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
-        - name: Set up Python
-          uses: actions/setup-python@v5
-          with:
-            python-version-file: ".python-version"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
 
-        - name: Install the project
-          run: uv sync --all-extras --dev
+      - name: Install the project
+        run: uv sync --all-extras --dev
 
-        # Run the benchmarks for the commit that triggered this workflow
-        - name: Run benchmarks
-          run: ./scripts/run_benchmarks.sh ${{ github.sha }} ${{ runner.name }} ./results
+      - name: Run benchmarks
+        run: ./scripts/run_benchmarks.sh ${{ github.sha }} ${{ runner.name }} ./results
 
-        # Configure git to use the name/email of github-actions[bot] so it renders
-        # as a bot commit in the GitHub UI
-        - name: Configure Git
-          run: |
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-        # diff-index only succeeds if there are changes to commit
-        # use truncated sha in commit message
-        - name: Commit changes
-          env:
-            SHORT_SHA: ${{ github.sha }}
-          run: |
-            git add ./results/*
-            git diff-index --quiet HEAD || git commit -m "[benchmark chore] Update benchmark results for ${{ github.repository }}@${SHORT_SHA:0:7}"
+      - name: Commit changes
+        env:
+          SHORT_SHA: ${{ github.sha }}
+        run: |
+          git add ./results/*
+          git diff-index --quiet HEAD || git commit -m "[benchmark chore] Update benchmark results for ${{ github.repository }}@${SHORT_SHA:0:7}"
 
-        # Do a quick pull with rebase to ensure we are up to date with the main branch
-        # for example if another commit was pushed to main while this workflow was running
-        - name: Pull with rebase
-          run: |
-            git pull --rebase origin main
+      - name: Pull with rebase
+        run: |
+          git pull --rebase origin ${{ github.ref_name }}
 
-        - name: Push changes
-          env:
-            TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          run: |
-            git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }} HEAD:main
-
+      - name: Push changes
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
