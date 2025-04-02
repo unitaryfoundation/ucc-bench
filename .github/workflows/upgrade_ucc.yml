@@ -1,0 +1,67 @@
+# Job that automates upgrading UCC to a specific commit in the UCC repo
+# This workflow enables us to benchmark performance of UCC contributions on a
+# per merge basis, rather than only releases.
+# It is triggered from UCC repo workflow via a repository_dispatch event.
+name: Auto Upgrade UCC Dependency
+
+on:
+  repository_dispatch:
+    types: [ucc-main-push]
+
+permissions:
+    pull-requests: write
+
+jobs:
+  upgrade-ucc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine UCC commit sha
+        id: get_sha
+        run: |
+          UCC_SHA="${{ github.event.client_payload.commit_hash }}"
+          SHORT_UCC_SHA="${UCC_SHA:0:7}"
+          echo "UCC_SHA=$UCC_SHA" >> $GITHUB_OUTPUT
+          echo "SHORT_UCC_SHA=$SHORT_UCC_SHA" >> $GITHUB_OUTPUT
+
+      - name: Checkout ucc-bench
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Set up git config to be bot user
+        run: |
+          git config --global user.email "github-actions@users.noreply.github.com"
+          git config --global user.name "github-actions"
+
+      - name: Update UCC dependency
+        run: |
+          uv add git+https://github.com/unitaryfoundation/ucc@${{ steps.get_sha.outputs.UCC_SHA }}
+
+      - name: Commit changes
+        env:
+          SHORT_UCC_SHA: ${{ steps.get_sha.outputs.SHORT_UCC_SHA }}
+        run: |
+          git add ./results/*
+          git diff-index --quiet HEAD || git commit -m "[upgrade chore] Update to ucc@${SHORT_UCC_SHA:0:7}"
+
+      - name: Pull with rebase
+        run: |
+          git pull --rebase origin main
+
+      - name: Push changes
+        run: |
+          git push origin HEAD:main
+

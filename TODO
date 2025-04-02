@@ -151,4 +151,9 @@ So
 2. Build github actions in order above (DONE ucc-bench, trigger ucc-bench, cron for plots, PRs)
 
 
+If we use a the temporary PR kciked off from ucc -> ucc-bench with automerge, we end
+up with conflicts if more than one is in flight at the same time. The main reason to do this
+was to ensure unit tests/benchmarks still run, but that is overkill as the PR run should already have done that
 
+Instead, eliminate this and just make a job that commits to main directly and upgrades the ucc version.
+That should be quick and if we make only one instance of that job run at a time, should avoid conflicts
