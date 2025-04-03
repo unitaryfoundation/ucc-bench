@@ -9,8 +9,7 @@ on:
         - main
 
 jobs:
-  uv-example:
-    name: python
+  test:
     runs-on: ubuntu-latest
 
     steps:
