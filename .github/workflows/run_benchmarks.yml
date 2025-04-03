@@ -42,7 +42,7 @@ jobs:
       - name: Install the project
         run: uv sync --all-extras --dev
 
-     - name: Run benchmarks
+      - name: Run benchmarks
         run: ./scripts/run_benchmarks.sh ${{ github.sha }} $RUNNER_LABEL ./results
 
       - name: Configure Git
