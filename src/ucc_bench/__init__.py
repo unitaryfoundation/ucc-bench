@@ -1,7 +1,7 @@
 from importlib.metadata import version
 
-# load to ensure we register all compilers and simulation items
-import ucc_bench.compilers as _compilers
-import ucc_bench.simulation as _simulation
+# Load to ensure we register all compilers and simulation items
+from ucc_bench import simulation as simulation
+from ucc_bench import compilers as compilers
 
 __version__ = version("ucc_bench")

@@ -22,6 +22,11 @@ jobs:
   run-benchmarks-pr:
     runs-on: ucc-benchmarks-8-core-U22.04
 
+    # Cancel if a newer commit is pushed to the PR
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+
     steps:
       - uses: actions/checkout@v4
 
@@ -44,7 +49,7 @@ jobs:
       - name: Find meaningful merge base
         id: get_sha
         run: |
-          ANCESTOR_SHA=$(.github/scripts/find_useful_merge_base.sh HEAD origin/main)
+          ANCESTOR_SHA=$(.github/scripts/find_ancestor_sha.sh HEAD origin/main)
           echo "Useful base commit: $ANCESTOR_SHA"
           echo "ANCESTOR_SHA=$ANCESTOR_SHA" >> "$GITHUB_ENV"
 
