@@ -55,7 +55,7 @@ jobs:
           SHORT_UCC_SHA: ${{ steps.get_sha.outputs.SHORT_UCC_SHA }}
         run: |
           git add pyproject.toml uv.lock
-          git diff-index --quiet HEAD || git commit -m "[upgrade chore] Update to ucc@${SHORT_UCC_SHA:0:7}"
+          git diff-index --quiet HEAD || git commit -m "[upgrade chore] Update to unitaryfoundation/ucc@${SHORT_UCC_SHA:0:7}"
 
       - name: Pull with rebase
         run: |
