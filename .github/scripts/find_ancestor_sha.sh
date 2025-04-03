@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 # This script finds the SHA of the last commit on the main branch that is
 #  -- not a [benchmark chore] commit
@@ -10,7 +10,7 @@ FEATURE_BRANCH=$1
 MAIN_BRANCH=$2
 
 
-if [[ ! -f ".github/scripts/find_merge_base.sh" ]]; then
+if [[ ! -f ".github/scripts/find_ancestor_sha.sh" ]]; then
   echo "Please run this script from the root of the repository."
   exit 1
 fi

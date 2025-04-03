@@ -1,7 +1,7 @@
 # Run benchmarks on pull requests and post a comment back detailing the results.
 # Unlike benchmarks on pushes, these results are not committed back to the repo.
 # The purpose here is to provide performance view before merging a PR.
-name: PR Benchmark Comparison
+name: Run PR Benchmark Comparison
 
 on:
   pull_request:
@@ -29,7 +29,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
+        with:
+          fetch-depth: 0 # Needed to walk ancestor commits
       - name: Install uv
         uses: astral-sh/setup-uv@v5
 
@@ -51,15 +52,18 @@ jobs:
         run: |
           ANCESTOR_SHA=$(.github/scripts/find_ancestor_sha.sh HEAD origin/main)
           echo "Useful base commit: $ANCESTOR_SHA"
-          echo "ANCESTOR_SHA=$ANCESTOR_SHA" >> "$GITHUB_ENV"
+          echo "ANCESTOR_SHA=$ANCESTOR_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Post benchmark comparison to PR
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANCESTOR_SHA: ${{ steps.get_sha.outputs.ANCESTOR_SHA }}
         run: |
           uv run python .github/scripts/post_benchmark_diff_comment.py \
             --repo "${{ github.repository }}" \
             --pr "${{ github.event.pull_request.number }}" \
-            --sha_old "${{ steps.get_sha.outputs.ANCESTOR_SHA }}" \
+            --root_dir ./results \
+            --runner_name $RUNNER_LABEL \
+            --sha_base $ANCESTOR_SHA \
             --sha_new "${{ github.sha }}"
 

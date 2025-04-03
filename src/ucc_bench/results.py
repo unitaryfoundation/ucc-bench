@@ -169,3 +169,33 @@ def save_results_csv(suite_results: SuiteResults, root_dir: Path) -> None:
 
         print(f"Saving simulation results to {out_path}")
         sim_df.to_csv(out_path, index=False)
+
+
+class SuiteResultsDatabase(BaseModel):
+    _suite_results: List[SuiteResults]
+    _suite_results_by_uid: dict[str, SuiteResults]
+
+    def __init__(self, suite_results: List[SuiteResults]):
+        super().__init__(suite_results=suite_results)
+        self._suite_results_by_uid = {
+            result.metadata.uid: result for result in suite_results
+        }
+
+    @classmethod
+    def from_root(cls, root_dir: str, runner_name: str) -> "SuiteResultsDatabase":
+        """
+        Load all results from the given root directory.
+        """
+        suite_results = []
+        for path in (Path(root_dir) / runner_name).glob("**/*.json"):
+            suite_results.append(
+                SuiteResults.model_validate_json(path.read_text(encoding="utf-8"))
+            )
+        return cls(suite_results)
+
+    def from_uid(self, uid: str) -> Optional[SuiteResults]:
+        """
+        Get the results from the given UID.
+        Return None of no results found
+        """
+        return self._suite_results_by_uid.get(uid, None)
