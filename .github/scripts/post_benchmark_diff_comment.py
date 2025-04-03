@@ -3,7 +3,7 @@ import requests
 import pandas as pd
 import sys
 import argparse
-from ucc_bench.results import SuiteResults, to_df_timing
+from ucc_bench.results import to_df_timing, SuiteResultsDatabase
 
 
 def format_change(old, new, threshold=10):
@@ -104,14 +104,12 @@ def main():
         "--repo", required=True, help="GitHub repository in 'owner/name' format"
     )
     parser.add_argument("--pr", type=int, required=True, help="Pull request number")
-    parser.add_argument(
-        "--old", required=True, help="Path to old benchmark JSON (base)"
-    )
-    parser.add_argument(
-        "--new", required=True, help="Path to new benchmark JSON (head)"
-    )
     parser.add_argument("--sha_base", required=True, help="SHA of the base commit")
     parser.add_argument("--sha_new", required=True, help="SHA of the new commit (head)")
+    parser.add_argument("--root_dir", required=True, help="Root directory for results")
+    parser.add_argument(
+        "--runner_name", required=True, help="Name of the benchmark runner"
+    )
     parser.add_argument(
         "--dry", help="Dry run (do not post comment)", action="store_true"
     )
@@ -119,8 +117,15 @@ def main():
 
     token = os.environ["GITHUB_TOKEN"] if "GITHUB_TOKEN" in os.environ else None
 
-    results_old = SuiteResults.model_validate_json(open(args.old, "rb").read())
-    results_new = SuiteResults.model_validate_json(open(args.new, "rb").read())
+    results_db = SuiteResultsDatabase.from_root(args.root_dir, args.runner_name)
+    results_old = results_db.from_uid(args.sha_base)
+    if results_old is None:
+        print(f"Results not found for {args.sha_base}.")
+        sys.exit(1)
+    results_new = results_db.from_uid(args.sha_new)
+    if results_new is None:
+        print(f"Results not found for {args.sha_new}.")
+        sys.exit(1)
 
     # Confirm the results are from the same benchmark suite and version
     if results_old.suite_specification.id != results_new.suite_specification.id:
@@ -145,7 +150,7 @@ def main():
     message = f"""
 ## 📊 Benchmark Summary
 
-Comparing {args.sha_new} to {args.sha_base}, we observe:
+Comparing {args.repo}@{args.sha_new} to {args.repo}@{args.sha_base}, we observe:
 
 - 🟢 {ct_impr} improvements in `compile_time_ms`
 - 🔴 {ct_reg} regressions in `compile_time_ms`

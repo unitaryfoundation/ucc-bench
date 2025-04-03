@@ -1,3 +1,4 @@
+# Explicitly import the modules to be sure the register.compiler decorator runs
 from .base_compiler import BaseCompiler as BaseCompiler
 from .qiskit_compiler import QiskitCompiler as QiskitCompiler
 from .cirq_compiler import CirqCompiler as CirqCompiler
