@@ -148,7 +148,12 @@ Always make the plots for latest/over-time time ordered based on what is in the 
 
 So
 #1. Add auxiliary data to simulation results, command line to specify
-2. Build github actions in order above (DONE ucc-bench, trigger ucc-bench, cron for plots, PRs)
+2. Build github actions in order above (DONE ucc-bench,
+3. Trigger ucc-bench (DONE ucc-bench upgrade, TODO ucc action to trigger)
+4. PR in ucc-bench
+5. PR in ucc
+6. Port history/code for plots
+7. Cron for plots
 
 
 If we use a the temporary PR kciked off from ucc -> ucc-bench with automerge, we end
