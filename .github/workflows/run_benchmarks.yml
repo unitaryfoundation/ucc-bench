@@ -40,8 +40,13 @@ jobs:
       - name: Install the project
         run: uv sync --all-extras --dev
 
+      - name: Sanitize runner name
+        run: |
+          safe_name=$(echo "${{ runner.name }}" | tr -cd '[:alnum:]_-' | tr '[:upper:]' '[:lower:]')
+          echo "SAFE_NAME=$safe_name" >> $GITHUB_ENV
+
       - name: Run benchmarks
-        run: ./scripts/run_benchmarks.sh ${{ github.sha }} ${{ runner.name }} ./results
+        run: ./scripts/run_benchmarks.sh ${{ github.sha }} $SAFE_NAME ./results
 
       - name: Configure Git
         run: |
