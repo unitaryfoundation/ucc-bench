@@ -9,7 +9,7 @@ set -euo pipefail
 
 
 # Ensure this script is run from the root of the repository
-if [[ ! -f "scripts/run_benchmarks.sh" ]]; then
+if [[ ! -f ".github/scripts/run_benchmarks.sh" ]]; then
   echo "Please run this script from the root of the repository."
   exit 1
 fi
@@ -45,7 +45,7 @@ echo "Commit time for ucc-bench@$commit_hash: $uid_time"
 
 # Extract upstream commit information for the version of UCC
 # set in pyproject.toml
-ucc_hash=$(uv run ./scripts/extract_ucc_revision.py ./pyproject.toml || true)
+ucc_hash=$(uv run .github/scripts/extract_ucc_revision.py ./pyproject.toml || true)
 
 if [[ -n "$ucc_hash" ]]; then
   echo "ucc in pyproject-toml is ucc@$ucc_hash"
