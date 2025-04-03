@@ -109,19 +109,8 @@ def save_results_json(suite_results: SuiteResults, root_dir: Path) -> None:
         f.write(suite_results.model_dump_json(indent=2))
 
 
-def save_results_csv(suite_results: SuiteResults, root_dir: Path) -> None:
-    """
-    Save the benchmark results in CSV format beneath the given root directory.
-
-    Benchmark results are organized by slowly varying dimensions for easier loading
-    and comparison, so will be in the path {out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.compilation.csv
-    or {out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.simulation.csv
-    """
-
-    out_path = out_path_for_results(suite_results, root_dir, "compilation.csv")
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-
-    print(f"Saving timing results to {out_path}")
+def to_df_timing(suite_results: SuiteResults) -> pd.DataFrame:
+    """Return a DataFrame of the timing results from the benchmark suite."""
     timing_data = [
         {
             "compiler": result.compiler.id,
@@ -134,7 +123,11 @@ def save_results_csv(suite_results: SuiteResults, root_dir: Path) -> None:
     ]
     # Create a Pandas DataFrame and write it to a CSV file
     df = pd.DataFrame(timing_data)
-    df.to_csv(out_path, index=False)
+    return df
+
+
+def to_df_simulation(suite_results: SuiteResults) -> pd.DataFrame:
+    """Return a DataFrame of the simulation results from the benchmark suite."""
 
     measurement_data = [
         {
@@ -149,12 +142,30 @@ def save_results_csv(suite_results: SuiteResults, root_dir: Path) -> None:
         for result in suite_results.results
         if result.simulation_metrics
     ]
+    df = pd.DataFrame(measurement_data)
+    return df
 
-    if len(measurement_data) > 0:
+
+def save_results_csv(suite_results: SuiteResults, root_dir: Path) -> None:
+    """
+    Save the benchmark results in CSV format beneath the given root directory.
+
+    Benchmark results are organized by slowly varying dimensions for easier loading
+    and comparison, so will be in the path {out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.compilation.csv
+    or {out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.simulation.csv
+    """
+
+    out_path = out_path_for_results(suite_results, root_dir, "compilation.csv")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    print(f"Saving timing results to {out_path}")
+    to_df_timing(suite_results).to_csv(out_path, index=False)
+
+    sim_df = to_df_simulation(suite_results)
+
+    if len(sim_df) > 0:
         out_path = out_path_for_results(suite_results, root_dir, "simulation.csv")
         out_path.parent.mkdir(parents=True, exist_ok=True)
 
         print(f"Saving simulation results to {out_path}")
-        # Create a Pandas DataFrame and write it to a CSV file
-        df = pd.DataFrame(measurement_data)
-        df.to_csv(out_path, index=False)
+        sim_df.to_csv(out_path, index=False)

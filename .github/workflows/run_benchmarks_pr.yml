@@ -1,0 +1,60 @@
+# Run benchmarks on pull requests and post a comment back detailing the results.
+# Unlike benchmarks on pushes, these results are not committed back to the repo.
+# The purpose here is to provide performance view before merging a PR.
+name: PR Benchmark Comparison
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+
+permissions:
+  pull-requests: write
+  contents: read
+# Set the runner name here for use in a later step, but also next to
+# the actual runs-on designation below so users know to change both together
+env:
+  RUNNER_LABEL: ucc-benchmarks-8-core-U22.04
+jobs:
+  run-benchmarks-pr:
+    runs-on: ucc-benchmarks-8-core-U22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Run benchmarks for PR comparison
+        run: .github/scripts/run_benchmarks.sh ${{ github.sha }} $RUNNER_LABEL ./results
+
+      # Get the SHA of the last commit on the main branch before this PR as the
+      # baseline for comparison
+      - name: Find meaningful merge base
+        id: get_sha
+        run: |
+          ANCESTOR_SHA=$(.github/scripts/find_useful_merge_base.sh HEAD origin/main)
+          echo "Useful base commit: $ANCESTOR_SHA"
+          echo "ANCESTOR_SHA=$ANCESTOR_SHA" >> "$GITHUB_ENV"
+
+      - name: Post benchmark comparison to PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          uv run python .github/scripts/post_benchmark_diff_comment.py \
+            --repo "${{ github.repository }}" \
+            --pr "${{ github.event.pull_request.number }}" \
+            --sha_old "${{ steps.get_sha.outputs.ANCESTOR_SHA }}" \
+            --sha_new "${{ github.sha }}"
+
