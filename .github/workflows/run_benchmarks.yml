@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   run-benchmarks:
-    runs-on: ubuntu-latest
+    runs-on: ucc-benchmarks-8-core-U22.04
 
     # Don't run on forks or on commits that are already benchmark results
     if: ${{ github.repository == 'unitaryfoundation/ucc-bench' && !contains(github.event.head_commit.message, '[benchmark chore]') }}
