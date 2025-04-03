@@ -16,6 +16,7 @@ permissions:
 jobs:
   run-benchmarks:
     runs-on: ucc-benchmarks-8-core-U22.04
+
     env: # expose this in env for later steps since its not available in the runner. variable
       RUNNER_LABEL: ucc-benchmarks-8-core-U22.04
 
