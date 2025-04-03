@@ -16,6 +16,8 @@ permissions:
 jobs:
   run-benchmarks:
     runs-on: ucc-benchmarks-8-core-U22.04
+    env: # expose this in env for later steps since its not available in the runner. variable
+      RUNNER_LABEL: ucc-benchmarks-8-core-U22.04
 
     # Don't run on forks or on commits that are already benchmark results
     if: ${{ github.repository == 'unitaryfoundation/ucc-bench' && !contains(github.event.head_commit.message, '[benchmark chore]') }}
@@ -37,13 +39,8 @@ jobs:
       - name: Install the project
         run: uv sync --all-extras --dev
 
-      - name: Sanitize runner name
-        run: |
-          safe_name=$(echo "${{ runner.name }}" | tr -cd '[:alnum:]_-' | tr '[:upper:]' '[:lower:]')
-          echo "SAFE_NAME=$safe_name" >> $GITHUB_ENV
-
-      - name: Run benchmarks
-        run: ./scripts/run_benchmarks.sh ${{ github.sha }} $SAFE_NAME ./results
+     - name: Run benchmarks
+        run: ./scripts/run_benchmarks.sh ${{ github.sha }} $RUNNER_LABEL ./results
 
       - name: Configure Git
         run: |
