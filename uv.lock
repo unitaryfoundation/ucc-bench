@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version < '3.13'",
@@ -1618,7 +1619,7 @@ name = "tqdm"
 version = "4.67.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "platform_system == 'Windows'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a8/4b/29b4ef32e036bb34e4ab51796dd745cdba7ed47ad142a9f4a1eb8e0c744d/tqdm-4.67.1.tar.gz", hash = "sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2", size = 169737 }
 wheels = [
@@ -1655,7 +1656,7 @@ wheels = [
 [[package]]
 name = "ucc"
 version = "0.4.4"
-source = { git = "https://github.com/unitaryfoundation/ucc?rev=65e6bdbfd1f30a015375e58c40b359d4a816ba5d#65e6bdbfd1f30a015375e58c40b359d4a816ba5d" }
+source = { git = "https://github.com/unitaryfoundation/ucc?rev=d5ed4aa3c60d0154f31b7838634588b3b663efd7#d5ed4aa3c60d0154f31b7838634588b3b663efd7" }
 dependencies = [
     { name = "cirq-core" },
     { name = "ply" },
@@ -1698,7 +1699,7 @@ requires-dist = [
     { name = "qbraid", specifier = ">=0.9.4" },
     { name = "qiskit", specifier = ">=1.4.2" },
     { name = "qiskit-aer", specifier = ">=0.17.0" },
-    { name = "ucc", git = "https://github.com/unitaryfoundation/ucc?rev=65e6bdbfd1f30a015375e58c40b359d4a816ba5d" },
+    { name = "ucc", git = "https://github.com/unitaryfoundation/ucc?rev=d5ed4aa3c60d0154f31b7838634588b3b663efd7" },
 ]
 
 [package.metadata.requires-dev]
