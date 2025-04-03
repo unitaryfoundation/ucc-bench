@@ -13,9 +13,6 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: ${{ github.workflow }}
-
 jobs:
   run-benchmarks:
     runs-on: ubuntu-latest
