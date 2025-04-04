@@ -115,7 +115,7 @@ def main():
     )
     args = parser.parse_args()
 
-    token = os.environ["GITHUB_TOKEN"] if "GITHUB_TOKEN" in os.environ else None
+    token = os.environ["GH_TOKEN"] if "GH_TOKEN" in os.environ else None
 
     results_db = SuiteResultsDatabase.from_root(args.root_dir, args.runner_name)
     results_old = results_db.from_uid(args.sha_base)
@@ -142,6 +142,9 @@ def main():
     df_old = to_df_timing(results_old)
     df_new = to_df_timing(results_new)
 
+    print(df_old)
+    print("--------------------------")
+    print(df_new)
     comparison_df = build_comparison_table(df_old, df_new)
     ct_impr, ct_reg, mq_impr, mq_reg = summarize_changes(comparison_df)
 

@@ -53,10 +53,17 @@ jobs:
           ANCESTOR_SHA=$(.github/scripts/find_ancestor_sha.sh HEAD origin/main)
           echo "Useful base commit: $ANCESTOR_SHA"
           echo "ANCESTOR_SHA=$ANCESTOR_SHA" >> "$GITHUB_OUTPUT"
+      # Use token of Github App to post the comment
+      - name: Generate token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.UCC_BENCH_APP_ID }}
+          private-key: ${{ secrets.UCC_BENCH_APP_PRIVATE_KEY }}
 
       - name: Post benchmark comparison to PR
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
           ANCESTOR_SHA: ${{ steps.get_sha.outputs.ANCESTOR_SHA }}
         run: |
           uv run python .github/scripts/post_benchmark_diff_comment.py \
