@@ -41,7 +41,11 @@ def build_comparison_table(df_old, df_new):
                 "Compiler": row["compiler"],
                 "Benchmark": row["benchmark_id"],
                 "Compile Time Δ": compile_time_change,
+                "Compile Time New (ms)": row["compile_time_ms_new"],
+                "Compile Time Old (ms)": row["compile_time_ms_old"],
                 "MultiQ Gates Δ": gates_change,
+                "MultiQ Gates New": row["compiled_multiq_gates_new"],
+                "MultiQ Gates Old": row["compiled_multiq_gates_old"],
             }
         )
 
@@ -110,6 +114,9 @@ def main():
     parser.add_argument(
         "--runner_name", required=True, help="Name of the benchmark runner"
     )
+    parser.add_argument(
+        "--dry", action="store_true", help="Dry run, do not post comment"
+    )
     args = parser.parse_args()
 
     token = os.environ["GH_TOKEN"] if "GH_TOKEN" in os.environ else None
@@ -160,24 +167,9 @@ Comparing new {args.repo}@{args.sha_new} to baseline {args.repo}@{args.sha_base}
 {markdown_table}
 
 </details>
-
-<details>
-<summary>⚙️ See full benchmark results</summary>
-For new {args.repo}@{args.sha_new}
-
-```json
-{results_new.model_dump_json(indent=2)}
-```
-
-For baseline {args.repo}@{args.sha_base}
-
-```
-{results_new.model_dump_json(indent=2)}
-```
-</details>
 """
 
-    if args.pr:
+    if args.pr or args.dry:
         print("Posting comment to PR...")
         post_comment(token, args.repo, args.pr, message)
     else:

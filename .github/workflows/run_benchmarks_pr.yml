@@ -1,6 +1,8 @@
 # Run benchmarks on pull requests and post a comment back detailing the results.
 # Unlike benchmarks on pushes, these results are not committed back to the repo.
 # The purpose here is to provide performance view before merging a PR.
+# This will only be run if the PR has the label "preview-benchmark-results"
+# and will be skipped if the label is removed.
 name: Run PR Benchmark Comparison
 
 on:
@@ -10,6 +12,8 @@ on:
     types:
       - opened
       - synchronize
+      - labeled
+      - unlabeled
 
 # Only one benchmark run should be in progress at a time
 concurrency:
@@ -25,6 +29,7 @@ env:
   RUNNER_LABEL: ucc-benchmarks-8-core-U22.04
 jobs:
   run-benchmarks-pr:
+    if: contains(github.event.pull_request.labels.*.name, 'preview-benchmark-results')
     runs-on: ucc-benchmarks-8-core-U22.04
 
     # Cancel if a newer commit is pushed to the PR
