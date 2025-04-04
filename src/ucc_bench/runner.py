@@ -10,6 +10,7 @@ from .registry import register
 from .simulation.observables import calc_expectation_value
 from .simulation.noise_models import create_depolarizing_noise_model
 from qbraid import transpile
+from time import perf_counter, process_time
 
 
 def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResult:
@@ -43,12 +44,20 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
 
     logger.info(f"Begin compiling '{benchmark.qasm_file}'")
 
-    start_compile = datetime.now()
+    start_compile_wall = perf_counter()
+    start_compile_cpu = process_time()
+
     compiled_circuit = compiler.compile(raw_circuit)
-    end_compile = datetime.now()
+
+    end_compile_cpu = process_time()
+    end_compile_wall = perf_counter()
+
+    cpu_time = end_compile_cpu - start_compile_cpu
+    wall_time = end_compile_wall - start_compile_wall
+    cpu_utilization = cpu_time / wall_time if wall_time > 0 else 0.0
 
     logger.info(
-        f"Finished compiling. Duration: {(end_compile - start_compile).total_seconds()} seconds."
+        f"Finished compiling. Wall Time: {wall_time:.4f}s, CPU Time: {cpu_time:.4f}s, Utilization: {cpu_utilization:.2%}"
     )
 
     simulation_metrics = None
@@ -91,10 +100,10 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
     return BenchmarkResult(
         compiler=CompilerInfo(id=compiler.id(), version=compiler.version()),
         benchmark_id=benchmark.id,
-        run_start=start_compile,
-        run_end=end_compile,
+        run_start=start_compile_wall,
+        run_end=end_compile_wall,
         compilation_metrics=CompilationMetrics(
-            compilation_time_ms=(end_compile - start_compile).total_seconds() * 1000,
+            compilation_time_ms=wall_time * 1000,
             raw_multiq_gates=compiler.count_multi_qubit_gates(raw_circuit),
             compiled_multiq_gates=compiler.count_multi_qubit_gates(compiled_circuit),
         ),
