@@ -234,3 +234,8 @@ suite.py: Defines Pydantic models (BenchmarkSuite, BenchmarkSpec, CompilerSpec, 
 * * `noise_models.py`: Defines functions to create noise models (currently a standard depolarizing model).
 * * `observables.py`: Provides functions to calculate expectation values and includes implementations of registered observables (computational_basis, qaoa).
 * * `heavy_output_prob.py`: Implements the Heavy Output Probability metric as a registered output metric.
+
+## License
+
+`ucc-bench` is distributed under [GNU Affero General Public License version 3.0](https://www.gnu.org/licenses/agpl-3.0.en.html)(AGPLv3).
+Parts of ucc contain code or modified code that is part of [Qiskit](https://github.com/Qiskit/qiskit) or [Qiskit Benchpress](https://github.com/Qiskit/benchpress), which are distributed under the Apache 2.0 license.
