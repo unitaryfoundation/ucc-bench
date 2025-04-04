@@ -278,7 +278,7 @@ def main() -> None:
     message = f"""
 ## 📊 Benchmark Summary ({args.runner_name})
 
-Comparing `{args.repo}@{args.sha_new}` to `{args.repo}@{args.sha_base}`:
+Comparing {args.repo}@{args.sha_new} to {args.repo}@{args.sha_base}:
 
 - 🟢 `{ct_impr}` improvements in `compile_time_ms`
 - 🔴 `{ct_reg}` regressions in `compile_time_ms`
