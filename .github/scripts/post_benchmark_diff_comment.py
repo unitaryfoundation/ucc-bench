@@ -166,6 +166,17 @@ Comparing {args.repo}@{args.sha_new} to {args.repo}@{args.sha_base}, we observe:
 {markdown_table}
 
 </details>
+
+<details>
+<summary>⚙️ See full benchmark results</summary>
+For {args.repo}@{args.sha_new}
+
+{results_new.model_dump_json(indent=2)}
+
+For {args.repo}@{args.sha_base}
+
+{results_new.model_dump_json(indent=2)}
+</details>
 """
 
     if args.dry:
