@@ -182,12 +182,14 @@ class SuiteResultsDatabase(BaseModel):
         }
 
     @classmethod
-    def from_root(cls, root_dir: str, runner_name: str) -> "SuiteResultsDatabase":
+    def from_root(
+        cls, root_dir: str, runner_name: str, suite_id: str
+    ) -> "SuiteResultsDatabase":
         """
-        Load all results from the given root directory.
+        Load all results from the given root/runner/suite_id directory
         """
         suite_results = []
-        for path in (Path(root_dir) / runner_name).glob("**/*.json"):
+        for path in (Path(root_dir) / runner_name / suite_id).glob("**/*.json"):
             suite_results.append(
                 SuiteResults.model_validate_json(path.read_text(encoding="utf-8"))
             )

@@ -75,20 +75,6 @@ def build_comparison_table(
     return comparison_df
 
 
-def _try_parse_percent(value: str) -> Optional[float]:
-    """Helper to safely parse percentage string from format_change output."""
-    if value == "N/A":
-        return None  # Or 0.0 if preferred
-    try:
-        # Remove formatting characters and convert to float
-        numeric_part = value.replace("%", "").replace("*", "")
-        return float(numeric_part)
-    except ValueError:
-        # Handle unexpected format gracefully
-        print(f"Warning: Could not parse '{value}' as percentage.", file=sys.stderr)
-        return None  # Indicate parsing failed
-
-
 def summarize_changes(
     df: pd.DataFrame, threshold: float = DEFAULT_THRESHOLD
 ) -> Tuple[int, int, int, int]:
@@ -202,17 +188,12 @@ def main() -> None:
         )
         sys.exit(1)
 
-    # Load results with error handling
-    try:
-        results_db = SuiteResultsDatabase.from_root(args.root_dir, args.runner_name)
-        results_old: Optional[SuiteResults] = results_db.from_uid(args.sha_base)
-        results_new: Optional[SuiteResults] = results_db.from_uid(args.sha_new)
-    except Exception as e:
-        print(
-            f"Error loading benchmark database from '{args.root_dir}' for runner '{args.runner_name}': {e}",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    # Only commenting on timing results for now (not simulation ones)
+    timing_results_db = SuiteResultsDatabase.from_root(
+        args.root_dir, args.runner_name, "timing_benchmarks"
+    )
+    results_old: Optional[SuiteResults] = timing_results_db.from_uid(args.sha_base)
+    results_new: Optional[SuiteResults] = timing_results_db.from_uid(args.sha_new)
 
     # Check if results were found
     if results_old is None:
