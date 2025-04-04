@@ -150,13 +150,15 @@ So
 #1. Add auxiliary data to simulation results, command line to specify
 #2. Build github actions in order above (DONE ucc-bench,
 #3. Trigger ucc-bench (DONE ucc-bench upgrade, DONE ucc action to trigger)
-4. PR in ucc-bench -> Add label filter, decide whether to embed full json
+#4. PR in ucc-bench -> Add label filter, decide whether to embed full json
 5. PR in ucc - only if preview-benchmark label is set;
         walk ucc_hash before calling action in ucc-bench
         ucc-bench does lookup?
         github bot user for both, use icon and name
-
-6. Port history/code for plots
+5a. Debug consistency issues in runner -- why are there such large changes in
+    timings in ucc-bench, but not in ucc
+      Try dockerfile?
+6. Port code for plots
 7. Cron for plots
 8. Add runbook/docs to .github directory/ Also explain how storing data
 9. Clean up README

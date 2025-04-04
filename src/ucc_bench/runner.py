@@ -11,6 +11,7 @@ from .simulation.observables import calc_expectation_value
 from .simulation.noise_models import create_depolarizing_noise_model
 from qbraid import transpile
 from time import perf_counter, process_time
+import multiprocessing
 
 
 def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResult:
@@ -132,6 +133,11 @@ def run_suite(
     """
     results = []
     tasks = []
+
+    # Ensure that the multiprocessing module uses the 'spawn' method for creating new processes
+    # This helps ensure consistency because each process will start with a fresh Python interpreter
+    # versus a fork of the current one.
+    multiprocessing.set_start_method("spawn", force=True)
 
     with ProcessPoolExecutor(
         max_workers=num_parallel,
