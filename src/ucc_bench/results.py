@@ -126,6 +126,27 @@ def to_df_timing(suite_results: SuiteResults) -> pd.DataFrame:
     return df
 
 
+def to_df_timing_detailed(suite_results: SuiteResults) -> pd.DataFrame:
+    """Return a DataFrame of the timing results from the benchmark suite with
+    detailed data about compiler version and timestamps."""
+    timing_data = [
+        {
+            "compiler": result.compiler.id,
+            "benchmark_id": result.benchmark_id,
+            "raw_multiq_gates": result.compilation_metrics.raw_multiq_gates,
+            "compile_time_ms": result.compilation_metrics.compilation_time_ms,
+            "compiled_multiq_gates": result.compilation_metrics.compiled_multiq_gates,
+            "compiler_version": result.compiler.version,
+            "uid_timestamp": suite_results.metadata.uid_timestamp,
+            "upstream_timestamp": suite_results.metadata.upstream_timestamp,
+        }
+        for result in suite_results.results
+    ]
+    # Create a Pandas DataFrame and write it to a CSV file
+    df = pd.DataFrame(timing_data)
+    return df
+
+
 def to_df_simulation(suite_results: SuiteResults) -> pd.DataFrame:
     """Return a DataFrame of the simulation results from the benchmark suite."""
 
@@ -208,3 +229,6 @@ class SuiteResultsDatabase:
         """
         latest_result = max(self._suite_results, key=lambda x: x.metadata.uid_timestamp)
         return latest_result
+
+    def get_all(self) -> List[SuiteResults]:
+        return self._suite_results
