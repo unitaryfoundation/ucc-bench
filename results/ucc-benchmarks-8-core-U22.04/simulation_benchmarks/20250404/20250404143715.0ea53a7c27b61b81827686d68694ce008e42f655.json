@@ -3,7 +3,7 @@
     "spec_path": "benchmarks/simulation_benchmarks.toml",
     "spec_version": "1.0",
     "suite_version": "0.1",
-    "id": "observable_benchmarks",
+    "id": "simulation_benchmarks",
     "description": "Benchmarks to measure impact of compiling on circuit-specific observables for UCC project",
     "compilers": [
       {
@@ -77,15 +77,15 @@
     ]
   },
   "metadata": {
-    "uid": "58859c8933d88c726fe551f35d2ebbd6cf56d419",
-    "uid_timestamp": "2025-04-03T18:41:39Z",
-    "run_start": "2025-04-03T18:49:11.634388",
-    "run_end": "2025-04-03T18:50:50.360567",
+    "uid": "0ea53a7c27b61b81827686d68694ce008e42f655",
+    "uid_timestamp": "2025-04-04T14:37:15Z",
+    "run_start": "2025-04-04T14:43:40.456646",
+    "run_end": "2025-04-04T14:45:19.594491",
     "runner_name": "ucc-benchmarks-8-core-U22.04",
     "runner_specs": {
       "os": "Linux",
       "cpu": "x86_64",
-      "ram_gb": 31.340503692626953,
+      "ram_gb": 31.33953857421875,
       "physical_cores": 4
     },
     "runner_version": "0.1.0",
@@ -93,9 +93,9 @@
       "/home/runner/work/ucc-bench/ucc-bench/.venv/bin/ucc-bench",
       "./benchmarks/simulation_benchmarks.toml",
       "--uid",
-      "58859c8933d88c726fe551f35d2ebbd6cf56d419",
+      "0ea53a7c27b61b81827686d68694ce008e42f655",
       "--uid_time",
-      "2025-04-03T18:41:39Z",
+      "2025-04-04T14:37:15Z",
       "--log_level",
       "INFO",
       "-o",
@@ -117,10 +117,10 @@
         "version": "0.4.4"
       },
       "benchmark_id": "qaoa",
-      "run_start": "2025-04-03T18:49:11.665461",
-      "run_end": "2025-04-03T18:49:11.715252",
+      "run_start": "2025-04-04T14:43:40.482124",
+      "run_end": "2025-04-04T14:43:40.511417",
       "compilation_metrics": {
-        "compilation_time_ms": 49.791000000000004,
+        "compilation_time_ms": 29.293,
         "raw_multiq_gates": 96,
         "compiled_multiq_gates": 96
       },
@@ -138,19 +138,19 @@
         "version": "0.4.4"
       },
       "benchmark_id": "qv",
-      "run_start": "2025-04-03T18:49:11.676377",
-      "run_end": "2025-04-03T18:49:11.718368",
+      "run_start": "2025-04-04T14:43:40.490163",
+      "run_end": "2025-04-04T14:43:40.529639",
       "compilation_metrics": {
-        "compilation_time_ms": 41.991,
+        "compilation_time_ms": 39.476,
         "raw_multiq_gates": 150,
         "compiled_multiq_gates": 150
       },
       "simulation_metrics": {
         "measurement_id": "heavy_output",
-        "uncompiled_ideal": -0.5114440540679475,
-        "compiled_ideal": -0.48388659948246726,
-        "uncompiled_noisy": -0.6178146059877451,
-        "compiled_noisy": -0.5919342686368971
+        "uncompiled_ideal": -0.6077820965241096,
+        "compiled_ideal": -0.6121864323747926,
+        "uncompiled_noisy": -0.6135327858859972,
+        "compiled_noisy": -0.6179053368185191
       }
     },
     {
@@ -159,10 +159,10 @@
         "version": "0.4.4"
       },
       "benchmark_id": "qft",
-      "run_start": "2025-04-03T18:49:11.664409",
-      "run_end": "2025-04-03T18:49:11.696601",
+      "run_start": "2025-04-04T14:43:40.482329",
+      "run_end": "2025-04-04T14:43:40.513266",
       "compilation_metrics": {
-        "compilation_time_ms": 32.192,
+        "compilation_time_ms": 30.936999999999998,
         "raw_multiq_gates": 105,
         "compiled_multiq_gates": 105
       },
@@ -180,10 +180,10 @@
         "version": "0.4.4"
       },
       "benchmark_id": "square_heisenberg",
-      "run_start": "2025-04-03T18:49:11.668645",
-      "run_end": "2025-04-03T18:49:11.698481",
+      "run_start": "2025-04-04T14:43:40.481854",
+      "run_end": "2025-04-04T14:43:40.501587",
       "compilation_metrics": {
-        "compilation_time_ms": 29.836000000000002,
+        "compilation_time_ms": 19.733,
         "raw_multiq_gates": 144,
         "compiled_multiq_gates": 36
       },
@@ -201,17 +201,17 @@
         "version": "0.4.4"
       },
       "benchmark_id": "prep_select",
-      "run_start": "2025-04-03T18:49:12.123032",
-      "run_end": "2025-04-03T18:49:12.376043",
+      "run_start": "2025-04-04T14:43:40.942615",
+      "run_end": "2025-04-04T14:43:41.198746",
       "compilation_metrics": {
-        "compilation_time_ms": 253.011,
+        "compilation_time_ms": 256.131,
         "raw_multiq_gates": 658,
         "compiled_multiq_gates": 948
       },
       "simulation_metrics": {
         "measurement_id": "computational_basis",
         "uncompiled_ideal": -2.13469795757649e-18,
-        "compiled_ideal": -2.0801535061920439e-16,
+        "compiled_ideal": -2.8145819569136763e-16,
         "uncompiled_noisy": -5.421010862427522e-19,
         "compiled_noisy": 1.6082806387649959e-9
       }
@@ -222,10 +222,10 @@
         "version": "0.4.4"
       },
       "benchmark_id": "qcnn",
-      "run_start": "2025-04-03T18:49:14.257637",
-      "run_end": "2025-04-03T18:49:14.266807",
+      "run_start": "2025-04-04T14:43:43.174157",
+      "run_end": "2025-04-04T14:43:43.182324",
       "compilation_metrics": {
-        "compilation_time_ms": 9.17,
+        "compilation_time_ms": 8.167,
         "raw_multiq_gates": 32,
         "compiled_multiq_gates": 32
       },
@@ -243,10 +243,10 @@
         "version": "2.0.1"
       },
       "benchmark_id": "qaoa",
-      "run_start": "2025-04-03T18:49:14.765188",
-      "run_end": "2025-04-03T18:49:15.826875",
+      "run_start": "2025-04-04T14:43:43.634687",
+      "run_end": "2025-04-04T14:43:44.600976",
       "compilation_metrics": {
-        "compilation_time_ms": 1061.6870000000001,
+        "compilation_time_ms": 966.289,
         "raw_multiq_gates": 96,
         "compiled_multiq_gates": 96
       },
@@ -264,19 +264,19 @@
         "version": "2.0.1"
       },
       "benchmark_id": "qv",
-      "run_start": "2025-04-03T18:49:15.800166",
-      "run_end": "2025-04-03T18:49:17.531960",
+      "run_start": "2025-04-04T14:43:44.636354",
+      "run_end": "2025-04-04T14:43:46.341785",
       "compilation_metrics": {
-        "compilation_time_ms": 1731.794,
+        "compilation_time_ms": 1705.4309999999998,
         "raw_multiq_gates": 150,
         "compiled_multiq_gates": 150
       },
       "simulation_metrics": {
         "measurement_id": "heavy_output",
-        "uncompiled_ideal": -0.48902699667745775,
-        "compiled_ideal": -0.502912521214964,
-        "uncompiled_noisy": -0.5436336167341155,
-        "compiled_noisy": -0.6157121763861482
+        "uncompiled_ideal": -0.5160501867375015,
+        "compiled_ideal": -0.6135327858859972,
+        "uncompiled_noisy": -0.618033986858218,
+        "compiled_noisy": -0.5931247497997998
       }
     },
     {
@@ -285,10 +285,10 @@
         "version": "2.0.1"
       },
       "benchmark_id": "qft",
-      "run_start": "2025-04-03T18:49:18.140983",
-      "run_end": "2025-04-03T18:49:18.925110",
+      "run_start": "2025-04-04T14:43:47.036627",
+      "run_end": "2025-04-04T14:43:47.812580",
       "compilation_metrics": {
-        "compilation_time_ms": 784.1270000000001,
+        "compilation_time_ms": 775.953,
         "raw_multiq_gates": 105,
         "compiled_multiq_gates": 90
       },
@@ -306,10 +306,10 @@
         "version": "2.0.1"
       },
       "benchmark_id": "square_heisenberg",
-      "run_start": "2025-04-03T18:49:21.575372",
-      "run_end": "2025-04-03T18:49:22.094137",
+      "run_start": "2025-04-04T14:43:50.537972",
+      "run_end": "2025-04-04T14:43:51.044742",
       "compilation_metrics": {
-        "compilation_time_ms": 518.765,
+        "compilation_time_ms": 506.77000000000004,
         "raw_multiq_gates": 144,
         "compiled_multiq_gates": 36
       },
@@ -327,10 +327,10 @@
         "version": "2.0.1"
       },
       "benchmark_id": "prep_select",
-      "run_start": "2025-04-03T18:49:22.657529",
-      "run_end": "2025-04-03T18:49:32.366530",
+      "run_start": "2025-04-04T14:43:51.549593",
+      "run_end": "2025-04-04T14:44:01.172273",
       "compilation_metrics": {
-        "compilation_time_ms": 9709.001,
+        "compilation_time_ms": 9622.68,
         "raw_multiq_gates": 658,
         "compiled_multiq_gates": 948
       },
@@ -348,10 +348,10 @@
         "version": "2.0.1"
       },
       "benchmark_id": "qcnn",
-      "run_start": "2025-04-03T18:49:29.356875",
-      "run_end": "2025-04-03T18:49:29.706661",
+      "run_start": "2025-04-04T14:43:58.415609",
+      "run_end": "2025-04-04T14:43:58.760489",
       "compilation_metrics": {
-        "compilation_time_ms": 349.786,
+        "compilation_time_ms": 344.88,
         "raw_multiq_gates": 32,
         "compiled_multiq_gates": 32
       },
@@ -369,10 +369,10 @@
         "version": "1.4.2"
       },
       "benchmark_id": "qaoa",
-      "run_start": "2025-04-03T18:49:30.800494",
-      "run_end": "2025-04-03T18:49:30.836066",
+      "run_start": "2025-04-04T14:43:59.929243",
+      "run_end": "2025-04-04T14:43:59.997694",
       "compilation_metrics": {
-        "compilation_time_ms": 35.572,
+        "compilation_time_ms": 68.451,
         "raw_multiq_gates": 96,
         "compiled_multiq_gates": 96
       },
@@ -390,19 +390,19 @@
         "version": "1.4.2"
       },
       "benchmark_id": "qv",
-      "run_start": "2025-04-03T18:49:33.145496",
-      "run_end": "2025-04-03T18:49:33.207742",
+      "run_start": "2025-04-04T14:44:02.449154",
+      "run_end": "2025-04-04T14:44:02.505169",
       "compilation_metrics": {
-        "compilation_time_ms": 62.246,
+        "compilation_time_ms": 56.015,
         "raw_multiq_gates": 150,
         "compiled_multiq_gates": 150
       },
       "simulation_metrics": {
         "measurement_id": "heavy_output",
-        "uncompiled_ideal": -0.4980392455763647,
-        "compiled_ideal": -0.5048351276472571,
-        "uncompiled_noisy": -0.6174457798067411,
-        "compiled_noisy": -0.608396419806731
+        "uncompiled_ideal": -0.4754632630265381,
+        "compiled_ideal": -0.6098530295660993,
+        "uncompiled_noisy": -0.6137406952961452,
+        "compiled_noisy": -0.6071497863689513
       }
     },
     {
@@ -411,17 +411,17 @@
         "version": "1.4.2"
       },
       "benchmark_id": "qft",
-      "run_start": "2025-04-03T18:49:33.962014",
-      "run_end": "2025-04-03T18:49:33.983545",
+      "run_start": "2025-04-04T14:44:02.966495",
+      "run_end": "2025-04-04T14:44:02.985391",
       "compilation_metrics": {
-        "compilation_time_ms": 21.531000000000002,
+        "compilation_time_ms": 18.896,
         "raw_multiq_gates": 105,
         "compiled_multiq_gates": 105
       },
       "simulation_metrics": {
         "measurement_id": "computational_basis",
         "uncompiled_ideal": 2.1684237122734696e-19,
-        "compiled_ideal": 2.168416174851491e-18,
+        "compiled_ideal": 2.3852467646397382e-18,
         "uncompiled_noisy": 7.589415207398531e-19,
         "compiled_noisy": 3.2526065174565133e-19
       }
@@ -432,10 +432,10 @@
         "version": "1.4.2"
       },
       "benchmark_id": "square_heisenberg",
-      "run_start": "2025-04-03T18:49:36.686875",
-      "run_end": "2025-04-03T18:49:36.717786",
+      "run_start": "2025-04-04T14:44:05.775696",
+      "run_end": "2025-04-04T14:44:05.805115",
       "compilation_metrics": {
-        "compilation_time_ms": 30.911,
+        "compilation_time_ms": 29.419,
         "raw_multiq_gates": 144,
         "compiled_multiq_gates": 36
       },
@@ -453,17 +453,17 @@
         "version": "1.4.2"
       },
       "benchmark_id": "prep_select",
-      "run_start": "2025-04-03T18:49:37.082659",
-      "run_end": "2025-04-03T18:49:37.249736",
+      "run_start": "2025-04-04T14:44:06.160587",
+      "run_end": "2025-04-04T14:44:06.293584",
       "compilation_metrics": {
-        "compilation_time_ms": 167.077,
+        "compilation_time_ms": 132.997,
         "raw_multiq_gates": 658,
         "compiled_multiq_gates": 948
       },
       "simulation_metrics": {
         "measurement_id": "computational_basis",
         "uncompiled_ideal": -2.13469795757649e-18,
-        "compiled_ideal": 8.376640575429028e-17,
+        "compiled_ideal": -8.114145624239095e-17,
         "uncompiled_noisy": -5.421010862427522e-19,
         "compiled_noisy": -8.131516293641283e-18
       }
@@ -474,10 +474,10 @@
         "version": "1.4.2"
       },
       "benchmark_id": "qcnn",
-      "run_start": "2025-04-03T18:49:48.717436",
-      "run_end": "2025-04-03T18:49:48.753055",
+      "run_start": "2025-04-04T14:44:18.505580",
+      "run_end": "2025-04-04T14:44:18.517106",
       "compilation_metrics": {
-        "compilation_time_ms": 35.619,
+        "compilation_time_ms": 11.526,
         "raw_multiq_gates": 32,
         "compiled_multiq_gates": 32
       },
@@ -495,10 +495,10 @@
         "version": "1.4.1"
       },
       "benchmark_id": "qaoa",
-      "run_start": "2025-04-03T18:49:49.942699",
-      "run_end": "2025-04-03T18:49:50.506350",
+      "run_start": "2025-04-04T14:44:19.248023",
+      "run_end": "2025-04-04T14:44:19.772029",
       "compilation_metrics": {
-        "compilation_time_ms": 563.6510000000001,
+        "compilation_time_ms": 524.006,
         "raw_multiq_gates": 96,
         "compiled_multiq_gates": 96
       },
@@ -516,19 +516,19 @@
         "version": "1.4.1"
       },
       "benchmark_id": "qv",
-      "run_start": "2025-04-03T18:49:51.324912",
-      "run_end": "2025-04-03T18:49:53.235781",
+      "run_start": "2025-04-04T14:44:21.158994",
+      "run_end": "2025-04-04T14:44:22.764441",
       "compilation_metrics": {
-        "compilation_time_ms": 1910.869,
+        "compilation_time_ms": 1605.4470000000001,
         "raw_multiq_gates": 150,
         "compiled_multiq_gates": 150
       },
       "simulation_metrics": {
         "measurement_id": "heavy_output",
-        "uncompiled_ideal": -0.6119456632275858,
-        "compiled_ideal": -0.60869681251199,
-        "uncompiled_noisy": -0.6178659714605702,
-        "compiled_noisy": -0.617093393833772
+        "uncompiled_ideal": -0.6135327858859972,
+        "compiled_ideal": -0.4578810713093294,
+        "uncompiled_noisy": -0.5861694139645295,
+        "compiled_noisy": -0.6180311760819064
       }
     },
     {
@@ -537,10 +537,10 @@
         "version": "1.4.1"
       },
       "benchmark_id": "qft",
-      "run_start": "2025-04-03T18:49:53.076046",
-      "run_end": "2025-04-03T18:49:53.725004",
+      "run_start": "2025-04-04T14:44:22.569292",
+      "run_end": "2025-04-04T14:44:23.120207",
       "compilation_metrics": {
-        "compilation_time_ms": 648.9580000000001,
+        "compilation_time_ms": 550.9150000000001,
         "raw_multiq_gates": 105,
         "compiled_multiq_gates": 105
       },
@@ -558,19 +558,19 @@
         "version": "1.4.1"
       },
       "benchmark_id": "square_heisenberg",
-      "run_start": "2025-04-03T18:49:57.029228",
-      "run_end": "2025-04-03T18:49:57.512870",
+      "run_start": "2025-04-04T14:44:26.542107",
+      "run_end": "2025-04-04T14:44:26.943351",
       "compilation_metrics": {
-        "compilation_time_ms": 483.642,
+        "compilation_time_ms": 401.24399999999997,
         "raw_multiq_gates": 144,
         "compiled_multiq_gates": 36
       },
       "simulation_metrics": {
         "measurement_id": "computational_basis",
         "uncompiled_ideal": 0.9999999999999997,
-        "compiled_ideal": 0.9999999999999978,
+        "compiled_ideal": 1.0000000000000027,
         "uncompiled_noisy": 0.2995441524046913,
-        "compiled_noisy": 0.6804702621300115
+        "compiled_noisy": 0.6793366894081715
       }
     },
     {
@@ -579,10 +579,10 @@
         "version": "1.4.1"
       },
       "benchmark_id": "prep_select",
-      "run_start": "2025-04-03T18:49:59.377103",
-      "run_end": "2025-04-03T18:50:09.953116",
+      "run_start": "2025-04-04T14:44:28.518587",
+      "run_end": "2025-04-04T14:44:37.194024",
       "compilation_metrics": {
-        "compilation_time_ms": 10576.012999999999,
+        "compilation_time_ms": 8675.437,
         "raw_multiq_gates": 658,
         "compiled_multiq_gates": 1064
       },
@@ -600,10 +600,10 @@
         "version": "1.4.1"
       },
       "benchmark_id": "qcnn",
-      "run_start": "2025-04-03T18:50:09.023267",
-      "run_end": "2025-04-03T18:50:09.271194",
+      "run_start": "2025-04-04T14:44:39.381500",
+      "run_end": "2025-04-04T14:44:39.663868",
       "compilation_metrics": {
-        "compilation_time_ms": 247.92700000000002,
+        "compilation_time_ms": 282.368,
         "raw_multiq_gates": 32,
         "compiled_multiq_gates": 32
       },

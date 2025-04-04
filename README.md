@@ -165,7 +165,7 @@ For these standard results, we follow the following convention:
 
 * `out_dir` is `results` (this directory)
 * `runner_name` is `ucc-benchmarks-8-core-U22.0`, the name of the GitHub runner used
-* `benchmark_suite` is the benchmark suite id in the corresponding TOML file. Today this is either `timing_benchmarks` or `observable_benchmarks`
+* `benchmark_suite` is the benchmark suite id in the corresponding TOML file. Today this is either `timing_benchmarks` or `simulation_benchmarks`
 * The `uid` is the git hash of the `ucc-bench` repository reflecting the set of configurations when the benchmark was run. `uid_date` is the date for that git hash.
 
 Thus the main subtetly here is using the git hash of `ucc-bench`. This was chosen so that we can always identify the exact configuration used in that run.

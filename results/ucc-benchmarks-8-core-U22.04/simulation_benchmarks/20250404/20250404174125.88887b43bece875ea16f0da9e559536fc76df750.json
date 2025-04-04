@@ -3,7 +3,7 @@
     "spec_path": "benchmarks/simulation_benchmarks.toml",
     "spec_version": "1.0",
     "suite_version": "0.1",
-    "id": "observable_benchmarks",
+    "id": "simulation_benchmarks",
     "description": "Benchmarks to measure impact of compiling on circuit-specific observables for UCC project",
     "compilers": [
       {
@@ -77,15 +77,15 @@
     ]
   },
   "metadata": {
-    "uid": "eb1de7148c60f248f744d2151365409b73021131",
-    "uid_timestamp": "2025-04-04T19:13:37Z",
-    "run_start": "2025-04-04T19:20:19.461668",
-    "run_end": "2025-04-04T19:22:01.411960",
+    "uid": "88887b43bece875ea16f0da9e559536fc76df750",
+    "uid_timestamp": "2025-04-04T17:41:25Z",
+    "run_start": "2025-04-04T17:47:53.679597",
+    "run_end": "2025-04-04T17:49:32.907765",
     "runner_name": "ucc-benchmarks-8-core-U22.04",
     "runner_specs": {
       "os": "Linux",
       "cpu": "x86_64",
-      "ram_gb": 31.33953857421875,
+      "ram_gb": 31.339534759521484,
       "physical_cores": 4
     },
     "runner_version": "0.1.0",
@@ -93,9 +93,9 @@
       "/home/runner/work/ucc-bench/ucc-bench/.venv/bin/ucc-bench",
       "./benchmarks/simulation_benchmarks.toml",
       "--uid",
-      "eb1de7148c60f248f744d2151365409b73021131",
+      "88887b43bece875ea16f0da9e559536fc76df750",
       "--uid_time",
-      "2025-04-04T19:13:37Z",
+      "2025-04-04T17:41:25Z",
       "--log_level",
       "INFO",
       "-o",
@@ -117,10 +117,10 @@
         "version": "0.4.4"
       },
       "benchmark_id": "qaoa",
-      "run_start": "1970-01-01T00:10:16.529887Z",
-      "run_end": "1970-01-01T00:10:16.553482Z",
+      "run_start": "2025-04-04T17:47:53.702513",
+      "run_end": "2025-04-04T17:47:53.732113",
       "compilation_metrics": {
-        "compilation_time_ms": 23.595570999987103,
+        "compilation_time_ms": 29.6,
         "raw_multiq_gates": 96,
         "compiled_multiq_gates": 96
       },
@@ -138,19 +138,19 @@
         "version": "0.4.4"
       },
       "benchmark_id": "qv",
-      "run_start": "1970-01-01T00:10:16.570934Z",
-      "run_end": "1970-01-01T00:10:16.603362Z",
+      "run_start": "2025-04-04T17:47:53.712900",
+      "run_end": "2025-04-04T17:47:53.751021",
       "compilation_metrics": {
-        "compilation_time_ms": 32.42820900004517,
+        "compilation_time_ms": 38.121,
         "raw_multiq_gates": 150,
         "compiled_multiq_gates": 150
       },
       "simulation_metrics": {
         "measurement_id": "heavy_output",
-        "uncompiled_ideal": -0.49506950264725713,
-        "compiled_ideal": -0.49506950264725713,
-        "uncompiled_noisy": -0.6166605460582155,
-        "compiled_noisy": -0.6126539781997443
+        "uncompiled_ideal": -0.5249757623146565,
+        "compiled_ideal": -0.5095748719433545,
+        "uncompiled_noisy": -0.6162836573589925,
+        "compiled_noisy": -0.6160077237065041
       }
     },
     {
@@ -159,10 +159,10 @@
         "version": "0.4.4"
       },
       "benchmark_id": "qft",
-      "run_start": "1970-01-01T00:10:16.562976Z",
-      "run_end": "1970-01-01T00:10:16.590781Z",
+      "run_start": "2025-04-04T17:47:53.703580",
+      "run_end": "2025-04-04T17:47:53.738028",
       "compilation_metrics": {
-        "compilation_time_ms": 27.8050299999677,
+        "compilation_time_ms": 34.448,
         "raw_multiq_gates": 105,
         "compiled_multiq_gates": 105
       },
@@ -180,10 +180,10 @@
         "version": "0.4.4"
       },
       "benchmark_id": "square_heisenberg",
-      "run_start": "1970-01-01T00:10:16.567676Z",
-      "run_end": "1970-01-01T00:10:16.582604Z",
+      "run_start": "2025-04-04T17:47:53.704606",
+      "run_end": "2025-04-04T17:47:53.724687",
       "compilation_metrics": {
-        "compilation_time_ms": 14.928238000038618,
+        "compilation_time_ms": 20.081000000000003,
         "raw_multiq_gates": 144,
         "compiled_multiq_gates": 36
       },
@@ -201,10 +201,10 @@
         "version": "0.4.4"
       },
       "benchmark_id": "prep_select",
-      "run_start": "1970-01-01T00:10:16.956199Z",
-      "run_end": "1970-01-01T00:10:17.191106Z",
+      "run_start": "2025-04-04T17:47:54.141443",
+      "run_end": "2025-04-04T17:47:54.391312",
       "compilation_metrics": {
-        "compilation_time_ms": 234.907400000111,
+        "compilation_time_ms": 249.869,
         "raw_multiq_gates": 658,
         "compiled_multiq_gates": 948
       },
@@ -222,10 +222,10 @@
         "version": "0.4.4"
       },
       "benchmark_id": "qcnn",
-      "run_start": "1970-01-01T00:10:19.193053Z",
-      "run_end": "1970-01-01T00:10:19.206585Z",
+      "run_start": "2025-04-04T17:47:56.427096",
+      "run_end": "2025-04-04T17:47:56.440787",
       "compilation_metrics": {
-        "compilation_time_ms": 13.532929000007243,
+        "compilation_time_ms": 13.691,
         "raw_multiq_gates": 32,
         "compiled_multiq_gates": 32
       },
@@ -243,10 +243,10 @@
         "version": "2.1.0"
       },
       "benchmark_id": "qaoa",
-      "run_start": "1970-01-01T00:10:19.779965Z",
-      "run_end": "1970-01-01T00:10:20.744945Z",
+      "run_start": "2025-04-04T17:47:56.866011",
+      "run_end": "2025-04-04T17:47:57.805589",
       "compilation_metrics": {
-        "compilation_time_ms": 964.9803309999925,
+        "compilation_time_ms": 939.578,
         "raw_multiq_gates": 96,
         "compiled_multiq_gates": 96
       },
@@ -264,19 +264,19 @@
         "version": "2.1.0"
       },
       "benchmark_id": "qv",
-      "run_start": "1970-01-01T00:10:20.739740Z",
-      "run_end": "1970-01-01T00:10:22.391403Z",
+      "run_start": "2025-04-04T17:47:58.049274",
+      "run_end": "2025-04-04T17:47:59.701572",
       "compilation_metrics": {
-        "compilation_time_ms": 1651.6625639999347,
+        "compilation_time_ms": 1652.298,
         "raw_multiq_gates": 150,
         "compiled_multiq_gates": 150
       },
       "simulation_metrics": {
         "measurement_id": "heavy_output",
-        "uncompiled_ideal": -0.6153971210664271,
-        "compiled_ideal": -0.6114501873662487,
-        "uncompiled_noisy": -0.5881663984566009,
-        "compiled_noisy": -0.617093393833772
+        "uncompiled_ideal": -0.5,
+        "compiled_ideal": -0.6135327858859972,
+        "uncompiled_noisy": -0.5888151354540346,
+        "compiled_noisy": -0.6080915112734274
       }
     },
     {
@@ -285,10 +285,10 @@
         "version": "2.1.0"
       },
       "benchmark_id": "qft",
-      "run_start": "1970-01-01T00:10:23.167036Z",
-      "run_end": "1970-01-01T00:10:23.931994Z",
+      "run_start": "2025-04-04T17:48:00.269759",
+      "run_end": "2025-04-04T17:48:01.029152",
       "compilation_metrics": {
-        "compilation_time_ms": 764.9583769999708,
+        "compilation_time_ms": 759.393,
         "raw_multiq_gates": 105,
         "compiled_multiq_gates": 90
       },
@@ -306,10 +306,10 @@
         "version": "2.1.0"
       },
       "benchmark_id": "square_heisenberg",
-      "run_start": "1970-01-01T00:10:26.687776Z",
-      "run_end": "1970-01-01T00:10:27.185061Z",
+      "run_start": "2025-04-04T17:48:03.779187",
+      "run_end": "2025-04-04T17:48:04.296481",
       "compilation_metrics": {
-        "compilation_time_ms": 497.2852339999463,
+        "compilation_time_ms": 517.294,
         "raw_multiq_gates": 144,
         "compiled_multiq_gates": 36
       },
@@ -327,10 +327,10 @@
         "version": "2.1.0"
       },
       "benchmark_id": "prep_select",
-      "run_start": "1970-01-01T00:10:27.675072Z",
-      "run_end": "1970-01-01T00:10:37.102766Z",
+      "run_start": "2025-04-04T17:48:04.798567",
+      "run_end": "2025-04-04T17:48:14.185791",
       "compilation_metrics": {
-        "compilation_time_ms": 9427.69387699991,
+        "compilation_time_ms": 9387.224,
         "raw_multiq_gates": 658,
         "compiled_multiq_gates": 948
       },
@@ -348,10 +348,10 @@
         "version": "2.1.0"
       },
       "benchmark_id": "qcnn",
-      "run_start": "1970-01-01T00:10:34.822349Z",
-      "run_end": "1970-01-01T00:10:35.158596Z",
+      "run_start": "2025-04-04T17:48:12.089693",
+      "run_end": "2025-04-04T17:48:12.428191",
       "compilation_metrics": {
-        "compilation_time_ms": 336.2475500000528,
+        "compilation_time_ms": 338.49800000000005,
         "raw_multiq_gates": 32,
         "compiled_multiq_gates": 32
       },
@@ -369,10 +369,10 @@
         "version": "1.4.2"
       },
       "benchmark_id": "qaoa",
-      "run_start": "1970-01-01T00:10:36.285956Z",
-      "run_end": "1970-01-01T00:10:36.345745Z",
+      "run_start": "2025-04-04T17:48:13.581338",
+      "run_end": "2025-04-04T17:48:13.649025",
       "compilation_metrics": {
-        "compilation_time_ms": 59.78926000000229,
+        "compilation_time_ms": 67.687,
         "raw_multiq_gates": 96,
         "compiled_multiq_gates": 96
       },
@@ -390,19 +390,19 @@
         "version": "1.4.2"
       },
       "benchmark_id": "qv",
-      "run_start": "1970-01-01T00:10:38.802205Z",
-      "run_end": "1970-01-01T00:10:38.870568Z",
+      "run_start": "2025-04-04T17:48:16.096594",
+      "run_end": "2025-04-04T17:48:16.151581",
       "compilation_metrics": {
-        "compilation_time_ms": 68.36305199999515,
+        "compilation_time_ms": 54.987,
         "raw_multiq_gates": 150,
         "compiled_multiq_gates": 150
       },
       "simulation_metrics": {
         "measurement_id": "heavy_output",
-        "uncompiled_ideal": -0.5048351276472571,
-        "compiled_ideal": -0.6114501873662487,
-        "uncompiled_noisy": -0.615232310383528,
-        "compiled_noisy": -0.6139438644018224
+        "uncompiled_ideal": -0.6095707981505173,
+        "compiled_ideal": -0.6098530295660993,
+        "uncompiled_noisy": -0.59008754350555,
+        "compiled_noisy": -0.6141422813589468
       }
     },
     {
@@ -411,17 +411,17 @@
         "version": "1.4.2"
       },
       "benchmark_id": "qft",
-      "run_start": "1970-01-01T00:10:38.913132Z",
-      "run_end": "1970-01-01T00:10:38.931394Z",
+      "run_start": "2025-04-04T17:48:16.340603",
+      "run_end": "2025-04-04T17:48:16.359597",
       "compilation_metrics": {
-        "compilation_time_ms": 18.262051999954565,
+        "compilation_time_ms": 18.994,
         "raw_multiq_gates": 105,
         "compiled_multiq_gates": 105
       },
       "simulation_metrics": {
         "measurement_id": "computational_basis",
         "uncompiled_ideal": 2.1684237122734696e-19,
-        "compiled_ideal": 6.505304552856788e-19,
+        "compiled_ideal": 2.168416174851491e-18,
         "uncompiled_noisy": 7.589415207398531e-19,
         "compiled_noisy": 3.2526065174565133e-19
       }
@@ -432,10 +432,10 @@
         "version": "1.4.2"
       },
       "benchmark_id": "square_heisenberg",
-      "run_start": "1970-01-01T00:10:41.681929Z",
-      "run_end": "1970-01-01T00:10:41.740685Z",
+      "run_start": "2025-04-04T17:48:19.178820",
+      "run_end": "2025-04-04T17:48:19.239390",
       "compilation_metrics": {
-        "compilation_time_ms": 58.75560299989502,
+        "compilation_time_ms": 60.57,
         "raw_multiq_gates": 144,
         "compiled_multiq_gates": 36
       },
@@ -453,17 +453,17 @@
         "version": "1.4.2"
       },
       "benchmark_id": "prep_select",
-      "run_start": "1970-01-01T00:10:42.054603Z",
-      "run_end": "1970-01-01T00:10:42.185373Z",
+      "run_start": "2025-04-04T17:48:19.576669",
+      "run_end": "2025-04-04T17:48:19.722356",
       "compilation_metrics": {
-        "compilation_time_ms": 130.77047299998412,
+        "compilation_time_ms": 145.687,
         "raw_multiq_gates": 658,
         "compiled_multiq_gates": 948
       },
       "simulation_metrics": {
         "measurement_id": "computational_basis",
         "uncompiled_ideal": -2.13469795757649e-18,
-        "compiled_ideal": 3.4253425421307987e-17,
+        "compiled_ideal": 3.6556702433798915e-17,
         "uncompiled_noisy": -5.421010862427522e-19,
         "compiled_noisy": -8.131516293641283e-18
       }
@@ -474,10 +474,10 @@
         "version": "1.4.2"
       },
       "benchmark_id": "qcnn",
-      "run_start": "1970-01-01T00:10:54.957956Z",
-      "run_end": "1970-01-01T00:10:55.007265Z",
+      "run_start": "2025-04-04T17:48:32.137332",
+      "run_end": "2025-04-04T17:48:32.157448",
       "compilation_metrics": {
-        "compilation_time_ms": 49.308737999922414,
+        "compilation_time_ms": 20.116,
         "raw_multiq_gates": 32,
         "compiled_multiq_gates": 32
       },
@@ -495,10 +495,10 @@
         "version": "1.4.1"
       },
       "benchmark_id": "qaoa",
-      "run_start": "1970-01-01T00:10:55.394522Z",
-      "run_end": "1970-01-01T00:10:55.869377Z",
+      "run_start": "2025-04-04T17:48:32.430994",
+      "run_end": "2025-04-04T17:48:32.925660",
       "compilation_metrics": {
-        "compilation_time_ms": 474.8541919999525,
+        "compilation_time_ms": 494.666,
         "raw_multiq_gates": 96,
         "compiled_multiq_gates": 96
       },
@@ -516,19 +516,19 @@
         "version": "1.4.1"
       },
       "benchmark_id": "qv",
-      "run_start": "1970-01-01T00:10:57.427180Z",
-      "run_end": "1970-01-01T00:10:59.038130Z",
+      "run_start": "2025-04-04T17:48:34.682667",
+      "run_end": "2025-04-04T17:48:36.291211",
       "compilation_metrics": {
-        "compilation_time_ms": 1610.9505389999867,
+        "compilation_time_ms": 1608.5439999999999,
         "raw_multiq_gates": 150,
         "compiled_multiq_gates": 150
       },
       "simulation_metrics": {
         "measurement_id": "heavy_output",
-        "uncompiled_ideal": -0.6141422813589468,
-        "compiled_ideal": -0.5009746551495482,
-        "uncompiled_noisy": -0.6171890700348209,
-        "compiled_noisy": -0.5925335431199893
+        "uncompiled_ideal": -0.6061677595981665,
+        "compiled_ideal": -0.49506950264725713,
+        "uncompiled_noisy": -0.5868435920991295,
+        "compiled_noisy": -0.6139438644018224
       }
     },
     {
@@ -537,10 +537,10 @@
         "version": "1.4.1"
       },
       "benchmark_id": "qft",
-      "run_start": "1970-01-01T00:10:58.674848Z",
-      "run_end": "1970-01-01T00:10:59.217753Z",
+      "run_start": "2025-04-04T17:48:35.866394",
+      "run_end": "2025-04-04T17:48:36.414564",
       "compilation_metrics": {
-        "compilation_time_ms": 542.9049690000056,
+        "compilation_time_ms": 548.1700000000001,
         "raw_multiq_gates": 105,
         "compiled_multiq_gates": 105
       },
@@ -558,10 +558,10 @@
         "version": "1.4.1"
       },
       "benchmark_id": "square_heisenberg",
-      "run_start": "1970-01-01T00:11:02.524518Z",
-      "run_end": "1970-01-01T00:11:02.926928Z",
+      "run_start": "2025-04-04T17:48:39.749959",
+      "run_end": "2025-04-04T17:48:40.155034",
       "compilation_metrics": {
-        "compilation_time_ms": 402.4100689999841,
+        "compilation_time_ms": 405.07500000000005,
         "raw_multiq_gates": 144,
         "compiled_multiq_gates": 36
       },
@@ -579,10 +579,10 @@
         "version": "1.4.1"
       },
       "benchmark_id": "prep_select",
-      "run_start": "1970-01-01T00:11:04.567346Z",
-      "run_end": "1970-01-01T00:11:13.236633Z",
+      "run_start": "2025-04-04T17:48:41.766638",
+      "run_end": "2025-04-04T17:48:50.503191",
       "compilation_metrics": {
-        "compilation_time_ms": 8669.287140999928,
+        "compilation_time_ms": 8736.553,
         "raw_multiq_gates": 658,
         "compiled_multiq_gates": 1064
       },
@@ -600,10 +600,10 @@
         "version": "1.4.1"
       },
       "benchmark_id": "qcnn",
-      "run_start": "1970-01-01T00:11:15.236596Z",
-      "run_end": "1970-01-01T00:11:15.483601Z",
+      "run_start": "2025-04-04T17:48:52.328565",
+      "run_end": "2025-04-04T17:48:52.547126",
       "compilation_metrics": {
-        "compilation_time_ms": 247.00459799998953,
+        "compilation_time_ms": 218.561,
         "raw_multiq_gates": 32,
         "compiled_multiq_gates": 32
       },
