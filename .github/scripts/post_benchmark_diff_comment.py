@@ -6,29 +6,16 @@ import argparse
 from typing import Optional, Tuple
 from ucc_bench.results import to_df_timing, SuiteResultsDatabase, SuiteResults
 
-# Constants for configuration / API interaction seem reasonable to keep
 DEFAULT_THRESHOLD = 10.0
+EPS = 1e-8
 
 
-def format_change(old: float, new: float, threshold: float = DEFAULT_THRESHOLD) -> str:
-    """Formats the percentage change between old and new values.
-
-    Highlights the change in Markdown bold if the absolute percentage change
-    exceeds the threshold.
-
-    Args:
-        old: The old numerical value.
-        new: The new numerical value.
-        threshold: The percentage threshold for highlighting (default: 10.0).
-
-    Returns:
-        A string representing the formatted percentage change (e.g., "+5.2%", "**-15.0%**", "N/A").
-    """
-    if old == 0:
-        return "N/A"  # Avoid division by zero
-    delta = new - old
-    percent = (delta / old) * 100
-    # Use threshold for highlighting
+def format_change(
+    percent: Optional[float], threshold: float = DEFAULT_THRESHOLD
+) -> str:
+    """Formats the percentage change with optional highlighting."""
+    if percent is None:
+        return "N/A"
     highlight = "**" if abs(percent) > threshold else ""
     return f"{highlight}{percent:+.1f}%{highlight}"
 
@@ -54,29 +41,36 @@ def build_comparison_table(
         df_new, on=["compiler", "benchmark_id"], suffixes=("_old", "_new"), how="inner"
     )
 
-    # Create the comparison dataframe using apply (more idiomatic than iterrows)
+    # Create the comparison dataframe
     comparison_df = pd.DataFrame()
     comparison_df["Compiler"] = merged["compiler"]
     comparison_df["Benchmark"] = merged["benchmark_id"]
 
     comparison_df["Compile Time Base (s)"] = merged["compile_time_ms_old"] / 1000.0
     comparison_df["Compile Time New (s)"] = merged["compile_time_ms_new"] / 1000.0
-    comparison_df["Compile Time Δ"] = merged.apply(
-        lambda row: format_change(
-            row["compile_time_ms_old"], row["compile_time_ms_new"], threshold
-        ),
-        axis=1,
+
+    # Calculate percentage changes using vectorized operations
+    comparison_df["Compile Time Δ Raw"] = (
+        (merged["compile_time_ms_new"] - merged["compile_time_ms_old"])
+        / (merged["compile_time_ms_old"] + EPS)
+        * 100
     )
+    comparison_df["MultiQ Gates Δ Raw"] = (
+        (merged["compiled_multiq_gates_new"] - merged["compiled_multiq_gates_old"])
+        / (merged["compiled_multiq_gates_old"] + EPS)
+        * 100
+    )
+
+    # Format changes using vectorized operations
+    comparison_df["Compile Time Δ"] = comparison_df["Compile Time Δ Raw"].map(
+        lambda percent: format_change(percent, threshold)
+    )
+    comparison_df["MultiQ Gates Δ"] = comparison_df["MultiQ Gates Δ Raw"].map(
+        lambda percent: format_change(percent, threshold)
+    )
+
     comparison_df["MultiQ Gates Base"] = merged["compiled_multiq_gates_old"]
     comparison_df["MultiQ Gates New"] = merged["compiled_multiq_gates_new"]
-    comparison_df["MultiQ Gates Δ"] = merged.apply(
-        lambda row: format_change(
-            row["compiled_multiq_gates_old"],
-            row["compiled_multiq_gates_new"],
-            threshold,
-        ),
-        axis=1,
-    )
 
     return comparison_df
 
@@ -110,13 +104,10 @@ def summarize_changes(
         A tuple: (compile_time_improvements, compile_time_regressions,
                  multiq_gates_improvements, multiq_gates_regressions)
     """
-    # Use apply with the helper to parse percentages safely
-    # Ensure the column names match the output of build_comparison_table
-    ct_changes = df["Compile Time Δ"].apply(_try_parse_percent)
-    mq_changes = df["MultiQ Gates Δ"].apply(_try_parse_percent)
+    # Use raw percentage changes for summarization
+    ct_changes = df["Compile Time Δ Raw"]
+    mq_changes = df["MultiQ Gates Δ Raw"]
 
-    # Use boolean indexing and sum() for counting - efficient and idiomatic
-    # Note: .sum() on a boolean Series counts True values. We handle None from parsing.
     ct_improvements = (ct_changes < -threshold).sum()
     ct_regressions = (ct_changes > threshold).sum()
     mq_improvements = (mq_changes < -threshold).sum()
@@ -270,6 +261,10 @@ def main() -> None:
     else:
         ct_impr, ct_reg, mq_impr, mq_reg = summarize_changes(
             comparison_df, threshold=args.threshold
+        )
+        # Drop raw columns before rendering the final markdown table
+        comparison_df.drop(
+            columns=["Compile Time Δ Raw", "MultiQ Gates Δ Raw"], inplace=True
         )
         markdown_table = comparison_df.to_markdown(index=False, floatfmt=".2f")
 
