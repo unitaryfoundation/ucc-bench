@@ -158,10 +158,16 @@ So
 5a. Debug consistency issues in runner -- why are there such large changes in
     timings in ucc-bench, but not in ucc
       Try dockerfile?
-6. Port code for plots
-7. Cron for plots
+
+6. Port code for plots AVG by time and add to cron
+   What happens if we upgrade then downgrade in ucc-bench? How should this show up in plot?
+7. Import old data ...
+   'Grab for version dates? Or all?
+    - can map timestamps/hashes for official UCC release, otherwise need to fake them
+    - don't bother with exp val data for now
+WARNING -- Need to change version qiskit <2.0.0 requirement in ucc-bench (then go back and prevent major ver compatability)
 8. Add runbook/docs to .github directory/ Also explain how storing data
 9. Clean up README
 10. Demo/close old issues and port other issues
-   - TODO PR comments for exp val changes?
+   - TODO PR comments for exp val changes, and plots for exp vals
 word
