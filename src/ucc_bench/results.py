@@ -171,14 +171,14 @@ def save_results_csv(suite_results: SuiteResults, root_dir: Path) -> None:
         sim_df.to_csv(out_path, index=False)
 
 
-class SuiteResultsDatabase(BaseModel):
+class SuiteResultsDatabase:
     _suite_results: List[SuiteResults]
     _suite_results_by_uid: dict[str, SuiteResults]
 
     def __init__(self, suite_results: List[SuiteResults]):
-        super().__init__(suite_results=suite_results)
+        self._suite_results = suite_results
         self._suite_results_by_uid = {
-            result.metadata.uid: result for result in suite_results
+            result.metadata.uid: result for result in self._suite_results
         }
 
     @classmethod
@@ -201,3 +201,10 @@ class SuiteResultsDatabase(BaseModel):
         Return None of no results found
         """
         return self._suite_results_by_uid.get(uid, None)
+
+    def get_latest(self) -> SuiteResults:
+        """
+        Return the results with the most recent uid timestamp.
+        """
+        latest_result = max(self._suite_results, key=lambda x: x.metadata.uid_timestamp)
+        return latest_result
