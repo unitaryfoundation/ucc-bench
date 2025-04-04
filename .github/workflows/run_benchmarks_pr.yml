@@ -11,6 +11,11 @@ on:
       - opened
       - synchronize
 
+# Only one benchmark run should be in progress at a time
+concurrency:
+  group: benchmarks
+  cancel-in-progress: false
+
 permissions:
   pull-requests: write
   contents: read

@@ -13,9 +13,13 @@ on:
 permissions:
   contents: write
 
+# Only one benchmark run should be in progress at a time
+concurrency:
+  group: benchmarks
+  cancel-in-progress: false
+
 # Set the runner name here for use in a later step, but also next to
 # the actual runs-on designation below so users know to change both together
-
 env:
   RUNNER_LABEL: ucc-benchmarks-8-core-U22.04
 jobs:
