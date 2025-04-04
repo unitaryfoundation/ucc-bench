@@ -1,0 +1,32 @@
+name: Plot Latest Benchmark
+
+on:
+  schedule:
+    - cron: "0 */4 * * *" # Runs every 4 hours
+  workflow_dispatch: # Allows manual triggering
+
+# The runner to get results for (may be changed if we change runners)
+env:
+  RUNNER_LABEL: ucc-benchmarks-8-core-U22.04
+
+jobs:
+  plot-latest-benchmark:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Run benchmark plot script
+        run: |
+          uv run python .github/scripts/plot_latest_benchmark.py results ${RUNNER_LABEL}
