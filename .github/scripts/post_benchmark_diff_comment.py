@@ -103,15 +103,12 @@ def main():
     parser.add_argument(
         "--repo", required=True, help="GitHub repository in 'owner/name' format"
     )
-    parser.add_argument("--pr", type=int, required=True, help="Pull request number")
+    parser.add_argument("--pr", type=int, required=False, help="Pull request number")
     parser.add_argument("--sha_base", required=True, help="SHA of the base commit")
     parser.add_argument("--sha_new", required=True, help="SHA of the new commit (head)")
     parser.add_argument("--root_dir", required=True, help="Root directory for results")
     parser.add_argument(
         "--runner_name", required=True, help="Name of the benchmark runner"
-    )
-    parser.add_argument(
-        "--dry", help="Dry run (do not post comment)", action="store_true"
     )
     args = parser.parse_args()
 
@@ -142,9 +139,6 @@ def main():
     df_old = to_df_timing(results_old)
     df_new = to_df_timing(results_new)
 
-    print(df_old)
-    print("--------------------------")
-    print(df_new)
     comparison_df = build_comparison_table(df_old, df_new)
     ct_impr, ct_reg, mq_impr, mq_reg = summarize_changes(comparison_df)
 
@@ -153,7 +147,7 @@ def main():
     message = f"""
 ## 📊 Benchmark Summary
 
-Comparing {args.repo}@{args.sha_new} to {args.repo}@{args.sha_base}, we observe:
+Comparing new {args.repo}@{args.sha_new} to baseline {args.repo}@{args.sha_base}, we observe:
 
 - 🟢 {ct_impr} improvements in `compile_time_ms`
 - 🔴 {ct_reg} regressions in `compile_time_ms`
@@ -169,21 +163,26 @@ Comparing {args.repo}@{args.sha_new} to {args.repo}@{args.sha_base}, we observe:
 
 <details>
 <summary>⚙️ See full benchmark results</summary>
-For {args.repo}@{args.sha_new}
+For new {args.repo}@{args.sha_new}
 
+```json
 {results_new.model_dump_json(indent=2)}
+```
 
-For {args.repo}@{args.sha_base}
+For baseline {args.repo}@{args.sha_base}
 
+```
 {results_new.model_dump_json(indent=2)}
+```
 </details>
 """
 
-    if args.dry:
+    if args.pr:
+        print("Posting comment to PR...")
+        post_comment(token, args.repo, args.pr, message)
+    else:
         print("Dry run enabled. Comment would be:")
         print(message)
-    else:
-        post_comment(token, args.repo, args.pr, message)
 
 
 if __name__ == "__main__":

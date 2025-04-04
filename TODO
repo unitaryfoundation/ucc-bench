@@ -150,7 +150,7 @@ So
 #1. Add auxiliary data to simulation results, command line to specify
 #2. Build github actions in order above (DONE ucc-bench,
 #3. Trigger ucc-bench (DONE ucc-bench upgrade, DONE ucc action to trigger)
-4. PR in ucc-bench -> Add label filter
+4. PR in ucc-bench -> Add label filter, decide whether to embed full json
 5. PR in ucc - only if preview-benchmark label is set;
         walk ucc_hash before calling action in ucc-bench
         ucc-bench does lookup?
@@ -158,13 +158,7 @@ So
 
 6. Port history/code for plots
 7. Cron for plots
-8. Add runbook/docs to .github directory
-9. Clean up README (add license)
+8. Add runbook/docs to .github directory/ Also explain how storing data
+9. Clean up README
 10. Demo/close old issues and port other issues
-
-If we use a the temporary PR kciked off from ucc -> ucc-bench with automerge, we end
-up with conflicts if more than one is in flight at the same time. The main reason to do this
-was to ensure unit tests/benchmarks still run, but that is overkill as the PR run should already have done that
-
-Instead, eliminate this and just make a job that commits to main directly and upgrades the ucc version.
-That should be quick and if we make only one instance of that job run at a time, should avoid conflicts
+   - TODO PR comments for exp val changes?
