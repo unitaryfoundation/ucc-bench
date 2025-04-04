@@ -84,6 +84,8 @@ class MyCompiler(BaseCompiler[YourCircuitType]):
         # Count multi-qubit gates in your circuit type
         pass
 ```
+4. Import your class in the `compilers` module's [src/ucc_bench/compilers/__init__.py](`__init__.py`)
+to ensure the `@register` decorator runs to register the class.
 
 You can now use ```"my-compiler-id"``` in your TOML suite specification.
 
