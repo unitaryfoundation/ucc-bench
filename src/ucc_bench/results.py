@@ -82,7 +82,7 @@ class SuiteResults(BaseModel):
         # Ensure that for a given compiler id, the version is the same across all results
         checker = defaultdict(set)
         for result in self.results:
-            checker[result.compiler.id].append(result.compiler.version)
+            checker[result.compiler.id].add(result.compiler.version)
         for compiler_id, versions in checker.items():
             if len(versions) != 1:
                 raise ValueError(
@@ -217,11 +217,11 @@ class SuiteResultsDatabase:
     _suite_results_by_uid: dict[str, SuiteResults]
 
     def __init__(self, suite_results: List[SuiteResults]):
-        self._suite_results = sorted(
+        self._suite_results_time_ordered = sorted(
             suite_results, key=lambda x: x.metadata.uid_timestamp
         )
         self._suite_results_by_uid = {
-            result.metadata.uid: result for result in self._suite_results
+            result.metadata.uid: result for result in self._suite_results_time_ordered
         }
 
     @classmethod
