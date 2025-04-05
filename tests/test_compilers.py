@@ -27,7 +27,7 @@ def qasm_code():
 @pytest.mark.parametrize(
     "compiler_class,expected_circuit_type,expected_id",
     [
-        (QiskitCompiler, QuantumCircuit, "qiskit"),
+        (QiskitCompiler, QuantumCircuit, "qiskit-default"),
         (CirqCompiler, cirq.Circuit, "cirq"),
         (PytketPeepCompiler, PytketCircuit, "pytket-peep"),
         (UCCCompiler, QuantumCircuit, "ucc"),
