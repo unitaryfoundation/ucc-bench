@@ -1,4 +1,5 @@
-from pydantic import BaseModel, computed_field, cached_property
+from pydantic import BaseModel, computed_field
+from functools import cached_property
 from typing import List, Optional
 from datetime import datetime
 from pathlib import Path
@@ -7,7 +8,7 @@ import pandas as pd
 from collections import defaultdict
 
 
-class RunnerInfo(BaseModel):
+class RunnerSpecs(BaseModel):
     os: str
     cpu: str
     ram_gb: float
@@ -38,7 +39,7 @@ class Metadata(BaseModel):
     run_start: datetime
     run_end: datetime
     runner_name: str
-    runner_specs: RunnerInfo
+    runner_specs: RunnerSpecs
     runner_version: str
     runner_args: List[str]
     upstream_hash: Optional[str] = None
@@ -212,11 +213,13 @@ def save_results_csv(suite_results: SuiteResults, root_dir: Path) -> None:
 
 
 class SuiteResultsDatabase:
-    _suite_results: List[SuiteResults]
+    _suite_results_time_ordered: List[SuiteResults]
     _suite_results_by_uid: dict[str, SuiteResults]
 
     def __init__(self, suite_results: List[SuiteResults]):
-        self._suite_results = suite_results
+        self._suite_results = sorted(
+            suite_results, key=lambda x: x.metadata.uid_timestamp
+        )
         self._suite_results_by_uid = {
             result.metadata.uid: result for result in self._suite_results
         }
@@ -251,3 +254,19 @@ class SuiteResultsDatabase:
 
     def get_all(self) -> List[SuiteResults]:
         return self._suite_results
+
+    def get_versions_changed(self) -> List[SuiteResults]:
+        """
+        From the time ordered set of results, return only those results
+        when the compiler version changed for at least one compiler.
+        """
+        res = []
+
+        last_versions = None
+
+        for result in self._suite_results_time_ordered:
+            if last_versions is None or result.compiler_versions != last_versions:
+                res.append(result)
+                last_versions = result.compiler_versions
+
+        return res
