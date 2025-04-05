@@ -100,7 +100,11 @@ for compiler in sorted_compilers:
     color = color_map[compiler]
 
     ax1.plot(
-        comp_df["uid_timestamp"], comp_df["compiled_ratio"], label=compiler, color=color
+        comp_df["uid_timestamp"],
+        comp_df["compiled_ratio"],
+        label=compiler,
+        color=color,
+        marker="o",  # Add markers to the line
     )
 
     # Add version change annotations
@@ -114,12 +118,14 @@ for compiler in sorted_compilers:
             ha="center",
             va="bottom",
             color=color,
-            bbox=dict(
-                boxstyle="round,pad=0.2",
-                edgecolor=color,
-                facecolor="white",
-                linewidth=0.8,
-            ),
+            alpha=0.8,
+            # bbox=dict(
+            #     boxstyle="round,pad=0.2",
+            #     edgecolor=color,
+            #     facecolor="white",
+            #     linewidth=0.8,
+            #     alpha=0.6,
+            # ),
         )
         texts_ax1.append(text)
 
@@ -134,7 +140,11 @@ for compiler in sorted_compilers:
     color = color_map[compiler]
 
     ax2.plot(
-        comp_df["uid_timestamp"], comp_df["compile_time_s"], label=compiler, color=color
+        comp_df["uid_timestamp"],
+        comp_df["compile_time_s"],
+        label=compiler,
+        color=color,
+        marker="o",  # Add markers to the line
     )
 
     changes = version_changes_df[version_changes_df["compiler"] == compiler]
@@ -147,12 +157,14 @@ for compiler in sorted_compilers:
             ha="center",
             va="bottom",
             color=color,
-            bbox=dict(
-                boxstyle="round,pad=0.2",
-                edgecolor=color,
-                facecolor="white",
-                linewidth=0.8,
-            ),
+            alpha=0.8,
+            # bbox=dict(
+            #     boxstyle="round,pad=0.2",
+            #     edgecolor=color,
+            #     facecolor="white",
+            #     linewidth=0.8,
+            #     alpha=0.6,
+            # ),
         )
         texts_ax2.append(text)
 
@@ -164,9 +176,9 @@ ax2.grid(True)
 ax2.legend(loc="best")
 
 # --- Adjust labels separately for each axis ---
-adjust_text(texts_ax1, ax=ax1, arrowprops=dict(arrowstyle="-", color="gray", lw=0.5))
+adjust_text(texts_ax1, ax=ax1, arrowprops=dict(arrowstyle="->", color="gray", lw=0.5))
 
-adjust_text(texts_ax2, ax=ax2, arrowprops=dict(arrowstyle="-", color="gray", lw=0.5))
+adjust_text(texts_ax2, ax=ax2, arrowprops=dict(arrowstyle="->", color="gray", lw=0.5))
 
 fig.tight_layout()
 
