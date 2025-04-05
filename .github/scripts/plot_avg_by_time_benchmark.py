@@ -104,28 +104,26 @@ for compiler in sorted_compilers:
         comp_df["compiled_ratio"],
         label=compiler,
         color=color,
-        marker="o",  # Add markers to the line
     )
-
     # Add version change annotations
     changes = version_changes_df[version_changes_df["compiler"] == compiler]
     for _, row in changes.iterrows():
+        scatter = ax1.scatter(
+            row["uid_timestamp"],
+            row["compiled_ratio"],
+            color=color,
+            s=30,  # Marker size
+            zorder=3,  # Ensure markers are above the line
+        )
         text = ax1.text(
             row["uid_timestamp"],
             row["compiled_ratio"],
             row["compiler_version"],
             fontsize=8,
-            ha="center",
+            ha="right",
             va="bottom",
             color=color,
             alpha=0.8,
-            # bbox=dict(
-            #     boxstyle="round,pad=0.2",
-            #     edgecolor=color,
-            #     facecolor="white",
-            #     linewidth=0.8,
-            #     alpha=0.6,
-            # ),
         )
         texts_ax1.append(text)
 
@@ -134,37 +132,40 @@ ax1.set_title("Average Compiled Ratio by Compiler")
 ax1.grid(True)
 ax1.legend(loc="best")
 
+# --- Adjust labels for ax1 ---
+adjust_text(
+    texts_ax1,
+    ax=ax1,
+    arrowprops=dict(arrowstyle="->", color="k", lw=0.5),
+)
+
 # --- Plot 2: compile_time_s (log scale) ---
 for compiler in sorted_compilers:
     comp_df = avg_df[avg_df["compiler"] == compiler]
     color = color_map[compiler]
 
     ax2.plot(
-        comp_df["uid_timestamp"],
-        comp_df["compile_time_s"],
-        label=compiler,
-        color=color,
-        marker="o",  # Add markers to the line
+        comp_df["uid_timestamp"], comp_df["compile_time_s"], label=compiler, color=color
     )
 
     changes = version_changes_df[version_changes_df["compiler"] == compiler]
     for _, row in changes.iterrows():
-        text = ax2.text(
+        scatter = ax2.scatter(
             row["uid_timestamp"],
             row["compile_time_s"],
+            color=color,
+            s=30,  # Marker size
+            zorder=3,  # Ensure markers are above the line
+        )
+        text = ax2.text(
+            row["uid_timestamp"],
+            row["compile_time_s"] * 1.08,
             row["compiler_version"],
             fontsize=8,
-            ha="center",
+            ha="right",
             va="bottom",
             color=color,
             alpha=0.8,
-            # bbox=dict(
-            #     boxstyle="round,pad=0.2",
-            #     edgecolor=color,
-            #     facecolor="white",
-            #     linewidth=0.8,
-            #     alpha=0.6,
-            # ),
         )
         texts_ax2.append(text)
 
@@ -175,10 +176,12 @@ ax2.set_xlabel("Timestamp")
 ax2.grid(True)
 ax2.legend(loc="best")
 
-# --- Adjust labels separately for each axis ---
-adjust_text(texts_ax1, ax=ax1, arrowprops=dict(arrowstyle="->", color="gray", lw=0.5))
-
-adjust_text(texts_ax2, ax=ax2, arrowprops=dict(arrowstyle="->", color="gray", lw=0.5))
+# --- Adjust labels for ax2 ---
+adjust_text(
+    texts_ax2,
+    ax=ax2,
+    arrowprops=dict(arrowstyle="->", color="k", lw=0.5),
+)
 
 fig.tight_layout()
 
