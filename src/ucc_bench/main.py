@@ -11,7 +11,7 @@ from ucc_bench.suite import BenchmarkSuite
 from ucc_bench.runner import run_suite
 from ucc_bench.results import (
     SuiteResults,
-    RunnerInfo,
+    RunnerSpecs,
     Metadata,
     save_results_json,
     save_results_csv,
@@ -110,7 +110,7 @@ def main() -> None:
             run_start=run_start,
             run_end=run_end,
             runner_name=args.runner_name,
-            runner_specs=RunnerInfo.from_system(),
+            runner_specs=RunnerSpecs.from_system(),
             runner_version=__version__,
             runner_args=sys.argv,
             upstream_hash=args.upstream_hash,
