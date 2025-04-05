@@ -4,10 +4,12 @@ from qiskit import (
     transpile as qiskit_transpile,
     __version__ as qiskit_version,
 )
+from qbraid import transpile
+
 from ..registry import register
 
 
-@register.compiler("qiskit")
+@register.compiler("qiskit-default")
 class QiskitCompiler(BaseCompiler[QuantumCircuit]):
     """
     Wrapper for benchmarking qiskit compiler.
@@ -18,6 +20,10 @@ class QiskitCompiler(BaseCompiler[QuantumCircuit]):
     @classmethod
     def version(cls) -> str:
         return qiskit_version
+
+    def qasm_to_native(self, qasm: str) -> QuantumCircuit:
+        # Specify since we have -default suffix
+        return transpile(qasm, "qiskit")
 
     def compile(self, circuit: QuantumCircuit) -> QuantumCircuit:
         return qiskit_transpile(
