@@ -44,6 +44,8 @@ jobs:
         with:
           app-id: ${{ secrets.UCC_BENCH_APP_ID }}
           private-key: ${{ secrets.UCC_BENCH_APP_PRIVATE_KEY }}
+          owner: unitaryfoundation
+          repositories: ucc-bench
 
       - uses: actions/checkout@v4
         with:

@@ -162,16 +162,20 @@ So
 6. Port code for plots AVG by time and add to cron
    DONE
 7. #Make UF app instead of brad C app (update cert keys)
+   FIX PR comment -- if the results for the ancestor were pushed AFTER this commit
+     they will be missing. Can you rebase? What if conflicts?
    USe the token better https://github.com/actions/create-github-app-token
      - specify specific permissions
      - specify specific repo
      - configure github user to be that bot user versus github actions overall
-   Make PR triggerable from either repo
-   Add it to other repo
+
 7. Import old data ...
    'Grab for version dates? Or all?
     - can map timestamps/hashes for official UCC release, otherwise need to fake them
     - don't bother with exp val data for now
+8.  Make PR triggerable from either repo
+   Add it to other repo
+  Add repo and owner to the app token create
 WARNING -- Need to change version qiskit <2.0.0 requirement in ucc-bench (then go back and prevent major ver compatability)
 8. Add runbook/docs to .github directory/ Also explain how storing data
 9. Clean up README
