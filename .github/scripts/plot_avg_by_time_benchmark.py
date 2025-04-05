@@ -18,72 +18,79 @@ timing_results_db = SuiteResultsDatabase.from_root(
     root_dir, runner_name, "timing_benchmarks"
 )
 
-# First get dataframe that has timing data, dates, compiler version
-df = pd.concat((to_df_timing_detailed(d) for d in timing_results_db.get_all()))
+# Gets time ordered list of results when at least one compiler version
+# changed from the prior run.
+timing_results = timing_results_db.get_versions_changed()
+df = pd.concat((to_df_timing_detailed(d) for d in timing_results))
 df["compile_time"] = df["compile_time_ms"] / 1000
 df["compiled_ratio"] = df["compiled_multiq_gates"] / df["raw_multiq_gates"]
-
-df["effective_timestamp"] = df.apply(
-    lambda row: row["upstream_timestamp"]
-    if row["compiler"] == "ucc"
-    else row["uid_timestamp"],
-    axis=1,
-)
-df["effective_date"] = df["effective_timestamp"].dt.date
-
-# --- STEP 2: Get first version appearance ---
-first_version_dates = (
-    df.groupby(["compiler", "compiler_version"])["effective_timestamp"]
-    .min()
+avg_df = (
+    df.groupby(["uid_timestamp", "compiler"])
+    .agg(
+        {
+            "compile_time_ms": "mean",
+            "compiler_version": "first",  # assume same version per compiler per run
+        }
+    )
     .reset_index()
 )
-first_version_dates["first_date"] = first_version_dates["effective_timestamp"].dt.date
-first_version_dates.drop("effective_timestamp", axis=1, inplace=True)
 
-# --- STEP 3: Filter original data to those first-date rows ---
-df_merged = df.merge(first_version_dates, on=["compiler", "compiler_version"])
-filtered = df_merged[df_merged["effective_date"] == df_merged["first_date"]]
+# --- STEP 3: Identify version change points per compiler ---
+version_changes = []
+last_versions = {}
 
-# --- STEP 4: Average compile times per compiler & date ---
-result = (
-    filtered.groupby(["compiler", "first_date"])["compile_time"].mean().reset_index()
-)
-result.rename(columns={"first_date": "date"}, inplace=True)
+for _, row in avg_df.iterrows():
+    compiler = row["compiler"]
+    version = row["compiler_version"]
+    timestamp = row["uid_timestamp"]
+    compile_time = row["compile_time_ms"]
 
-# --- STEP 5: Add version labels ---
-annotations = pd.merge(
-    first_version_dates,
-    result,
-    left_on=["compiler", "first_date"],
-    right_on=["compiler", "date"],
-)
+    if compiler not in last_versions or version != last_versions[compiler]:
+        version_changes.append(
+            {
+                "compiler": compiler,
+                "uid_timestamp": timestamp,
+                "compiler_version": version,
+                "compile_time_ms": compile_time,
+            }
+        )
+        last_versions[compiler] = version
 
-# --- STEP 6: Create consistent color map for compilers ---
+version_changes_df = pd.DataFrame(version_changes)
 
-sorted_compilers = sorted(result["compiler"].unique())
-colors = plt.cm.tab10.colors  # use a colormap with enough distinct colors
+# --- STEP 4: Create consistent color map ---
+sorted_compilers = sorted(avg_df["compiler"].unique())
+colors = plt.cm.tab10.colors
 color_map = {
     compiler: colors[i % len(colors)] for i, compiler in enumerate(sorted_compilers)
 }
 
-# --- STEP 7: Plot with smart color-coded labels ---
+# --- STEP 5: Plot ---
 plt.figure(figsize=(12, 6))
 texts = []
 
 for compiler in sorted_compilers:
-    comp_df = result[result["compiler"] == compiler]
+    comp_df = avg_df[avg_df["compiler"] == compiler]
     color = color_map[compiler]
 
-    # Line
-    plt.plot(comp_df["date"], comp_df["compile_time"], label=compiler, color=color)
+    # Plot line
+    plt.plot(
+        comp_df["uid_timestamp"],
+        comp_df["compile_time_ms"],
+        label=compiler,
+        color=color,
+    )
 
-    # Labels
-    annots = annotations[annotations["compiler"] == compiler]
-    for _, row in annots.iterrows():
+    # Add version change annotations
+    changes = version_changes_df[version_changes_df["compiler"] == compiler]
+    for _, row in changes.iterrows():
+        label_text = row["compiler_version"]
+        label_date = row["uid_timestamp"].date()
+
         text = plt.text(
-            row["date"],
-            row["compile_time"],
-            row["compiler_version"],
+            row["uid_timestamp"],
+            row["compile_time_ms"],
+            label_text,
             fontsize=8,
             ha="center",
             va="bottom",
@@ -98,13 +105,11 @@ for compiler in sorted_compilers:
         texts.append(text)
 
 # Adjust text to avoid overlaps
-plt.yscale("log")
-adjust_text(texts, arrowprops=dict(arrowstyle="->", color="gray", lw=0.5))
+adjust_text(texts, arrowprops=dict(arrowstyle="-", color="gray", lw=0.5))
 
-
-plt.xlabel("Date")
-plt.ylabel("Average Compile Time (s)")
-plt.title("Average Compile Time by Compiler (First Version Appearance Only)")
+plt.xlabel("Timestamp")
+plt.ylabel("Average Compile Time (ms)")
+plt.title("Average Compile Time by Compiler (Version Change Points Annotated)")
 plt.legend()
 plt.tight_layout()
 plt.show()
