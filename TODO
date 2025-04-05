@@ -161,7 +161,11 @@ So
 
 6. Port code for plots AVG by time and add to cron
    DONE
-7. Make UF app instead of brad C app (update cert keys)
+7. #Make UF app instead of brad C app (update cert keys)
+   USe the token better https://github.com/actions/create-github-app-token
+     - specify specific permissions
+     - specify specific repo
+     - configure github user to be that bot user versus github actions overall
    Make PR triggerable from either repo
    Add it to other repo
 7. Import old data ...
@@ -173,4 +177,5 @@ WARNING -- Need to change version qiskit <2.0.0 requirement in ucc-bench (then g
 9. Clean up README
 10. Demo/close old issues and port other issues
    - TODO PR comments for exp val changes, and plots for exp vals
+   - TODO unit tests/code coverage?
 word

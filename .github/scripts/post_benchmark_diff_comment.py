@@ -197,6 +197,9 @@ def main() -> None:
 
     # Check if results were found
     if results_old is None:
+        msg = f"Error: Results not found for base commit {args.sha_base} (runner: {args.runner_name})."
+        if not args.dry_run:
+            post_comment()
         print(
             f"Error: Results not found for base commit {args.sha_base} (runner: {args.runner_name}).",
             file=sys.stderr,
