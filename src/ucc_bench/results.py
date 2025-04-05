@@ -249,11 +249,8 @@ class SuiteResultsDatabase:
         """
         Return the results with the most recent uid timestamp.
         """
-        latest_result = max(self._suite_results, key=lambda x: x.metadata.uid_timestamp)
+        latest_result = self._suite_results_time_ordered[-1]
         return latest_result
-
-    def get_all(self) -> List[SuiteResults]:
-        return self._suite_results
 
     def get_versions_changed(self) -> List[SuiteResults]:
         """
