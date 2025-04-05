@@ -15,6 +15,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+          fetch-depth: 0
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -30,3 +33,19 @@ jobs:
       - name: Run benchmark plot script
         run: |
           uv run python .github/scripts/plot_latest_benchmark.py results ${RUNNER_LABEL}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit changes
+        run: |
+          git add ./results/*
+          git diff-index --quiet HEAD || git commit -m "[benchmark chore] Update benchmark plots"
+
+      - name: Pull with rebase
+        run: git pull --rebase origin ${{ github.ref_name }}
+
+      - name: Push changes
+        run: git push origin HEAD:${{ github.ref_name }}
