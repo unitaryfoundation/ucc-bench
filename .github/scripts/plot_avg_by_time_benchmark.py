@@ -22,8 +22,23 @@ timing_results_db = SuiteResultsDatabase.from_root(
 # changed from the prior run.
 timing_results = timing_results_db.get_versions_changed()
 df = pd.concat((to_df_timing_detailed(d) for d in timing_results))
+
+# Path in data from old `ucc` runs (see results/README.md)
+# Add in legacy timing results
+df_legacy = pd.read_csv(
+    Path(root_dir) / runner_name / "timing_benchmarks" / "legacy_timing_results.csv"
+)
+df_legacy["compile_time_ms"] = df_legacy["compile_time"] * 1000
+df_legacy["benchmark_id"] = df_legacy["circuit_name"]
+df_legacy["uid_timestamp"] = pd.to_datetime(df_legacy["date"], utc=True)
+df_legacy = df_legacy[df.columns]
+df = pd.concat([df, df_legacy], ignore_index=True)
+df.sort_values("uid_timestamp", inplace=True)
+
+# Add calculated columns
 df["compile_time"] = df["compile_time_ms"] / 1000
 df["compiled_ratio"] = df["compiled_multiq_gates"] / df["raw_multiq_gates"]
+
 
 # --- STEP 2: Group by (uid_timestamp, compiler) ---
 avg_df = (
