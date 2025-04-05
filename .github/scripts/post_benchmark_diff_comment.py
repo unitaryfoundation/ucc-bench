@@ -102,45 +102,49 @@ def summarize_changes(
     return ct_improvements, ct_regressions, mq_improvements, mq_regressions
 
 
-def post_comment(token: str, repo: str, pr_number: int, body: str) -> None:
-    """Posts a comment to a GitHub Pull Request issue.
+def post_github_comment(
+    token: str,
+    repo: str,
+    pr_number: Optional[int],
+    body: str,
+    dry_run: bool,
+    is_error: bool = False,
+) -> None:
+    """
+    Posts a comment to a GitHub PR or prints it, with optional error styling.
 
     Args:
         token: GitHub personal access token.
         repo: GitHub repository in 'owner/name' format.
         pr_number: Pull request number.
         body: The comment content (Markdown supported).
-
-    Raises:
-        ValueError: If the token is empty or None.
-        SystemExit: If the request fails.
+        dry_run: Whether to only print instead of posting.
+        is_error: Whether the message is an error (adds heading).
     """
-    if not token:
-        raise ValueError("A valid GitHub token is required to post comments.")
+    if is_error:
+        body = f"## ❌ Error running benchmark comparison\n\n{body}"
+
+    print(body)
+    if dry_run or not pr_number:
+        return
 
     url = f"https://api.github.com/repos/{repo}/issues/{pr_number}/comments"
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",  # Good practice
+        "X-GitHub-Api-Version": "2022-11-28",
     }
     payload = {"body": body}
 
     try:
-        response = requests.post(
-            url, headers=headers, json=payload, timeout=30
-        )  # Added timeout
-        response.raise_for_status()  # Check for 4xx/5xx errors
+        response = requests.post(url, headers=headers, json=payload, timeout=30)
+        response.raise_for_status()
         print(f"✅ Comment posted successfully to PR #{pr_number} in {repo}.")
     except requests.exceptions.RequestException as e:
-        print(
-            f"❌ Failed to post comment to PR #{pr_number} in {repo}: {e}",
-            file=sys.stderr,
-        )
-        # Provide more context on error if available
+        print(f"❌ Failed to post comment to PR #{pr_number} in {repo}: {e}")
         if e.response is not None:
-            print(f"Response Status: {e.response.status_code}", file=sys.stderr)
-            print(f"Response Body: {e.response.text}", file=sys.stderr)
+            print(f"Response Status: {e.response.status_code}")
+            print(f"Response Body: {e.response.text}")
         sys.exit(1)
 
 
@@ -197,18 +201,17 @@ def main() -> None:
 
     # Check if results were found
     if results_old is None:
-        msg = f"Error: Results not found for base commit {args.sha_base} (runner: {args.runner_name})."
-        if not args.dry_run:
-            post_comment()
-        print(
-            f"Error: Results not found for base commit {args.sha_base} (runner: {args.runner_name}).",
-            file=sys.stderr,
+        error_msg = f"Results not found for base commit {args.sha_base} (runner: {args.runner_name})."
+        "You might need to rebase on more recent changes."
+
+        post_github_comment(
+            github_token, args.repo, args.pr, error_msg, args.dry_run, is_error=True
         )
         sys.exit(1)
     if results_new is None:
-        print(
-            f"Error: Results not found for new commit {args.sha_new} (runner: {args.runner_name}).",
-            file=sys.stderr,
+        error_msg = f"Results not found for new commit {args.sha_new} (runner: {args.runner_name})."
+        post_github_comment(
+            github_token, args.repo, args.pr, error_msg, args.dry_run, is_error=True
         )
         sys.exit(1)
 
@@ -216,17 +219,13 @@ def main() -> None:
     spec_old = results_old.suite_specification
     spec_new = results_new.suite_specification
     if spec_old.id != spec_new.id:
-        print(
-            f"Error: Benchmark suite IDs do not match ('{spec_old.id}' vs '{spec_new.id}').",
-            file=sys.stderr,
+        error_msg = (
+            f"Benchmark suite IDs do not match ('{spec_old.id}' vs '{spec_new.id}')."
+        )
+        post_github_comment(
+            github_token, args.repo, args.pr, error_msg, args.dry_run, is_error=True
         )
         sys.exit(1)
-    if spec_old.suite_version != spec_new.suite_version:
-        # Changed to warning as per previous refinement, could be error if needed
-        print(
-            f"Warning: Benchmark suite versions differ ('{spec_old.suite_version}' vs '{spec_new.suite_version}'). Comparison may be less meaningful.",
-            file=sys.stderr,
-        )
 
     # Convert results to DataFrames
     df_old = to_df_timing(results_old)
@@ -254,6 +253,14 @@ def main() -> None:
 
     # Prepare comment body
 
+    if spec_old.suite_version != spec_new.suite_version:
+        warning_msg = (
+            f"Warning: Benchmark suite versions differ ('{spec_old.suite_version}' vs '{spec_new.suite_version}'). "
+            "Comparison may be less meaningful."
+        )
+    else:
+        warning_msg = ""
+
     message = f"""
 ## 📊 Benchmark Summary ({args.runner_name})
 
@@ -264,6 +271,8 @@ Comparing new {args.repo}@{args.sha_new} to base {args.repo}@{args.sha_base}:
 - 🟢 `{mq_impr}` improvements in `compiled_multiq_gates`
 - 🔴 `{mq_reg}` regressions in `compiled_multiq_gates`
 
+{warning_msg}
+
 <details>
 <summary>🔍 See full benchmark table</summary>
 
@@ -272,14 +281,7 @@ Comparing new {args.repo}@{args.sha_new} to base {args.repo}@{args.sha_base}:
 </details>
 """
 
-    # Post comment or print for dry run
-    if args.dry_run:
-        print("\n--- DRY RUN: Comment body ---")
-        print(message)
-        print("--- END DRY RUN ---")
-    else:
-        # Token presence already checked if not dry_run
-        post_comment(github_token, args.repo, args.pr, message)  # type: ignore [arg-type]
+    post_github_comment(github_token, args.repo, args.pr, message, args.dry_run)
 
     print("Benchmark comparison script finished.")
 
