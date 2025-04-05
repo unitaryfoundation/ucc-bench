@@ -10,6 +10,11 @@ Results, including system metadata, runner information, compilation metrics, and
 
 This repository houses both the code to run the benchmarks, the specification files for the official benchmarks, and the results for official benchmarks. However to be clear, this repo is a companion to the main `ucc` [repository](https://github.com/unitaryfoundation/ucc). That repository is where all ongoing `ucc` work occurs.
 
+## Latest Results
+![alt text](results/ucc-benchmarks-8-core-U22.04/latest_compiler_benchmarks_by_circuit.png)
+
+And here you can see progress over time, with new package versions labeled for each compiler:
+![alt text](results/ucc-benchmarks-8-core-U22.04/avg_compiler_benchmarks_over_time.png)
 ## Running or Development
 
 At this time, `ucc-bench` is not published as a python package as it is very specific to the `ucc` project,
