@@ -1,9 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field, cached_property
 from typing import List, Optional
 from datetime import datetime
 from pathlib import Path
 from .suite import BenchmarkSuite
 import pandas as pd
+from collections import defaultdict
 
 
 class RunnerInfo(BaseModel):
@@ -26,6 +27,11 @@ class RunnerInfo(BaseModel):
         )
 
 
+class CompilerInfo(BaseModel):
+    id: str
+    version: str
+
+
 class Metadata(BaseModel):
     uid: str
     uid_timestamp: datetime
@@ -37,11 +43,6 @@ class Metadata(BaseModel):
     runner_args: List[str]
     upstream_hash: Optional[str] = None
     upstream_timestamp: Optional[datetime] = None
-
-
-class CompilerInfo(BaseModel):
-    id: str
-    version: str
 
 
 class CompilationMetrics(BaseModel):
@@ -71,6 +72,24 @@ class SuiteResults(BaseModel):
     suite_specification: BenchmarkSuite
     metadata: Metadata
     results: List[BenchmarkResult]
+
+    @computed_field(repr=False)
+    @cached_property
+    def compiler_versions(self) -> dict[str, str]:
+        """Return a map of compiler id to version used in this benchmark run"""
+
+        # Ensure that for a given compiler id, the version is the same across all results
+        checker = defaultdict(set)
+        for result in self.results:
+            checker[result.compiler.id].append(result.compiler.version)
+        for compiler_id, versions in checker.items():
+            if len(versions) != 1:
+                raise ValueError(
+                    f"Compiler {compiler_id} has multiple versions: {versions}"
+                )
+
+        # return flattened map of compiler id to version
+        return {result.compiler.id: result.compiler.version for result in self.results}
 
 
 def out_path_for_results(
