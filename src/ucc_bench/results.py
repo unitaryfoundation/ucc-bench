@@ -158,7 +158,6 @@ def to_df_timing_detailed(suite_results: SuiteResults) -> pd.DataFrame:
             "compiled_multiq_gates": result.compilation_metrics.compiled_multiq_gates,
             "compiler_version": result.compiler.version,
             "uid_timestamp": suite_results.metadata.uid_timestamp,
-            "upstream_timestamp": suite_results.metadata.upstream_timestamp,
         }
         for result in suite_results.results
     ]
