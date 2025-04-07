@@ -1,0 +1,625 @@
+{
+  "suite_specification": {
+    "spec_path": "benchmarks/simulation_benchmarks.toml",
+    "spec_version": "1.0",
+    "suite_version": "0.1",
+    "id": "simulation_benchmarks",
+    "description": "Benchmarks to measure impact of compiling on circuit-specific observables for UCC project",
+    "compilers": [
+      {
+        "id": "ucc"
+      },
+      {
+        "id": "pytket-peep"
+      },
+      {
+        "id": "qiskit-default"
+      },
+      {
+        "id": "cirq"
+      }
+    ],
+    "benchmarks": [
+      {
+        "id": "qaoa",
+        "description": "Quantum Approximate Optimization Algorithm of Barabási–Albert graph",
+        "qasm_file": "circuits/benchpress/qaoa_barabasi_albert_N10_3reps_basis_rz_rx_ry_cx.qasm",
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qaoa_barabasi_albert_N10_3reps_basis_rz_rx_ry_cx.qasm",
+        "simulate": {
+          "measurement": "qaoa"
+        }
+      },
+      {
+        "id": "qv",
+        "description": "Quantum Volume",
+        "qasm_file": "circuits/benchpress/qv_N010_12345_basis_rz_rx_ry_cx.qasm",
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qv_N010_12345_basis_rz_rx_ry_cx.qasm",
+        "simulate": {
+          "measurement": "heavy_output"
+        }
+      },
+      {
+        "id": "qft",
+        "description": "Quantum Fourier Transform",
+        "qasm_file": "circuits/benchpress/qft_N010_basis_rz_rx_ry_cx.qasm",
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qft_N010_basis_rz_rx_ry_cx.qasm",
+        "simulate": {
+          "measurement": "computational_basis"
+        }
+      },
+      {
+        "id": "square_heisenberg",
+        "description": "Heisenberg spin model on square lattice",
+        "qasm_file": "circuits/benchpress/square_heisenberg_N9_basis_rz_rx_ry_cx.qasm",
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/square_heisenberg_N9_basis_rz_rx_ry_cx.qasm",
+        "simulate": {
+          "measurement": "computational_basis"
+        }
+      },
+      {
+        "id": "prep_select",
+        "description": "GHZ state preparation",
+        "qasm_file": "circuits/ucc/prep_select_N10_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "resolved_qasm_file": "benchmarks/circuits/ucc/prep_select_N10_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": {
+          "measurement": "computational_basis"
+        }
+      },
+      {
+        "id": "qcnn",
+        "description": "Quantum Convolutional Neural Network",
+        "qasm_file": "circuits/ucc/qcnn_N10_4layers_basis_rz_rx_ry_h_cx.qasm",
+        "resolved_qasm_file": "benchmarks/circuits/ucc/qcnn_N10_4layers_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": {
+          "measurement": "computational_basis"
+        }
+      }
+    ]
+  },
+  "metadata": {
+    "uid": "5ccc5a2b3dcab9d52b916c1b12701d24543c437b",
+    "uid_timestamp": "2025-04-07T01:23:01Z",
+    "run_start": "2025-04-07T01:31:00.981742",
+    "run_end": "2025-04-07T01:32:43.008969",
+    "runner_name": "ucc-benchmarks-8-core-U22.04",
+    "runner_specs": {
+      "os": "Linux",
+      "cpu": "x86_64",
+      "ram_gb": 31.340503692626953,
+      "physical_cores": 4
+    },
+    "runner_version": "0.1.0",
+    "runner_args": [
+      "/home/runner/work/ucc-bench/ucc-bench/.venv/bin/ucc-bench",
+      "./benchmarks/simulation_benchmarks.toml",
+      "--uid",
+      "5ccc5a2b3dcab9d52b916c1b12701d24543c437b",
+      "--uid_time",
+      "2025-04-07T01:23:01Z",
+      "--log_level",
+      "INFO",
+      "-o",
+      "./results",
+      "--runner_name",
+      "ucc-benchmarks-8-core-U22.04",
+      "--upstream_hash",
+      "a2aaea899996f62686cf18623606b4980d425248",
+      "--upstream_time",
+      "2025-04-04T15:33:53Z"
+    ],
+    "upstream_hash": "a2aaea899996f62686cf18623606b4980d425248",
+    "upstream_timestamp": "2025-04-04T15:33:53Z"
+  },
+  "results": [
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.4"
+      },
+      "benchmark_id": "qaoa",
+      "run_start": "1970-01-01T00:10:13.227498Z",
+      "run_end": "1970-01-01T00:10:13.254149Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 26.651789000084136,
+        "raw_multiq_gates": 96,
+        "compiled_multiq_gates": 96
+      },
+      "simulation_metrics": {
+        "measurement_id": "qaoa",
+        "uncompiled_ideal": 5.579981587008057,
+        "compiled_ideal": 5.579981587008089,
+        "uncompiled_noisy": 3.686509319501648,
+        "compiled_noisy": 3.3012148851835574
+      }
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.4"
+      },
+      "benchmark_id": "qv",
+      "run_start": "1970-01-01T00:10:13.239401Z",
+      "run_end": "1970-01-01T00:10:13.275031Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 35.630114000014146,
+        "raw_multiq_gates": 150,
+        "compiled_multiq_gates": 150
+      },
+      "simulation_metrics": {
+        "measurement_id": "heavy_output",
+        "uncompiled_ideal": -0.5123729186121452,
+        "compiled_ideal": -0.6095707981505173,
+        "uncompiled_noisy": -0.6161481489242705,
+        "compiled_noisy": -0.6148881868551999
+      }
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.4"
+      },
+      "benchmark_id": "qft",
+      "run_start": "1970-01-01T00:10:13.286187Z",
+      "run_end": "1970-01-01T00:10:13.314776Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 28.589384000042628,
+        "raw_multiq_gates": 105,
+        "compiled_multiq_gates": 105
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": 2.1684237122734696e-19,
+        "compiled_ideal": 1.3639494104349498e-17,
+        "uncompiled_noisy": 7.589415207398531e-19,
+        "compiled_noisy": 2.0599841277224584e-18
+      }
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.4"
+      },
+      "benchmark_id": "square_heisenberg",
+      "run_start": "1970-01-01T00:10:13.301601Z",
+      "run_end": "1970-01-01T00:10:13.318428Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 16.82697299997926,
+        "raw_multiq_gates": 144,
+        "compiled_multiq_gates": 36
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": 1.0000000000000016,
+        "compiled_ideal": 1.0000000000000024,
+        "uncompiled_noisy": 0.2995441524046923,
+        "compiled_noisy": 0.697300556058248
+      }
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.4"
+      },
+      "benchmark_id": "prep_select",
+      "run_start": "1970-01-01T00:10:13.728672Z",
+      "run_end": "1970-01-01T00:10:13.999105Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 270.43342800004666,
+        "raw_multiq_gates": 658,
+        "compiled_multiq_gates": 948
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": -2.13469795757649e-18,
+        "compiled_ideal": -2.8145819569136763e-16,
+        "uncompiled_noisy": -5.421010862427522e-19,
+        "compiled_noisy": 1.6082806387649959e-9
+      }
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.4"
+      },
+      "benchmark_id": "qcnn",
+      "run_start": "1970-01-01T00:10:15.863993Z",
+      "run_end": "1970-01-01T00:10:15.876663Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 12.669284000025982,
+        "raw_multiq_gates": 32,
+        "compiled_multiq_gates": 32
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": -0.003377006091718024,
+        "compiled_ideal": -0.0033770060917185096,
+        "uncompiled_noisy": -0.002535195840460839,
+        "compiled_noisy": -0.0024316355008364605
+      }
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.1.0"
+      },
+      "benchmark_id": "qaoa",
+      "run_start": "1970-01-01T00:10:16.408619Z",
+      "run_end": "1970-01-01T00:10:17.390064Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 981.4444119999735,
+        "raw_multiq_gates": 96,
+        "compiled_multiq_gates": 96
+      },
+      "simulation_metrics": {
+        "measurement_id": "qaoa",
+        "uncompiled_ideal": 5.5799815870080725,
+        "compiled_ideal": 5.579981587008071,
+        "uncompiled_noisy": 3.6865093195016563,
+        "compiled_noisy": 3.6801697283123485
+      }
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.1.0"
+      },
+      "benchmark_id": "qv",
+      "run_start": "1970-01-01T00:10:17.518352Z",
+      "run_end": "1970-01-01T00:10:19.209324Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 1690.9717290000117,
+        "raw_multiq_gates": 150,
+        "compiled_multiq_gates": 150
+      },
+      "simulation_metrics": {
+        "measurement_id": "heavy_output",
+        "uncompiled_ideal": -0.4910564303245085,
+        "compiled_ideal": -0.6121864323747926,
+        "uncompiled_noisy": -0.6179662624855422,
+        "compiled_noisy": -0.5773925379834953
+      }
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.1.0"
+      },
+      "benchmark_id": "qft",
+      "run_start": "1970-01-01T00:10:19.713886Z",
+      "run_end": "1970-01-01T00:10:20.487208Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 773.3223799999678,
+        "raw_multiq_gates": 105,
+        "compiled_multiq_gates": 90
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": -3.686286928736212e-18,
+        "compiled_ideal": -3.035269253696442e-18,
+        "uncompiled_noisy": -1.0842021724855044e-18,
+        "compiled_noisy": -5.421010862427522e-19
+      }
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.1.0"
+      },
+      "benchmark_id": "square_heisenberg",
+      "run_start": "1970-01-01T00:10:23.186190Z",
+      "run_end": "1970-01-01T00:10:23.678432Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 492.2423490000938,
+        "raw_multiq_gates": 144,
+        "compiled_multiq_gates": 36
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": 1.0000000000000007,
+        "compiled_ideal": 0.9999999999999994,
+        "uncompiled_noisy": 0.29954415240469284,
+        "compiled_noisy": 0.7322406705874034
+      }
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.1.0"
+      },
+      "benchmark_id": "prep_select",
+      "run_start": "1970-01-01T00:10:24.183349Z",
+      "run_end": "1970-01-01T00:10:33.761423Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 9578.074243999936,
+        "raw_multiq_gates": 658,
+        "compiled_multiq_gates": 948
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": 1.0796126873010716e-16,
+        "compiled_ideal": 1.8098369614211904e-16,
+        "uncompiled_noisy": -1.6046192152785466e-17,
+        "compiled_noisy": -5.204170427930421e-18
+      }
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.1.0"
+      },
+      "benchmark_id": "qcnn",
+      "run_start": "1970-01-01T00:10:31.102858Z",
+      "run_end": "1970-01-01T00:10:31.458886Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 356.0274540000137,
+        "raw_multiq_gates": 32,
+        "compiled_multiq_gates": 32
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": -0.0033770060917179406,
+        "compiled_ideal": -0.0033770060917178105,
+        "uncompiled_noisy": -0.0025351958404608277,
+        "compiled_noisy": -0.0025027695740840235
+      }
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "1.4.2"
+      },
+      "benchmark_id": "qaoa",
+      "run_start": "1970-01-01T00:10:32.643301Z",
+      "run_end": "1970-01-01T00:10:32.674720Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 31.418687000041245,
+        "raw_multiq_gates": 96,
+        "compiled_multiq_gates": 96
+      },
+      "simulation_metrics": {
+        "measurement_id": "qaoa",
+        "uncompiled_ideal": 5.579981587008057,
+        "compiled_ideal": 5.579981587008057,
+        "uncompiled_noisy": 3.686509319501648,
+        "compiled_noisy": 3.686509319501648
+      }
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "1.4.2"
+      },
+      "benchmark_id": "qv",
+      "run_start": "1970-01-01T00:10:34.988477Z",
+      "run_end": "1970-01-01T00:10:35.050264Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 61.78716700003406,
+        "raw_multiq_gates": 150,
+        "compiled_multiq_gates": 150
+      },
+      "simulation_metrics": {
+        "measurement_id": "heavy_output",
+        "uncompiled_ideal": -0.5114440540679475,
+        "compiled_ideal": -0.4722413873146565,
+        "uncompiled_noisy": -0.6169926889440215,
+        "compiled_noisy": -0.6101306956935074
+      }
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "1.4.2"
+      },
+      "benchmark_id": "qft",
+      "run_start": "1970-01-01T00:10:35.712640Z",
+      "run_end": "1970-01-01T00:10:35.732911Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 20.27089299997442,
+        "raw_multiq_gates": 105,
+        "compiled_multiq_gates": 105
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": 2.1684237122734696e-19,
+        "compiled_ideal": 6.505304552856788e-19,
+        "uncompiled_noisy": 7.589415207398531e-19,
+        "compiled_noisy": 3.2526065174565133e-19
+      }
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "1.4.2"
+      },
+      "benchmark_id": "square_heisenberg",
+      "run_start": "1970-01-01T00:10:38.473952Z",
+      "run_end": "1970-01-01T00:10:38.534858Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 60.905490999971335,
+        "raw_multiq_gates": 144,
+        "compiled_multiq_gates": 36
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": 1.0000000000000016,
+        "compiled_ideal": 1.000000000000002,
+        "uncompiled_noisy": 0.2995441524046923,
+        "compiled_noisy": 0.7179108092767662
+      }
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "1.4.2"
+      },
+      "benchmark_id": "prep_select",
+      "run_start": "1970-01-01T00:10:38.856313Z",
+      "run_end": "1970-01-01T00:10:39.021358Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 165.04568700008804,
+        "raw_multiq_gates": 658,
+        "compiled_multiq_gates": 948
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": -2.13469795757649e-18,
+        "compiled_ideal": -8.114145624239095e-17,
+        "uncompiled_noisy": -5.421010862427522e-19,
+        "compiled_noisy": -8.131516293641283e-18
+      }
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "1.4.2"
+      },
+      "benchmark_id": "qcnn",
+      "run_start": "1970-01-01T00:10:50.282415Z",
+      "run_end": "1970-01-01T00:10:50.330523Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 48.10842099993806,
+        "raw_multiq_gates": 32,
+        "compiled_multiq_gates": 32
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": -0.003377006091718024,
+        "compiled_ideal": -0.0033770060917179996,
+        "uncompiled_noisy": -0.002535195840460839,
+        "compiled_noisy": -0.0025887238226311583
+      }
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.4.1"
+      },
+      "benchmark_id": "qaoa",
+      "run_start": "1970-01-01T00:10:51.649598Z",
+      "run_end": "1970-01-01T00:10:52.203983Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 554.3858209999826,
+        "raw_multiq_gates": 96,
+        "compiled_multiq_gates": 96
+      },
+      "simulation_metrics": {
+        "measurement_id": "qaoa",
+        "uncompiled_ideal": 5.579981588016547,
+        "compiled_ideal": 5.579981588016544,
+        "uncompiled_noisy": 3.686509320141693,
+        "compiled_noisy": 3.686509320141693
+      }
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.4.1"
+      },
+      "benchmark_id": "qv",
+      "run_start": "1970-01-01T00:10:52.874272Z",
+      "run_end": "1970-01-01T00:10:54.782080Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 1907.8076190000957,
+        "raw_multiq_gates": 150,
+        "compiled_multiq_gates": 150
+      },
+      "simulation_metrics": {
+        "measurement_id": "heavy_output",
+        "uncompiled_ideal": -0.48180370297464226,
+        "compiled_ideal": -0.4960632319561995,
+        "uncompiled_noisy": -0.6179013508738636,
+        "compiled_noisy": -0.6180104984573552
+      }
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.4.1"
+      },
+      "benchmark_id": "qft",
+      "run_start": "1970-01-01T00:10:54.770310Z",
+      "run_end": "1970-01-01T00:10:55.405229Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 634.9190919999046,
+        "raw_multiq_gates": 105,
+        "compiled_multiq_gates": 105
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": -2.3852411993012286e-18,
+        "compiled_ideal": -2.168482581096327e-19,
+        "uncompiled_noisy": -3.144186300207963e-18,
+        "compiled_noisy": 5.095750210681871e-18
+      }
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.4.1"
+      },
+      "benchmark_id": "square_heisenberg",
+      "run_start": "1970-01-01T00:10:58.715885Z",
+      "run_end": "1970-01-01T00:10:59.196224Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 480.338905999929,
+        "raw_multiq_gates": 144,
+        "compiled_multiq_gates": 36
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": 0.9999999999999997,
+        "compiled_ideal": 0.9999999999999978,
+        "uncompiled_noisy": 0.2995441524046913,
+        "compiled_noisy": 0.6804702621300115
+      }
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.4.1"
+      },
+      "benchmark_id": "prep_select",
+      "run_start": "1970-01-01T00:11:01.018488Z",
+      "run_end": "1970-01-01T00:11:11.585828Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 10567.339521999998,
+        "raw_multiq_gates": 658,
+        "compiled_multiq_gates": 1064
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": -7.103990119857024e-17,
+        "compiled_ideal": 2.323633950943304e-17,
+        "uncompiled_noisy": 2.3310346708438345e-17,
+        "compiled_noisy": 2.8966141820850264e-8
+      }
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.4.1"
+      },
+      "benchmark_id": "qcnn",
+      "run_start": "1970-01-01T00:11:10.050346Z",
+      "run_end": "1970-01-01T00:11:10.297230Z",
+      "compilation_metrics": {
+        "compilation_time_ms": 246.88402200001747,
+        "raw_multiq_gates": 32,
+        "compiled_multiq_gates": 32
+      },
+      "simulation_metrics": {
+        "measurement_id": "computational_basis",
+        "uncompiled_ideal": -0.003377006092551727,
+        "compiled_ideal": -0.003377006092551727,
+        "uncompiled_noisy": -0.002535195841103366,
+        "compiled_noisy": -0.002535195841103366
+      }
+    }
+  ],
+  "compiler_versions": {
+    "ucc": "0.4.4",
+    "pytket-peep": "2.1.0",
+    "qiskit-default": "1.4.2",
+    "cirq": "1.4.1"
+  }
+}
