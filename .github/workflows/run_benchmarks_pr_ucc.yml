@@ -61,7 +61,7 @@ jobs:
       - name: Get baseline version of UCC
         id: get_ucc_base_sha
         run: |
-          UCC_BASE_SHA=$(uv run .github/scripts/extract_ucc_revision.py ./pyproject.toml
+          UCC_BASE_SHA=$(uv run .github/scripts/extract_ucc_revision.py ./pyproject.toml)
           echo "UCC_BASE_SHA=$UCC_BASE_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Upgrade to target version of UCC
