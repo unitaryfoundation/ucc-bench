@@ -55,44 +55,8 @@ jobs:
         with:
           python-version-file: ".python-version"
 
-      - name: Run benchmark setup and execution
+      - name: Run benchmarks and post PR  comment
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
-        run: |
-          # Install the project
-          uv sync --all-extras --dev
-
-          # Set up git config to be bot user
-          git config --global user.email "github-actions@users.noreply.github.com"
-          git config --global user.name "github-actions"
-
-          # Get baseline version of UCC
-          UCC_BASE_SHA=$(uv run .github/scripts/extract_ucc_revision.py ./pyproject.toml)
-          echo "UCC_BASE_SHA=$UCC_BASE_SHA"
-
-          # Upgrade to target version of UCC
-          git checkout -b upgrade-ucc-${{ github.event.client_payload.commit_hash }}
-          uv add git+https://github.com/unitaryfoundation/ucc@${{ github.event.client_payload.commit_hash }}
-          git add pyproject.toml uv.lock
-          git commit -m "Upgrade UCC to ${{ github.event.client_payload.commit_hash }}"
-          SHA_NEW=$(git rev-parse HEAD)
-          echo "SHA_NEW=$SHA_NEW"
-
-          # Run benchmarks for PR comparison
-          .github/scripts/run_benchmarks.sh $SHA_NEW $RUNNER_LABEL ./results
-
-          # Get the SHA of the last commit on the main branch before this PR as the baseline for comparison
-          ANCESTOR_SHA=$(.github/scripts/find_ancestor_sha.sh HEAD origin/main)
-          echo "Useful base commit: $ANCESTOR_SHA"
-
-          uv run python .github/scripts/post_benchmark_diff_comment.py \
-            --repo "unitaryfoundation/ucc" \
-            --pr "${{ github.event.client_payload.pr_number }}" \
-            --root_dir ./results \
-            --runner_name $RUNNER_LABEL \
-            --sha_base $ANCESTOR_SHA \
-            --sha_new "$SHA_NEW" \
-            --sha_ucc_base "$UCC_BASE_SHA" \
-            --sha_ucc_new "${{ github.event.client_payload.commit_hash }}"
-
+        run: bash .github/scripts/run_benchmarks.sh $RUNNER_LABEL ${{ github.event.client_payload.commit_hash }} ${{ github.event.client_payload.pr_number }}
