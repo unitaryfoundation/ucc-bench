@@ -16,8 +16,6 @@ RUNNER_LABEL=$1
 UCC_NEW_SHA=$2
 PR_NUMBER=$3
 
-echo "Running PR benchmarks for $RUNNER_LABEL with UCC@$UCC_NEW_SHA and posting to PR #$PR_NUMBER"
-
 # Install the project
 uv sync --all-extras --dev
 
@@ -44,10 +42,6 @@ echo "SHA_NEW=$SHA_NEW"
 ANCESTOR_SHA=$(.github/scripts/find_ancestor_sha.sh HEAD origin/main)
 echo "Useful base commit: $ANCESTOR_SHA"
 
-## DELETE ME
-tree results
-
-
 uv run python .github/scripts/post_benchmark_diff_comment.py \
 --repo "unitaryfoundation/ucc" \
 --pr "$PR_NUMBER" \
@@ -56,4 +50,4 @@ uv run python .github/scripts/post_benchmark_diff_comment.py \
 --sha_base $ANCESTOR_SHA \
 --sha_new "$SHA_NEW" \
 --sha_ucc_base "$UCC_BASE_SHA" \
---sha_ucc_new "$UCC_NEW_SHA" --dry
+--sha_ucc_new "$UCC_NEW_SHA"

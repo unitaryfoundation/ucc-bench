@@ -222,6 +222,16 @@ def main() -> None:
     # Check if results were found
     if results_old is None:
         error_msg = f"Results not found for base commit {args.sha_base} (runner: {args.runner_name})."
+        if args.repo == "unitaryfoundation/ucc":
+            error_msg += (
+                "That benchmark run might still be going. You may need to wait for it to finish,"
+                " and then try retagging this PR to rerun the comparison."
+            )
+        else:
+            error_msg += (
+                "That benchmark run might still be going. You may need to wait for it to finish,"
+                " and then try rebase on top of the main branch to rerun the comparison."
+            )
 
         post_github_comment(
             github_token, args.repo, args.pr, error_msg, args.dry_run, is_error=True
