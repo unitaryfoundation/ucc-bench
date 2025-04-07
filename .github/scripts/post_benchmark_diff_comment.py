@@ -9,6 +9,11 @@ from ucc_bench.results import to_df_timing, SuiteResultsDatabase, SuiteResults
 DEFAULT_THRESHOLD = 10.0
 EPS = 1e-8
 
+# Script for comparing UCC benchmark results and posting a comment summarizing
+# the changes to a Github PR. This supports PRs to either the ucc-bench repo,
+# e.g. if changing the benchmark suite or one of the non-ucc compilers, or PRs to
+# the ucc repo, e.g. if changing the ucc compiler itself.
+
 
 def format_change(
     percent: Optional[float], threshold: float = DEFAULT_THRESHOLD
@@ -115,7 +120,7 @@ def post_github_comment(
 
     Args:
         token: GitHub personal access token.
-        repo: GitHub repository in 'owner/name' format.
+        repo: GitHub repository name in 'owner/name' format.
         pr_number: Pull request number.
         body: The comment content (Markdown supported).
         dry_run: Whether to only print instead of posting.
@@ -150,17 +155,27 @@ def post_github_comment(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Post benchmark comparison to a GitHub PR.",
-        # Provides defaults in help message
+        description="Post benchmark comparison summary to a GitHub PR.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
-        "--repo", required=True, help="GitHub repository in 'owner/name' format"
+        "--repo",
+        required=True,
+        choices=["unitaryfoundation/ucc", "unitaryfoundation/ucc-bench"],
+        help="Repository where the PR is (must be 'unitaryfoundation/ucc' or 'unitaryfoundation/ucc-bench')",
     )
     parser.add_argument("--pr", type=int, help="Pull request number")
-    # Use dest for clearer access via args.sha_base etc.
-    parser.add_argument("--sha_base", required=True, help="SHA of the base commit")
-    parser.add_argument("--sha_new", required=True, help="SHA of the new commit (head)")
+    parser.add_argument(
+        "--sha_base", required=True, help="SHA of the base commit in ucc-bench"
+    )
+    parser.add_argument(
+        "--sha_new", required=True, help="SHA of the new commit in ucc-bench"
+    )
+    parser.add_argument(
+        "--sha_upstream",
+        required=False,
+        help="If set, SHA of the upstream commit in UCC repo that the PR is based on",
+    )
     parser.add_argument("--root_dir", required=True, help="Root directory for results")
     parser.add_argument(
         "--runner_name",
@@ -192,6 +207,13 @@ def main() -> None:
         )
         sys.exit(1)
 
+    if args.repo == "ucc" and not args.sha_upstream:
+        print(
+            "Error: --sha_upstream must be specified when the PR is to the ucc repo.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
     # Only commenting on timing results for now (not simulation ones)
     timing_results_db = SuiteResultsDatabase.from_root(
         args.root_dir, args.runner_name, "timing_benchmarks"
@@ -202,7 +224,8 @@ def main() -> None:
     # Check if results were found
     if results_old is None:
         error_msg = f"Results not found for base commit {args.sha_base} (runner: {args.runner_name})."
-        "You might need to rebase on more recent changes."
+        "You might need to rebase on more recent changes if the base commit results were created"
+        " after the PR was opened."
 
         post_github_comment(
             github_token, args.repo, args.pr, error_msg, args.dry_run, is_error=True
@@ -261,10 +284,14 @@ def main() -> None:
     else:
         warning_msg = ""
 
+    if args.repo == "ucc":
+        comp_summary = f"Comparing new unitaryfoundation/ucc@{args.sha_upstream} to base unitaryfoundation/ucc-bench@{args.sha_base}:"
+    else:
+        comp_summary = f"Comparing new unitaryfoundation/ucc-bench@{args.sha_new} to base unitaryfoundation/ucc-bench@{args.sha_base}:"
     message = f"""
 ## 📊 Benchmark Summary ({args.runner_name})
 
-Comparing new {args.repo}@{args.sha_new} to base {args.repo}@{args.sha_base}:
+{comp_summary}
 
 - 🟢 `{ct_impr}` improvements in `compile_time_ms`
 - 🔴 `{ct_reg}` regressions in `compile_time_ms`
