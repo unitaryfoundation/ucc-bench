@@ -1,0 +1,102 @@
+# When triggered (by a PR in the ucc repo), run benchmarks and post a comment back detailing the results.
+# Unlike benchmarks on pushes to main, these results are not committed back to the repo.
+# The purpose here is to provide performance view before merging a PR.
+#
+# !!This workflow is triggered by PRs in the ucc repo and comments back to that repo.
+# !!For PRs to the ucc-bench repo, the there is a `run_benchmarks_pr.yml` workflow that
+# !!is triggered
+name: Run ucc PR Benchmark Comparison
+
+on:
+  # The payload to this call should include
+  # - commit hash of the UCC repo
+  # - PR number in UCC repo
+  repository_dispatch:
+    types: [ucc-main-pr]
+
+# Set the runner name here for use in a later step, but also next to
+# the actual runs-on designation below so users know to change both together
+env:
+  RUNNER_LABEL: ucc-benchmarks-8-core-U22.04
+jobs:
+  run-benchmarks-ucc-pr:
+    runs-on: ucc-benchmarks-8-core-U22.04
+
+    # Cancel if a newer commit is pushed to the PR
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.client_payload.pr_number }}
+      cancel-in-progress: true
+
+    steps:
+
+      # Prepare a token of Github App to post the comment
+      # Note the private key needs to be PKCS#8 format, so
+      # follow https://github.com/gr2m/universal-github-app-jwt?tab=readme-ov-file#converting-openssh-to-pkcs8
+      # to convert to another format before adding it as a secret
+      # Run this step first to fail fast
+      - name: Generate token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.UCC_BENCH_APP_ID }}
+          private-key: ${{ secrets.UCC_BENCH_APP_PRIVATE_KEY }}
+          owner: unitaryfoundation
+          repositories: ucc-bench
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed to walk ancestor commits
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Get baseline version of UCC
+        id: get_ucc_base_sha
+        run: |
+          UCC_BASE_SHA=$(uv run .github/scripts/extract_ucc_revision.py ./pyproject.toml
+          echo "UCC_BASE_SHA=$UCC_BASE_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Upgrade to target version of UCC
+        id: upgrade_ucc
+        run: |
+          git checkout -b upgrade-ucc-${{ github.event.client_payload.commit_hash }}
+          uv add git+https://github.com/unitaryfoundation/ucc@${{ github.event.client_payload.commit_hash }}
+          git add pyproject.toml uv.lock
+          git commit -m "Upgrade UCC to ${{ github.event.client_payload.commit_hash }}"
+          SHA_NEW=$(git rev-parse HEAD)
+          echo "SHA_NEW=$SHA_NEW" >> "$GITHUB_OUTPUT"
+
+      - name: Run benchmarks for PR comparison
+        run: .github/scripts/run_benchmarks.sh ${{ steps.upgrade_ucc.SHA_NEW }} $RUNNER_LABEL ./results
+
+      # Get the SHA of the last commit on the main branch before this PR as the
+      # baseline for comparison
+      - name: Find meaningful merge base
+        id: get_sha
+        run: |
+          ANCESTOR_SHA=$(.github/scripts/find_ancestor_sha.sh HEAD origin/main)
+          echo "Useful base commit: $ANCESTOR_SHA"
+          echo "ANCESTOR_SHA=$ANCESTOR_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Post benchmark comparison to PR
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          uv run python .github/scripts/post_benchmark_diff_comment.py \
+            --repo "unitaryfoundation/ucc" \
+            --pr "${{ github.event.client_payload.pr_number }}" \
+            --root_dir ./results \
+            --runner_name $RUNNER_LABEL \
+            --sha_base ${{ steps.get_sha.outputs.ANCESTOR_SHA }} \
+            --sha_new "${{ steps.upgrade_ucc.SHA_NEW }}" \
+            --sha_ucc_base "${{ steps.get_ucc_base_sha.UCC_BASE_SHA }}" \
+            --sha_ucc_new "${{ github.event.client_payload.commit_hash }}"
+

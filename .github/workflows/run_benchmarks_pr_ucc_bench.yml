@@ -3,7 +3,10 @@
 # The purpose here is to provide performance view before merging a PR.
 # This will only be run if the PR has the label "preview-benchmark-results"
 # and will be skipped if the label is removed.
-name: Run PR Benchmark Comparison
+#
+# !!This workflow is triggered by PRs in the ucc-bench repo. For PRs to the UCC
+# !!repo, the there is a separet `run_benchmarks_pr_ucc.yml` workflow that is triggered
+name: Run ucc-bench PR Benchmark Comparison
 
 on:
   pull_request:
@@ -23,7 +26,7 @@ permissions:
 env:
   RUNNER_LABEL: ucc-benchmarks-8-core-U22.04
 jobs:
-  run-benchmarks-pr:
+  run-ucc-benchmarks-pr:
     if: contains(github.event.pull_request.labels.*.name, 'preview-benchmark-results')
     runs-on: ucc-benchmarks-8-core-U22.04
 
@@ -76,13 +79,12 @@ jobs:
       - name: Post benchmark comparison to PR
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-          ANCESTOR_SHA: ${{ steps.get_sha.outputs.ANCESTOR_SHA }}
         run: |
           uv run python .github/scripts/post_benchmark_diff_comment.py \
             --repo "${{ github.repository }}" \
             --pr "${{ github.event.pull_request.number }}" \
             --root_dir ./results \
             --runner_name $RUNNER_LABEL \
-            --sha_base $ANCESTOR_SHA \
+            --sha_base ${{ steps.get_sha.outputs.ANCESTOR_SHA }} \
             --sha_new "${{ github.sha }}"
 
