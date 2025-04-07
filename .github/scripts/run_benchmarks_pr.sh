@@ -33,7 +33,6 @@ uv add git+https://github.com/unitaryfoundation/ucc@${UCC_NEW_SHA}
 git add pyproject.toml uv.lock
 git commit -m "Upgrade UCC to ${UCC_NEW_SHA}"
 SHA_NEW=$(git rev-parse HEAD)
-git push origin HEAD:upgrade-ucc-${UCC_NEW_SHA}
 echo "SHA_NEW=$SHA_NEW"
 
 # Run benchmarks for PR comparison

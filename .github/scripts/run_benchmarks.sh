@@ -30,10 +30,8 @@ if ! command -v jq > /dev/null; then
   exit 1
 fi
 
-# Get commit time from GitHub API for the commit to ucc-bench
-uid_time=$(curl -s -H "Accept: application/vnd.github.v3+json" \
-  "https://api.github.com/repos/unitaryfoundation/ucc-bench/commits/${commit_hash}" | \
-  jq -r '.commit.committer.date // empty')
+# Get commit time for the specified commit hash
+uid_time=$(git show -s --format=%cI "${commit_hash}")
 
 if [[ -z "$uid_time" ]]; then
   echo "Error: Could not fetch commit time for hash ${commit_hash} from GitHub."
@@ -50,7 +48,7 @@ ucc_hash=$(uv run .github/scripts/extract_ucc_revision.py ./pyproject.toml || tr
 if [[ -n "$ucc_hash" ]]; then
   echo "ucc in pyproject-toml is ucc@$ucc_hash"
 
-  # Get UCC commit date from GitHub
+  # Get UCC commit date from GitHub, since ucc is a separate repo than ucc-bench
   ucc_commit_date=$(curl -s -H "Accept: application/vnd.github.v3+json" \
     "https://api.github.com/repos/unitaryfoundation/ucc/commits/${ucc_hash}" | \
     jq -r '.commit.committer.date // empty')
