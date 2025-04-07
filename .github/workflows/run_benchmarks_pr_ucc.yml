@@ -80,7 +80,7 @@ jobs:
           echo "SHA_NEW=$SHA_NEW" >> "$GITHUB_OUTPUT"
 
       - name: Run benchmarks for PR comparison
-        run: .github/scripts/run_benchmarks.sh ${{ steps.upgrade_ucc.SHA_NEW }} $RUNNER_LABEL ./results
+        run: .github/scripts/run_benchmarks.sh ${{ steps.upgrade_ucc.outputs.SHA_NEW }} $RUNNER_LABEL ./results
 
       # Get the SHA of the last commit on the main branch before this PR as the
       # baseline for comparison
@@ -101,7 +101,7 @@ jobs:
             --root_dir ./results \
             --runner_name $RUNNER_LABEL \
             --sha_base ${{ steps.get_sha.outputs.ANCESTOR_SHA }} \
-            --sha_new "${{ steps.upgrade_ucc.SHA_NEW }}" \
-            --sha_ucc_base "${{ steps.get_ucc_base_sha.UCC_BASE_SHA }}" \
+            --sha_new "${{ steps.upgrade_ucc.outputs.SHA_NEW }}" \
+            --sha_ucc_base "${{ steps.get_ucc_base_sha.outputs.UCC_BASE_SHA }}" \
             --sha_ucc_new "${{ github.event.client_payload.commit_hash }}"
 
