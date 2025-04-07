@@ -172,9 +172,14 @@ def main() -> None:
         "--sha_new", required=True, help="SHA of the new commit in ucc-bench"
     )
     parser.add_argument(
-        "--sha_upstream",
+        "--sha_ucc_base",
         required=False,
-        help="If set, SHA of the upstream commit in UCC repo that the PR is based on",
+        help="If set, SHA of the upstream commit in UCC repo that was used in ucc-bench@sha-base",
+    )
+    parser.add_argument(
+        "--sha_ucc_new",
+        required=False,
+        help="If set, SHA of the upstream commit in UCC repo that the PR is based on (and is the version of ucc in ucc-bench@sha_new)",
     )
     parser.add_argument("--root_dir", required=True, help="Root directory for results")
     parser.add_argument(
@@ -203,13 +208,6 @@ def main() -> None:
     if not args.dry_run and not github_token:
         print(
             "Error: Environment variable GH_TOKEN must be set for posting comments.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    if args.repo == "ucc" and not args.sha_upstream:
-        print(
-            "Error: --sha_upstream must be specified when the PR is to the ucc repo.",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -285,9 +283,16 @@ def main() -> None:
         warning_msg = ""
 
     if args.repo == "ucc":
-        comp_summary = f"Comparing new unitaryfoundation/ucc@{args.sha_upstream} to base unitaryfoundation/ucc-bench@{args.sha_base}:"
+        comp_summary = (
+            f"Comparing new unitaryfoundation/ucc@{args.sha_ucc_new} to base "
+            f"unitaryfoundation/ucc@{args.sha_ucc_base} "
+            f"(`ucc` version as of unitaryfoundation/ucc-bench@{args.sha_base}):"
+        )
     else:
-        comp_summary = f"Comparing new unitaryfoundation/ucc-bench@{args.sha_new} to base unitaryfoundation/ucc-bench@{args.sha_base}:"
+        comp_summary = (
+            f"Comparing new unitaryfoundation/ucc-bench@{args.sha_new} to base "
+            f"unitaryfoundation/ucc-bench@{args.sha_base}:"
+        )
     message = f"""
 ## 📊 Benchmark Summary ({args.runner_name})
 
