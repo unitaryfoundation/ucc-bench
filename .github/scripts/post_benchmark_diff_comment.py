@@ -222,8 +222,6 @@ def main() -> None:
     # Check if results were found
     if results_old is None:
         error_msg = f"Results not found for base commit {args.sha_base} (runner: {args.runner_name})."
-        "You might need to rebase on more recent changes if the base commit results were created"
-        " after the PR was opened."
 
         post_github_comment(
             github_token, args.repo, args.pr, error_msg, args.dry_run, is_error=True
