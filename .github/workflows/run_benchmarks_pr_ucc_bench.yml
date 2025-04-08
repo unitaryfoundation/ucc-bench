@@ -5,7 +5,7 @@
 # and will be skipped if the label is removed.
 #
 # !!This workflow is triggered by PRs in the ucc-bench repo. For PRs to the UCC
-# !!repo, the there is a separet `run_benchmarks_pr_ucc.yml` workflow that is triggered
+# !!repo, the there is a another `run_benchmarks_pr_ucc.yml` workflow that is triggered
 name: Run ucc-bench PR Benchmark Comparison
 
 on:
@@ -61,30 +61,7 @@ jobs:
         with:
           python-version-file: ".python-version"
 
-      - name: Install the project
-        run: uv sync --all-extras --dev
-
-      - name: Run benchmarks for PR comparison
-        run: .github/scripts/run_benchmarks.sh ${{ github.sha }} $RUNNER_LABEL ./results
-
-      # Get the SHA of the last commit on the main branch before this PR as the
-      # baseline for comparison
-      - name: Find meaningful merge base
-        id: get_sha
-        run: |
-          ANCESTOR_SHA=$(.github/scripts/find_ancestor_sha.sh HEAD origin/main)
-          echo "Useful base commit: $ANCESTOR_SHA"
-          echo "ANCESTOR_SHA=$ANCESTOR_SHA" >> "$GITHUB_OUTPUT"
-
-      - name: Post benchmark comparison to PR
+      - name: Run benchmarks and post PR comment
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-        run: |
-          uv run python .github/scripts/post_benchmark_diff_comment.py \
-            --repo "${{ github.repository }}" \
-            --pr "${{ github.event.pull_request.number }}" \
-            --root_dir ./results \
-            --runner_name $RUNNER_LABEL \
-            --sha_base ${{ steps.get_sha.outputs.ANCESTOR_SHA }} \
-            --sha_new "${{ github.sha }}"
-
+        run: bash .github/scripts/run_benchmarks_pr.sh $RUNNER_LABEL ${{ github.sha }} ${{ github.event.pull_request.number }}
