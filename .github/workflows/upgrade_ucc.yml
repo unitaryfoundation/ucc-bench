@@ -2,7 +2,7 @@
 # This workflow enables us to benchmark performance of UCC contributions on a
 # per merge basis, rather than only releases.
 # It is triggered from UCC repo workflow via a repository_dispatch event.
-name: Auto Upgrade UCC Dependency
+name: Upgrade UCC version
 
 on:
   repository_dispatch:

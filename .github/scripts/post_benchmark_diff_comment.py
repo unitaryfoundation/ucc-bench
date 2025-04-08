@@ -41,12 +41,11 @@ def build_comparison_table(
         A new DataFrame summarizing the comparison. Columns: 'Compiler',
         'Benchmark', 'Compile Time Δ', 'MultiQ Gates Δ'.
     """
-    # Merge the dataframes
+
     merged = df_old.merge(
         df_new, on=["compiler", "benchmark_id"], suffixes=("_old", "_new"), how="inner"
     )
 
-    # Create the comparison dataframe
     comparison_df = pd.DataFrame()
     comparison_df["Compiler"] = merged["compiler"]
     comparison_df["Benchmark"] = merged["benchmark_id"]
@@ -54,7 +53,6 @@ def build_comparison_table(
     comparison_df["Compile Time Base (s)"] = merged["compile_time_ms_old"] / 1000.0
     comparison_df["Compile Time New (s)"] = merged["compile_time_ms_new"] / 1000.0
 
-    # Calculate percentage changes using vectorized operations
     comparison_df["Compile Time Δ Raw"] = (
         (merged["compile_time_ms_new"] - merged["compile_time_ms_old"])
         / (merged["compile_time_ms_old"] + EPS)
@@ -66,7 +64,6 @@ def build_comparison_table(
         * 100
     )
 
-    # Format changes using vectorized operations
     comparison_df["Compile Time Δ"] = comparison_df["Compile Time Δ Raw"].map(
         lambda percent: format_change(percent, threshold)
     )
@@ -95,7 +92,7 @@ def summarize_changes(
         A tuple: (compile_time_improvements, compile_time_regressions,
                  multiq_gates_improvements, multiq_gates_regressions)
     """
-    # Use raw percentage changes for summarization
+
     ct_changes = df["Compile Time Δ Raw"]
     mq_changes = df["MultiQ Gates Δ Raw"]
 
@@ -120,7 +117,7 @@ def post_github_comment(
 
     Args:
         token: GitHub personal access token.
-        repo: GitHub repository name in 'owner/name' format.
+        repo: GitHub repository name in 'name' format.
         pr_number: Pull request number.
         body: The comment content (Markdown supported).
         dry_run: Whether to only print instead of posting.
@@ -133,7 +130,7 @@ def post_github_comment(
     if dry_run or not pr_number:
         return
 
-    url = f"https://api.github.com/repos/{repo}/issues/{pr_number}/comments"
+    url = f"https://api.github.com/repos/unitaryfoundation/{repo}/issues/{pr_number}/comments"
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
@@ -161,8 +158,8 @@ def main() -> None:
     parser.add_argument(
         "--repo",
         required=True,
-        choices=["unitaryfoundation/ucc", "unitaryfoundation/ucc-bench"],
-        help="Repository where the PR is (must be 'unitaryfoundation/ucc' or 'unitaryfoundation/ucc-bench')",
+        choices=["ucc", "ucc-bench"],
+        help="Repository where the PR is (must be 'ucc' or 'ucc-bench')",
     )
     parser.add_argument("--pr", type=int, help="Pull request number")
     parser.add_argument(
@@ -201,10 +198,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    # Use os.environ.get for cleaner token retrieval
     github_token: Optional[str] = os.environ.get("GH_TOKEN")
-
-    # Check for token early if not a dry run
     if not args.dry_run and not github_token:
         print(
             "Error: Environment variable GH_TOKEN must be set for posting comments.",
@@ -219,10 +213,9 @@ def main() -> None:
     results_old: Optional[SuiteResults] = timing_results_db.from_uid(args.sha_base)
     results_new: Optional[SuiteResults] = timing_results_db.from_uid(args.sha_new)
 
-    # Check if results were found
     if results_old is None:
         error_msg = f"Results not found for base commit {args.sha_base} (runner: {args.runner_name})."
-        if args.repo == "unitaryfoundation/ucc":
+        if args.repo == "ucc":
             error_msg += (
                 "That benchmark run might still be going. You may need to wait for it to finish,"
                 " and then try retagging this PR to rerun the comparison."
@@ -244,7 +237,6 @@ def main() -> None:
         )
         sys.exit(1)
 
-    # Confirm the results are from the same benchmark suite and version
     spec_old = results_old.suite_specification
     spec_new = results_new.suite_specification
     if spec_old.id != spec_new.id:
@@ -256,7 +248,6 @@ def main() -> None:
         )
         sys.exit(1)
 
-    # Convert results to DataFrames
     df_old = to_df_timing(results_old)
     df_new = to_df_timing(results_new)
 
@@ -279,8 +270,6 @@ def main() -> None:
             columns=["Compile Time Δ Raw", "MultiQ Gates Δ Raw"], inplace=True
         )
         markdown_table = comparison_df.to_markdown(index=False, floatfmt=".2f")
-
-    # Prepare comment body
 
     if spec_old.suite_version != spec_new.suite_version:
         warning_msg = (
