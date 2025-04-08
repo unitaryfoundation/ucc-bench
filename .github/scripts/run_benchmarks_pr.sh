@@ -9,16 +9,16 @@ if [[ ! -f ".github/scripts/run_benchmarks_pr.sh" ]]; then
   exit 1
 fi
 
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <RUNNER_LABEL> <SHA_OR_UCC_NEW_SHA> <PR_NUMBER>"
+if [ "$#" -ne 4 ]; then
+    echo "Usage: $0 <REPO_NAME> <RUNNER_LABEL> <SHA_OR_UCC_NEW_SHA> <PR_NUMBER>"
     exit 1
 fi
 
-RUNNER_LABEL=$1 #  e.g. ucc-benchmarks-8-core-U22.04
-SHA_OR_UCC_NEW_SHA=$2 # the SHA of the commit in ucc or ucc-bench to run
-PR_NUMBER=$3 # the pull request number to post the comment to
+REPO_NAME=$1 # the name of the repository (e.g., "ucc-bench" or "ucc")
+RUNNER_LABEL=$2 # e.g. ucc-benchmarks-8-core-U22.04
+SHA_OR_UCC_NEW_SHA=$3 # the SHA of the commit in ucc or ucc-bench to run
+PR_NUMBER=$4 # the pull request number to post the comment to
 
-REPO_NAME=$(basename "$(git rev-parse --show-toplevel)")
 if [[ "$REPO_NAME" == "ucc-bench" ]]; then
   IS_UCC_BENCH=true
   echo "Running for ucc-bench"
