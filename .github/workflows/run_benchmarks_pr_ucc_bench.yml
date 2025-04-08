@@ -64,4 +64,4 @@ jobs:
       - name: Run benchmarks and post PR comment
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-        run: bash .github/scripts/run_benchmarks_pr.sh $RUNNER_LABEL ${{ github.sha }} ${{ github.event.pull_request.number }}
+        run: bash .github/scripts/run_benchmarks_pr.sh ucc-bench $RUNNER_LABEL ${{ github.sha }} ${{ github.event.pull_request.number }}
