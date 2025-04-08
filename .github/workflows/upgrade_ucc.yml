@@ -8,6 +8,12 @@ on:
   repository_dispatch:
     types: [ucc-main-push]
 
+  workflow_dispatch:
+    inputs:
+      ucc_commit_hash:
+        description: 'Hash of ucc commit to upgrade to'
+        required: true
+
 permissions:
     pull-requests: write
 
@@ -18,7 +24,14 @@ jobs:
       - name: Determine UCC commit sha
         id: get_sha
         run: |
-          UCC_SHA="${{ github.event.client_payload.commit_hash }}"
+          if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+            UCC_SHA="${{ github.event.client_payload.commit_hash }}"
+          elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            UCC_SHA="${{ github.event.inputs.ucc_commit_hash }}"
+          else
+            echo "Unsupported event type: ${{ github.event_name }}"
+            exit 1
+          fi
           SHORT_UCC_SHA="${UCC_SHA:0:7}"
           echo "UCC_SHA=$UCC_SHA" >> $GITHUB_OUTPUT
           echo "SHORT_UCC_SHA=$SHORT_UCC_SHA" >> $GITHUB_OUTPUT
