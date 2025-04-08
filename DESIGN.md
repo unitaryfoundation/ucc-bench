@@ -1,5 +1,4 @@
-This document outlines the design of `ucc-bench`, as originally written in
-a [GitHub discussion](https://github.com/unitaryfund/ucc/discussions/235).
+This document outlines the design of `ucc-bench`, adapated from the original [GitHub discussion](https://github.com/unitaryfund/ucc/discussions/235).
 
 ## Motivation
 The current version of benchmarking has done a great job of establishing baseline performance measures while integrating into the development lifecycle of `ucc`. As one of `ucc`s goals is to provide "high performance compilation of quantum circuits". Having this visibility is crucial to improve performance over time, especially across a wider and wider set of algorithms and use cases.
@@ -10,16 +9,6 @@ At the same time, given this importance in benchmarking, this discussion contemp
 1. Make it easier to maintain and support the existing and near-term set of benchmarking workflows.
 2. Adopt idiomatic python styles for a more consistent developer and user experience.
 3. Solve, or make it easier to solve, open issues involving benchmarking
-  - #229
-  - #227
-  - #225
-  - #222
-  - #221
-  - #217
-  - #213
-  - #170
-  - #149
-  - #146
 
 ## Non-Goals
 Overall, we should avoid over-engineering for the future or unspecified use cases. So our non-goals include
