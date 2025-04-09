@@ -38,6 +38,10 @@ git config --global user.email "github-actions@users.noreply.github.com"
 git config --global user.name "github-actions"
 echo "::endgroup::"
 
+echo "::group::Show recent git history"
+echo "$(git log --oneline -n 10)"
+echo "::endgroup::"
+
 if [[ "$IS_UCC_BENCH" == false ]]; then
   echo "::group::Upgrade UCC"
   UCC_NEW_SHA=$SHA_OR_UCC_NEW_SHA
