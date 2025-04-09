@@ -167,6 +167,15 @@ If for some reason you want to manually upgrade to a specific version of `ucc`, 
 upgrading non-UCC compilers. Instead of (2), run `uv add git+https://github.com/unitaryfoundation/ucc@<hash>`
 where `<hash>` is the git commit hash in the `ucc` repo you want to install.
 
+#### Updating a benchmark suite
+
+Updating a bench marksuite means editing the corresponding `.toml` file. You might add a new circuit, or
+change the expectation value calculated. In either case, it is important to change the `suite_version` in the
+file to indicate a change occured, as the results may no longer be comparable to prior results.
+
+Currently, the only place this version is referenced is in the post comments PR, as diffing may not be meaningful.
+But in the future, other reporting workflows may need to handle changes to benchmarks.
+
 ## Standard UCC Benchmark Results
 
 This repository also houses the standard results for UCC development. These are stored in
