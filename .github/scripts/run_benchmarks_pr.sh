@@ -58,6 +58,10 @@ if [[ "$IS_UCC_BENCH" == false ]]; then
   SHA_NEW=$(git rev-parse HEAD)
   echo "SHA_NEW=$SHA_NEW"
   echo "::endgroup::"
+
+  echo "::group::Show recent git history again"
+  echo "$(git log --oneline -n 10)"
+  echo "::endgroup::"
 else
   # We are is simply benchmarking the configuration as of this commit
   # in ucc-bench
@@ -67,6 +71,10 @@ fi
 # Run benchmarks for PR comparison
 echo "::group::Run benchmarks"
 .github/scripts/run_benchmarks.sh $SHA_NEW $RUNNER_LABEL ./results
+echo "::endgroup::"
+
+echo "::group::Show benchmark result files"
+echo "$(tree ./results)"
 echo "::endgroup::"
 
 # Get the SHA of the last commit on the main branch before this PR as the baseline for comparison
