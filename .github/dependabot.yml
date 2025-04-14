@@ -1,0 +1,25 @@
+# Set update schedule for GitHub Actions
+
+version: 2
+updates:
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "all"
+    ignore:
+      - dependency-name: "ucc"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "preview-benchmark-results"
+
+
+
