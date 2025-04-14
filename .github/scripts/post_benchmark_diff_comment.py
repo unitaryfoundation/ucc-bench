@@ -308,6 +308,18 @@ def main() -> None:
 {markdown_table}
 
 </details>
+
+<details>
+
+<summary>📜 See standalone benchmark tables</summary>
+
+New results:
+{df_new.to_markdown(index=False, floatfmt=".2f")}
+
+Baseline results:
+{df_old.to_markdown(index=False, floatfmt=".2f")}
+
+</details>
 """
 
     post_github_comment(github_token, args.repo, args.pr, message, args.dry_run)
