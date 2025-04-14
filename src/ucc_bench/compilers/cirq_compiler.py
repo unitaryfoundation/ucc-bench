@@ -115,7 +115,8 @@ class CirqCompiler(BaseCompiler[cirq.Circuit]):
             #
             # This prints ***many many times*** during the benchmark, and seems due
             # to the cirq qasm parser not adding this flag when construction circuit operations
-
+            # This looks to be fixed in cirq 1.6 line (https://github.com/quantumlib/Cirq/pull/6910)
+            # so we can remove the warning suppression in the future.
             return cirq.optimize_for_target_gateset(
                 circuit, gateset=BenchmarkTargetGateset()
             )
