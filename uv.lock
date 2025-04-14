@@ -957,6 +957,25 @@ wheels = [
 ]
 
 [[package]]
+name = "pyqpanda3"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "cython" },
+    { name = "graphviz" },
+    { name = "matplotlib" },
+    { name = "mypy" },
+    { name = "networkx" },
+    { name = "numpy" },
+    { name = "setuptools" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/17/2f/75005eb87ea90610574568e8de215db51b4e11860786bdb50615b90e8e21/pyqpanda3-0.2.0-cp312-cp312-macosx_13_0_arm64.whl", hash = "sha256:7ca0ea3fc252bc6a405d17a34a78eb9fc555fffd9b832a5ebe711cde48a34de5", size = 10761586 },
+    { url = "https://files.pythonhosted.org/packages/66/04/851fe810d9a76713f56cb78abf9f6e242b941b483abdf412b7160527e5d7/pyqpanda3-0.2.0-cp312-none-manylinux1_x86_64.whl", hash = "sha256:d06d98780d457bb05a12a2d12bd69b304d0970096e31d501a986571cf9b6ce03", size = 16686763 },
+    { url = "https://files.pythonhosted.org/packages/b7/de/d5f4020f1433aff407f5bfad8514e5982ae8c273ced0234d21495a712fc8/pyqpanda3-0.2.0-cp312-none-win_amd64.whl", hash = "sha256:bd7d92dd7c156314cd34470d243e645f2e53d586aa08f6bc784ce715baec345b", size = 8326363 },
+]
+
+[[package]]
 name = "pytest"
 version = "8.3.5"
 source = { registry = "https://pypi.org/simple" }
@@ -1417,6 +1436,7 @@ dependencies = [
     { name = "pandas" },
     { name = "psutil" },
     { name = "pydantic" },
+    { name = "pyqpanda3" },
     { name = "pytket" },
     { name = "qbraid" },
     { name = "qiskit" },
@@ -1439,6 +1459,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.2.3" },
     { name = "psutil", specifier = ">=7.0.0" },
     { name = "pydantic", specifier = ">=2.10.6" },
+    { name = "pyqpanda3", specifier = ">=0.2.0" },
     { name = "pytket", specifier = ">=2.0.1" },
     { name = "qbraid", specifier = ">=0.9.4" },
     { name = "qiskit", specifier = ">=1.4.2" },

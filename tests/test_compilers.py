@@ -4,6 +4,7 @@ from ucc_bench.compilers import (
     CirqCompiler,
     PytketPeepCompiler,
     UCCCompiler,
+    PyQPanda3Compiler,
 )
 from ucc_bench.compilers.cirq_compiler import BenchmarkTargetGateset
 
@@ -11,6 +12,7 @@ from qiskit import QuantumCircuit
 from qiskit.quantum_info import Operator
 import cirq
 from pytket.circuit import Circuit as PytketCircuit
+from pyqpanda3.core import QProg
 from qbraid import transpile
 
 
@@ -37,6 +39,7 @@ def qasm_code():
         (CirqCompiler, cirq.Circuit, "cirq"),
         (PytketPeepCompiler, PytketCircuit, "pytket-peep"),
         (UCCCompiler, QuantumCircuit, "ucc"),
+        (PyQPanda3Compiler, QProg, "pyqpanda3"),
     ],
 )
 def test_compiler(compiler_class, expected_circuit_type, expected_id, qasm_code):
