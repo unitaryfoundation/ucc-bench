@@ -223,7 +223,7 @@ def patch_legacy_data(df, root_dir, runner_name):
     df_legacy.sort_values("uid_timestamp", inplace=True)
 
     # Only pull new data after the transition cut-off
-    cutoff = "2025-05-06"
+    cutoff = "2025-04-06"
     df = pd.concat([df_legacy, df[df["uid_timestamp"] > cutoff]], ignore_index=True)
     df.sort_values("uid_timestamp", inplace=True)
     return df

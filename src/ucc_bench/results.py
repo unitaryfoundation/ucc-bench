@@ -163,6 +163,7 @@ def to_df_timing_detailed(suite_results: SuiteResults) -> pd.DataFrame:
     ]
     # Create a Pandas DataFrame and write it to a CSV file
     df = pd.DataFrame(timing_data)
+    df["uid_timestamp"] = pd.to_datetime(df["uid_timestamp"], utc=True)
     return df
 
 
