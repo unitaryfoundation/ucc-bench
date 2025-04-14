@@ -1,6 +1,7 @@
 from .base_compiler import BaseCompiler
 import cirq
 from typing import List
+import warnings
 from ..registry import register
 
 
@@ -104,9 +105,20 @@ class CirqCompiler(BaseCompiler[cirq.Circuit]):
         return cirq.__version__
 
     def compile(self, circuit: cirq.Circuit) -> cirq.Circuit:
-        return cirq.optimize_for_target_gateset(
-            circuit, gateset=BenchmarkTargetGateset()
-        )
+        with warnings.catch_warnings(action="ignore", category=FutureWarning):
+            # Cirq 1.5 release added the warning:
+            # "FutureWarning: In cirq 1.6 the default value of `use_repetition_ids` will change to
+            # `use_repetition_ids=False`. To make this warning go away, please pass
+            # explicit `use_repetition_ids`, e.g., to preserve current behavior, use
+            #
+            # CircuitOperations(..., use_repetition_ids=True)"
+            #
+            # This prints ***many many times*** during the benchmark, and seems due
+            # to the cirq qasm parser not adding this flag when construction circuit operations
+
+            return cirq.optimize_for_target_gateset(
+                circuit, gateset=BenchmarkTargetGateset()
+            )
 
     def count_multi_qubit_gates(self, circuit: cirq.Circuit) -> int:
         return sum(
