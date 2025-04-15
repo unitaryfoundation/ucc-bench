@@ -45,6 +45,7 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
 
     logger.info(f"Begin compiling '{benchmark.qasm_file}'")
 
+    start_compile_dt = datetime.now()
     start_compile_wall = perf_counter()
     start_compile_cpu = process_time()
 
@@ -52,6 +53,7 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
 
     end_compile_cpu = process_time()
     end_compile_wall = perf_counter()
+    end_compile_dt = datetime.now()
 
     cpu_time = end_compile_cpu - start_compile_cpu
     wall_time = end_compile_wall - start_compile_wall
@@ -101,8 +103,8 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
     return BenchmarkResult(
         compiler=CompilerInfo(id=compiler.id(), version=compiler.version()),
         benchmark_id=benchmark.id,
-        run_start=start_compile_wall,
-        run_end=end_compile_wall,
+        run_start=start_compile_dt,
+        run_end=end_compile_dt,
         compilation_metrics=CompilationMetrics(
             compilation_time_ms=wall_time * 1000,
             raw_multiq_gates=compiler.count_multi_qubit_gates(raw_circuit),
