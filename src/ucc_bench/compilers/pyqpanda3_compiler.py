@@ -1,6 +1,9 @@
 from .base_compiler import BaseCompiler
 from pyqpanda3 import __version__ as pyqpanda_version
-from pyqpanda3.intermediate_compiler import convert_qasm_string_to_qprog
+from pyqpanda3.intermediate_compiler import (
+    convert_qasm_string_to_qprog,
+    convert_qprog_to_qasm,
+)
 from pyqpanda3.core import QProg
 from pyqpanda3.transpilation import Transpiler
 from ..registry import register
@@ -19,8 +22,11 @@ class PyQPanda3Compiler(BaseCompiler[QProg]):
         return pyqpanda_version
 
     def qasm_to_native(self, qasm: str) -> QProg:
-        # Need to manually specifiy since id != "qiskit"
+        # Not supported by qbraid yet
         return convert_qasm_string_to_qprog(qasm)
+
+    def native_to_qasm(self, circuit: QProg) -> str:
+        return convert_qprog_to_qasm(circuit)
 
     def compile(self, circuit: QProg) -> QProg:
         transpiler = Transpiler()
