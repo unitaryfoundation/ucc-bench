@@ -80,5 +80,5 @@ run_bench() {
 }
 
 # Run the benchmarks
-run_bench ./benchmarks/timing_benchmarks.toml
+run_bench ./benchmarks/compilation_benchmarks.toml
 run_bench ./benchmarks/simulation_benchmarks.toml

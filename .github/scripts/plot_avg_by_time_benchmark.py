@@ -214,7 +214,10 @@ def patch_legacy_data(df, root_dir, runner_name):
     Pull in data from old `ucc` runs (see results/README.md)
     """
     df_legacy = pd.read_csv(
-        Path(root_dir) / runner_name / "timing_benchmarks" / "legacy_timing_results.csv"
+        Path(root_dir)
+        / runner_name
+        / "compilation_benchmarks"
+        / "legacy_timing_results.csv"
     )
     df_legacy["compile_time_ms"] = df_legacy["compile_time"] * 1000
     df_legacy["benchmark_id"] = df_legacy["circuit_name"]
@@ -240,7 +243,7 @@ def main():
     runner_name = args.runner_name
 
     timing_results_db = SuiteResultsDatabase.from_root(
-        root_dir, runner_name, "timing_benchmarks"
+        root_dir, runner_name, "compilation_benchmarks"
     )
 
     # Gets time ordered list of results when at least one compiler version

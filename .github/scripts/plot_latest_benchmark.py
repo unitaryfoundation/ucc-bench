@@ -13,7 +13,7 @@ root_dir = args.root_dir
 runner_name = args.runner_name
 
 timing_results_db = SuiteResultsDatabase.from_root(
-    root_dir, runner_name, "timing_benchmarks"
+    root_dir, runner_name, "compilation_benchmarks"
 )
 latest = timing_results_db.get_latest()
 

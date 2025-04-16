@@ -10,7 +10,7 @@ For these standard results, we follow the following convention:
 * `out_dir` is `results` (this directory)
 * `runner_name` is `ucc-benchmarks-8-core-U22.0`, the name of the GitHub runner used
 * `benchmark_suite` is the benchmark suite id in the corresponding TOML file.
-Currently this is either `timing_benchmarks` or `simulation_benchmarks`
+Currently this is either `compilation_benchmarks` or `simulation_benchmarks`
 * The `uid` is the git hash of the `ucc-bench` repository reflecting the set of configurations when the benchmark was run. `uid_date` is the date for that git hash.
 
 Thus the main subtlety here is using the git hash of `ucc-bench`. This was chosen so that we can always identify the exact configuration used in that run. This includes the version of `ucc-bench` code, the version of the dependencies as reflected in `uv.lock`, the specific circuits and benchmark versions. Although we could identify those components individually, the git hash is a nice way to boil it all down to one identifier.
@@ -116,5 +116,5 @@ To use this in Github workflows, we use the [`create-github-app-token`](https://
 
 Prior to `ucc-bench`, benchmark results were run and stored directly in the `ucc`
 repository. For the plots showing benchmark results over time, we wanted to include
-those earlier results. We did this by editing the corresponding [plot script](https://github.com/unitaryfoundation/ucc/blob/470f8e6a69e6c8bf209dc904c21d38940e7b8d3b/benchmarks/scripts/plot_avg_benchmarks_over_time.py#L68) in the `ucc` repo to save a CSV with the aggregated results. Those "legacy" results are saved as [legacy_timing_results.csv](./ucc-benchmarks-8-core-U22.04/timing_benchmarks/legacy_timing_results.csv), and then loaded into the new [plot script](../.github/scripts/plot_avg_by_time_benchmark.py) to show the full history.
+those earlier results. We did this by editing the corresponding [plot script](https://github.com/unitaryfoundation/ucc/blob/470f8e6a69e6c8bf209dc904c21d38940e7b8d3b/benchmarks/scripts/plot_avg_benchmarks_over_time.py#L68) in the `ucc` repo to save a CSV with the aggregated results. Those "legacy" results are saved as [legacy_timing_results.csv](./ucc-benchmarks-8-core-U22.04/compilation_benchmarks/legacy_timing_results.csv), and then loaded into the new [plot script](../.github/scripts/plot_avg_by_time_benchmark.py) to show the full history.
 

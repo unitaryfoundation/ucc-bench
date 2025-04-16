@@ -208,7 +208,7 @@ def main() -> None:
 
     # Only commenting on timing results for now (not simulation ones)
     timing_results_db = SuiteResultsDatabase.from_root(
-        args.root_dir, args.runner_name, "timing_benchmarks"
+        args.root_dir, args.runner_name, "compilation_benchmarks"
     )
     results_old: Optional[SuiteResults] = timing_results_db.from_uid(args.sha_base)
     results_new: Optional[SuiteResults] = timing_results_db.from_uid(args.sha_new)
