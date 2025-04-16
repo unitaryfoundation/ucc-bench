@@ -200,7 +200,7 @@ def save_results_csv(suite_results: SuiteResults, root_dir: Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     print(f"Saving timing results to {out_path}")
-    to_df_timing(suite_results).to_csv(out_path, index=False)
+    to_df_timing(suite_results).to_csv(out_path, index=False, float_format="%.4f")
 
     sim_df = to_df_simulation(suite_results)
 
@@ -209,7 +209,7 @@ def save_results_csv(suite_results: SuiteResults, root_dir: Path) -> None:
         out_path.parent.mkdir(parents=True, exist_ok=True)
 
         print(f"Saving simulation results to {out_path}")
-        sim_df.to_csv(out_path, index=False)
+        sim_df.to_csv(out_path, index=False, float_format="%.4f")
 
 
 class SuiteResultsDatabase:
