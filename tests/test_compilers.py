@@ -8,8 +8,10 @@ from ucc_bench.compilers import (
 from ucc_bench.compilers.cirq_compiler import BenchmarkTargetGateset
 
 from qiskit import QuantumCircuit
+from qiskit.quantum_info import Operator
 import cirq
 from pytket.circuit import Circuit as PytketCircuit
+from qbraid import transpile
 
 
 @pytest.fixture
@@ -20,7 +22,11 @@ def qasm_code():
     qreg q[2];
     creg c[2];
     h q[0];
+    rz(pi) q[1];
+    rx(pi/2) q[1];
+    rz(3*pi) q[1];
     cx q[0],q[1];
+    cz q[0],q[1];
     """
 
 
@@ -55,7 +61,13 @@ def test_compiler(compiler_class, expected_circuit_type, expected_id, qasm_code)
     # Test count_multi_qubit_gates of original circuit (to ignore compilation effects)
     multi_qubit_gates = compiler.count_multi_qubit_gates(circuit)
     assert isinstance(multi_qubit_gates, int)
-    assert multi_qubit_gates == 1
+    assert multi_qubit_gates == 2
+
+    # Check circuits are equivalent using Qiskit
+    compiled_qasm = compiler.native_to_qasm(compiled_circuit)
+    circuit_qiskit = transpile(qasm_code, "qiskit")
+    compiled_circuit_qiskit = transpile(compiled_qasm, "qiskit")
+    assert Operator(circuit_qiskit).equiv(Operator(compiled_circuit_qiskit), atol=1e-6)
 
 
 def test_cirq_benchmark_target_gateset_simple_circuit():

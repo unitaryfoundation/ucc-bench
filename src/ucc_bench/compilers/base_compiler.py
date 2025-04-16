@@ -36,6 +36,13 @@ class BaseCompiler(ABC, Generic[CircuitType]):
         return transpile(qasm, self.id())
 
     @abstractmethod
+    def native_to_qasm(self, circuit: CircuitType) -> str:
+        """
+        Convert a native circuit to a QASM string
+        """
+        return transpile(circuit, "qasm2")
+
+    @abstractmethod
     def compile(self, circuit: CircuitType) -> CircuitType:
         """Compile the given circuit"""
         pass
