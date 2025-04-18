@@ -1,0 +1,23 @@
+# Compiler versions: qiskit=1.4.2, cirq=1.4.1, pytket=2.1.0, ucc=0.4.4 # OS: Linux #25~22.04.1-Ubuntu SMP Thu Jan 16 21:37:09 UTC 2025, Architecture: 64bit, CPU Cores: 8
+compiler,circuit_name,raw_multiq_gates,compile_time,compiled_multiq_gates
+ucc,qft,10050,1.3120625019073486,2740
+ucc,qv,15000,5.231328964233398,14856
+ucc,square_heisenberg,2160,0.33562803268432617,540
+qiskit,qv,15000,10.230480194091797,14856
+cirq,qaoa_barabasi_albert,1176,10.57040548324585,1176
+qiskit,square_heisenberg,2160,0.44873857498168945,540
+pytket-peep,qaoa_barabasi_albert,1176,21.393763542175293,1176
+ucc,prep_select,9744,5.163349866867065,9702
+qiskit,prep_select,9744,1.8135790824890137,9708
+pytket-peep,square_heisenberg,2160,15.88853931427002,540
+ucc,qcnn,388,0.1313471794128418,388
+cirq,square_heisenberg,2160,11.874628782272339,540
+qiskit,qcnn,388,0.08806967735290527,388
+cirq,qcnn,388,4.836981296539307,388
+pytket-peep,qcnn,388,8.473035097122192,388
+cirq,qft,10050,61.522852659225464,4648
+pytket-peep,qft,10050,94.85879349708557,4498
+cirq,prep_select,9744,78.40789222717285,9712
+pytket-peep,prep_select,9744,161.4339735507965,9698
+pytket-peep,qv,15000,244.895498752594,14856
+cirq,qv,15000,192.85502791404724,14856
