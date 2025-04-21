@@ -36,20 +36,6 @@ jobs:
       cancel-in-progress: true
 
     steps:
-      # Prepare a token of Github App to post the comment
-      # Note the private key needs to be PKCS#8 format, so
-      # follow https://github.com/gr2m/universal-github-app-jwt?tab=readme-ov-file#converting-openssh-to-pkcs8
-      # to convert to another format before adding it as a secret
-      # Run this step first to fail fast
-      - name: Generate token
-        id: generate-token
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ secrets.UCC_BENCH_APP_ID }}
-          private-key: ${{ secrets.UCC_BENCH_APP_PRIVATE_KEY }}
-          owner: unitaryfoundation
-          repositories: ucc-bench
-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Needed to walk ancestor commits
@@ -63,5 +49,5 @@ jobs:
 
       - name: Run benchmarks and post PR comment
         env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash .github/scripts/run_benchmarks_pr.sh ucc-bench $RUNNER_LABEL ${{ github.sha }} ${{ github.event.pull_request.number }}
