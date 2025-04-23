@@ -171,12 +171,12 @@ def main() -> None:
     parser.add_argument(
         "--sha_ucc_base",
         required=False,
-        help="If set, SHA of the upstream commit in UCC repo that was used in ucc-bench@sha-base",
+        help="If set, SHA of the commit in UCC repo that was used in ucc-bench@sha-base",
     )
     parser.add_argument(
         "--sha_ucc_new",
         required=False,
-        help="If set, SHA of the upstream commit in UCC repo that the PR is based on (and is the version of ucc in ucc-bench@sha_new)",
+        help="If set, SHA of the commit in UCC repo that the PR is based on (and is the version of ucc in ucc-bench@sha_new)",
     )
     parser.add_argument("--root_dir", required=True, help="Root directory for results")
     parser.add_argument(
