@@ -3,7 +3,7 @@ set -euo pipefail
 
 # This script runs benchmarks for the UCC project and logs the results,
 # using the commit hash and commit time as the uid and uid_time for the benchmark results.
-# It also fetch upstream commit hash/time for the version of UCC in pyreproject.toml.
+# It also fetch commit hash/time for the version of UCC in pyreproject.toml.
 # This enables us to map the benchmark results to a specific commit in the UCC repository.
 #!/bin/bash
 
@@ -41,7 +41,7 @@ fi
 echo "Running benchmarks for ucc-bench@$commit_hash"
 echo "Commit time for ucc-bench@$commit_hash: $uid_time"
 
-# Extract upstream commit information for the version of UCC
+# Extract commit information for the version of UCC
 # set in pyproject.toml
 ucc_hash=$(uv run .github/scripts/extract_ucc_revision.py ./pyproject.toml || true)
 
@@ -60,7 +60,7 @@ if [[ -n "$ucc_hash" ]]; then
     ucc_commit_date=""
   fi
 else
-  echo "No upstream UCC hash found."
+  echo "No UCC hash found in pyproject-toml."
   ucc_commit_date=""
   ucc_hash=""
 fi
@@ -75,8 +75,8 @@ run_bench() {
     --log_level INFO \
     -o $out_dir \
     --runner_name "$runner_name" \
-    ${ucc_hash:+--upstream_hash "$ucc_hash"} \
-    ${ucc_commit_date:+--upstream_time "$ucc_commit_date"}
+    ${ucc_hash:+--ucc_hash "$ucc_hash"} \
+    ${ucc_commit_date:+--ucc_time "$ucc_commit_date"}
 }
 
 # Run the benchmarks
