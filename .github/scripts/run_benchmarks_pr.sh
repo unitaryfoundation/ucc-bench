@@ -29,7 +29,7 @@ fi
 
 # Install the project
 echo "::group::Install project"
-uv sync --all-extras --dev
+uv sync --all-extras --all-groups
 echo "::endgroup::"
 
 # Set up git config to be bot user
