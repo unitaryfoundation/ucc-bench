@@ -19,7 +19,6 @@ dependencies = [
     "pandas>=2.2.3",
     "tabulate>=0.9.0",
     "adjusttext>=1.3.0",
-    "pyqpanda3>=0.2.0",
 ]
 
 [build-system]
@@ -31,6 +30,9 @@ dev = [
     "mypy>=1.15.0",
     "pytest>=8.3.5",
     "ruff>=0.11.2",
+]
+pyqpanda3 = [
+    "pyqpanda3>=0.2.2",
 ]
 
 [tool.uv.sources]

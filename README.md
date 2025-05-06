@@ -24,7 +24,7 @@ Instead, users interested should clone this repository, and setup an environment
 $ uv sync
 ```
 
-See the [`uv` docs](https://docs.astral.sh/uv/) for information on installing `uv`.
+See the [`uv` docs](https://docs.astral.sh/uv/) for information on installing `uv`. Note that this will skip installing optional dependency groups. At this time that is `pyqpanda3`, which is not supported on macos intel chips. To install `pyqpanda3` as part of setup, call `uv sync --all-groups`.
 
 ## Usage (Running a benchmark suite)
 
