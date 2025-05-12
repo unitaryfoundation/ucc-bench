@@ -44,10 +44,9 @@ To run the benchmarks locally
 $ uv run ucc-bench <path_to/specification.toml>
 ```
 
-which by default will generate the results to the `.local_results` directory and parallelize using the number
-of cores available on your machine.
+which by default will generate the results to the `.local_results` directory and parallelize using the number of cores available on your machine. If you did not install the optional `pyqpanda3` dependency mentioned above, this run will fail on benchmark specifications that include the `pyqpanda3` compiler.
 
-To run a specific benchmark or a specific compiler only (useful for debugging), run
+You can instead restrict a suite to only run a specific compiler and/or a specific benchmark circuit. This is also useful for debugging.
 
 ```bash
 $ uv run ucc-bench <path_to/specification.toml> --only_compiler <compiler_id> --only_benchmark <benchmark_id>
