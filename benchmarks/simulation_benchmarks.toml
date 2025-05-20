@@ -55,7 +55,7 @@ simulate.measurement = "computational_basis"
 id="square_heisenberg"
 description = "Heisenberg spin model on square lattice"
 qasm_file = "circuits/benchpress/square_heisenberg_N9_basis_rz_rx_ry_cx.qasm"
-simulate.measurement = "computational_basis"
+simulate.measurement = "hamlib_heisenberg_pbc-qubitnodes_Lx-3_Ly-3_h-0.5"
 
 [[benchmarks]]
 id="prep_select"
