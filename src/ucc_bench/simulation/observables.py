@@ -8,6 +8,8 @@ use in the benchmarking framework. The observables should be defined as function
 in the circuit as an argument and return a Qiskit Operator representing the observable to measure.
 """
 
+from math import sqrt
+import json
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Operator, Statevector, SparsePauliOp
 from qiskit_aer import AerSimulator
@@ -85,146 +87,28 @@ def generate_computational_basis_observable(
     return Operator.from_label("Z" * num_qubits)
 
 
-@register.observable("hamlib_heisenberg_pbc-qubitnodes_Lx-3_Ly-3_h-0.5")
-def generate_square_heisenberg_observable():
-    """Generates the problem Hamiltonian as the observable for the 9-qubit
-    square Heisenberg benchmarking circuit. The Hamiltonian was obtained from
-    the Heisenberg dataset in the HamLib Hamiltonian library.
+@register.observable("hamlib_heisenberg_pbc-qubitnodes_Lx_Ly_h-0.5")
+def generate_square_heisenberg_observable(num_qubits):
+    """Uses the problem Hamiltonian as the observable for the square
+    Heisenberg benchmarking circuit. The Hamiltonian was obtained from the
+    Heisenberg dataset in the HamLib Hamiltonian library.
     Nicolas PD Sawaya et al. HamLib: A library of Hamiltonians for benchmarking
     quantum algorithms and hardware. arXiv: 2306.13126 (2024).
     link: https://arxiv.org/abs/2306.13126.
     """
-    pauli_terms = [
-        "XIIIIXIII",
-        "YIIIIYIII",
-        "ZIIIIZIII",
-        "XIIIIIXII",
-        "YIIIIIYII",
-        "ZIIIIIZII",
-        "XXIIIIIII",
-        "YYIIIIIII",
-        "ZZIIIIIII",
-        "XIXIIIIII",
-        "YIYIIIIII",
-        "ZIZIIIIII",
-        "IIIIIXXII",
-        "IIIIIYYII",
-        "IIIIIZZII",
-        "IIIIXXIII",
-        "IIIIYYIII",
-        "IIIIZZIII",
-        "IIIXIXIII",
-        "IIIYIYIII",
-        "IIIZIZIII",
-        "IIIIIIXXI",
-        "IIIIIIYYI",
-        "IIIIIIZZI",
-        "IIIIIIXIX",
-        "IIIIIIYIY",
-        "IIIIIIZIZ",
-        "IXIIXIIII",
-        "IYIIYIIII",
-        "IZIIZIIII",
-        "IXIIIIIXI",
-        "IYIIIIIYI",
-        "IZIIIIIZI",
-        "IXXIIIIII",
-        "IYYIIIIII",
-        "IZZIIIIII",
-        "IIXXIIIII",
-        "IIYYIIIII",
-        "IIZZIIIII",
-        "IIXIIIIIX",
-        "IIYIIIIIY",
-        "IIZIIIIIZ",
-        "IIIIXIIXI",
-        "IIIIYIIYI",
-        "IIIIZIIZI",
-        "IIIXXIIII",
-        "IIIYYIIII",
-        "IIIZZIIII",
-        "IIIIIIIXX",
-        "IIIIIIIYY",
-        "IIIIIIIZZ",
-        "IIIXIIIIX",
-        "IIIYIIIIY",
-        "IIIZIIIIZ",
-        "ZIIIIIIII",
-        "IIIIIZIII",
-        "IIIIIIZII",
-        "IZIIIIIII",
-        "IIZIIIIII",
-        "IIIIZIIII",
-        "IIIIIIIZI",
-        "IIIZIIIII",
-        "IIIIIIIIZ",
-    ]
-    coeffs = [
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        1.0 + 0.0j,
-        0.5 + 0.0j,
-        0.5 + 0.0j,
-        0.5 + 0.0j,
-        0.5 + 0.0j,
-        0.5 + 0.0j,
-        0.5 + 0.0j,
-        0.5 + 0.0j,
-        0.5 + 0.0j,
-        0.5 + 0.0j,
-    ]
-    return SparsePauliOp(pauli_terms, coeffs)
+    nnodes = int(sqrt(num_qubits))
+
+    with open("./sq_heis.json", "r") as file:
+        data = json.load(file)
+    for d in data:
+        if (
+            d["dataset_name"]
+            == f"/graph-2D-grid-pbc-qubitnodes_Lx-{nnodes}_Ly-{nnodes}_h-0.5"
+        ):
+            pstrings = d["pstrings"]
+            terms = [p + "I" * (max(map(len, pstrings)) - len(p)) for p in pstrings]
+            coeffs = d["coeffs"]
+            return SparsePauliOp(terms, coeffs)
 
 
 @register.observable("qaoa")
