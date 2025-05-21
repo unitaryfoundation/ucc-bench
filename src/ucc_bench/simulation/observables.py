@@ -97,7 +97,14 @@ def generate_square_heisenberg_observable(num_qubits):
     link: https://arxiv.org/abs/2306.13126.
     """
     nnodes = int(sqrt(num_qubits))
-
+    if num_qubits > nnodes**2:
+        raise ValueError("Invalid qubit number for square Heisenberg circuit")
+    elif num_qubits > 1024:
+        raise ValueError(
+            """Number of qubits is greater than maximum of 1024 supported for
+            simulation benchmarks.
+            """
+        )
     with open("./sq_heis.json", "r") as file:
         data = json.load(file)
     for d in data:
