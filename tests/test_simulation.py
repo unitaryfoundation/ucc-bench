@@ -1,5 +1,10 @@
 from qiskit import QuantumCircuit
+from qiskit.quantum_info import SparsePauliOp, Operator
 from ucc_bench.simulation.noise_models import get_n_qubit_gateset
+from ucc_bench.simulation.observables import (
+    generate_qcnn_observable,
+    generate_computational_basis_observable,
+)
 
 
 def test_get_n_qubit_gateset_single_qubit_gates():
@@ -46,3 +51,15 @@ def test_get_n_qubit_gateset_ignores_measurements():
 
     result = get_n_qubit_gateset(circuit, num_qubits=1)
     assert result == {"h"}, "Should ignore measurement operations"
+
+
+def test_generate_computational_basis_observable():
+    assert generate_computational_basis_observable(4) == Operator.from_label("ZZZZ")
+    assert generate_computational_basis_observable(6) == Operator.from_label("ZZZZZZ")
+
+
+def test_generate_qcnn_observable():
+    assert generate_qcnn_observable(4) == SparsePauliOp(["ZXZI", "IZXZ"])
+    assert generate_qcnn_observable(6) == SparsePauliOp(
+        ["ZXZIII", "IZXZII", "IIZXZI", "IIIZXZ"]
+    )
