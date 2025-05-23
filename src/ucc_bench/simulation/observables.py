@@ -135,3 +135,19 @@ def generate_qaoa_observable(num_qubits):
     coeffs = [weight for _, _, weight in weighted_edges]
     observable = SparsePauliOp(pauli_strings, coeffs)
     return observable
+
+
+@register.observable("qcnn")
+def generate_qcnn_observable(num_qubits):
+    """Generates the observable for the QCNN benchmarking circuits, based on
+    the observable defined in Iris Cong, Soonwon Choi, and Mikhail D. Lukin
+    "Quantum Convolutional Neural Networks". (2019) arXiv 1810.03787
+    (https://arxiv.org/abs/1810.03787).
+    """
+    pauli_strings = []
+    for i in range(num_qubits - 2):
+        pauli_string = ["I"] * num_qubits
+        pauli_string[i : i + 3] = ["Z", "X", "Z"]
+        pauli_strings.append("".join(pauli_string))
+    qcnn_observable = SparsePauliOp(pauli_strings)
+    return qcnn_observable
