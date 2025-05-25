@@ -9,7 +9,6 @@ in the circuit as an argument and return a Qiskit Operator representing the obse
 """
 
 from math import sqrt
-import json
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Operator, Statevector, SparsePauliOp
 from qiskit_aer import AerSimulator
@@ -87,6 +86,27 @@ def generate_computational_basis_observable(
     return Operator.from_label("Z" * num_qubits)
 
 
+def lattice_to_qubit_mapping(nnodes):
+    """Generate qubit mapping for the square Heisenberg problem Hamiltonian."""
+    lattice = np.array(
+        [
+            list(range(i * nnodes, (i + 1) * nnodes))
+            if i % 2 == 1
+            else list(reversed(range(i * nnodes, (i + 1) * nnodes)))
+            for i in range(nnodes)
+        ]
+    )
+    current = lattice.flatten()  # Flatten the arrays
+    # Get right and down neighbors using roll
+    right = np.roll(lattice, shift=-1, axis=1).flatten()
+    down = np.roll(lattice, shift=-1, axis=0).flatten()
+
+    return list(
+        {tuple(sorted(pair)) for pair in zip(current, right)}
+        | {tuple(sorted(pair)) for pair in zip(current, down)}
+    )
+
+
 @register.observable("hamlib_heisenberg_pbc-qubitnodes_Lx_Ly_h-0.5")
 def generate_square_heisenberg_observable(num_qubits):
     """Uses the problem Hamiltonian as the observable for the square
@@ -96,26 +116,25 @@ def generate_square_heisenberg_observable(num_qubits):
     quantum algorithms and hardware. arXiv: 2306.13126 (2024).
     link: https://arxiv.org/abs/2306.13126.
     """
+
     nnodes = int(sqrt(num_qubits))
+
     if num_qubits > nnodes**2:
         raise ValueError("Invalid qubit number for square Heisenberg circuit")
-    elif num_qubits > 1024:
-        raise ValueError(
-            """Number of qubits is greater than maximum of 1024 supported for
-            simulation benchmarks.
-            """
-        )
-    with open("./sq_heis.json", "r") as file:
-        data = json.load(file)
-    for d in data:
-        if (
-            d["dataset_name"]
-            == f"/graph-2D-grid-pbc-qubitnodes_Lx-{nnodes}_Ly-{nnodes}_h-0.5"
-        ):
-            pstrings = d["pstrings"]
-            terms = [p + "I" * (max(map(len, pstrings)) - len(p)) for p in pstrings]
-            coeffs = d["coeffs"]
-            return SparsePauliOp(terms, coeffs)
+
+    pstrings = []
+    # Pairwise Paulis
+    for op in "X", "Y", "Z":
+        for p in lattice_to_qubit_mapping(nnodes):
+            pstring = ["I"] * num_qubits
+            pstring[p[0]] = pstring[p[1]] = op
+            pstrings.append("".join(pstring))
+    # External field
+    pstrings.extend(
+        "".join(["I" * n, "Z", "I" * (num_qubits - n - 1)]) for n in range(num_qubits)
+    )
+    coeffs = [1.0] * (len(pstrings) - num_qubits) + [0.5] * (num_qubits)
+    return SparsePauliOp(pstrings, coeffs)
 
 
 @register.observable("qaoa")
