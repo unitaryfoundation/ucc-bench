@@ -166,7 +166,7 @@ If for some reason you want to manually upgrade to a specific version of `ucc`, 
 upgrading non-UCC compilers. Instead of (2), run `uv add git+https://github.com/unitaryfoundation/ucc@<hash>`
 where `<hash>` is the git commit hash in the `ucc` repo you want to install.
 
-#### Updating a benchmark suite
+#### Updating a benchmark (e.g. adding a new circuit or metric)
 
 Updating a bench marksuite means editing the corresponding `.toml` file. You might add a new circuit, or
 change the expectation value calculated. In either case, it is important to change the `suite_version` in the
@@ -174,6 +174,16 @@ file to indicate a change occured, as the results may no longer be comparable to
 
 Currently, the only place this version is referenced is in the post comments PR, as diffing may not be meaningful.
 But in the future, other reporting workflows may need to handle changes to benchmarks.
+
+As an example, suppose you want to add a new circuit to an existing benchmark. You would
+1. Add the QASM for that circuit to the corresponding benchmarks/circuits directory. If you have a python script that you used to generate the circuit, add that to the benchmarks/scripts directory.
+2. Edit the corresponding benchmarks `.toml` file to add a a new stanze for the benchmark, e.g.
+```toml
+[[benchmarks]]
+id = "my_new_benchmark"
+description = "New Benchmark"
+qasm_file = "circuits/path_to/new_benchmark.qasm"
+```
 
 ## Standard UCC Benchmark Results
 
