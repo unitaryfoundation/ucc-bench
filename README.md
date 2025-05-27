@@ -164,7 +164,7 @@ This enables benchmarking pre-release versions of `ucc`.
 
 If for some reason you want to manually upgrade to a specific version of `ucc`, run the steps above for
 upgrading non-UCC compilers. Instead of (2), run `uv add git+https://github.com/unitaryfoundation/ucc@<hash>`
-where `<hash>` is the git commit hash in the `ucc` repo you want to install.
+where `<hash>` is the git commit hash in the `ucc` repo you want to install. If developing in a fork of `ucc`, you would run `uv add git+https://github.com/<github_username>/ucc@<hash>`.
 
 #### Updating a benchmark (e.g. adding a new circuit or metric)
 
