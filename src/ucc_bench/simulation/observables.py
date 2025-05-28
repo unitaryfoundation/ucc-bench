@@ -88,19 +88,14 @@ def generate_computational_basis_observable(
 
 def lattice_to_qubit_mapping(nnodes):
     """Generate qubit mapping for the square Heisenberg problem Hamiltonian."""
-    lattice = np.array(
-        [
-            list(range(i * nnodes, (i + 1) * nnodes))
-            if i % 2 == 1
-            else list(reversed(range(i * nnodes, (i + 1) * nnodes)))
-            for i in range(nnodes)
-        ]
-    )
+    lattice = np.arange(nnodes * nnodes).reshape(
+        nnodes, nnodes
+    )  # generate rows in order
+    lattice[1::2, :] = lattice[1::2, ::-1]  # reverse every other row
     current = lattice.flatten()  # Flatten the arrays
     # Get right and down neighbors using roll
     right = np.roll(lattice, shift=-1, axis=1).flatten()
     down = np.roll(lattice, shift=-1, axis=0).flatten()
-
     return list(
         {tuple(sorted(pair)) for pair in zip(current, right)}
         | {tuple(sorted(pair)) for pair in zip(current, down)}
