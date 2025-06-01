@@ -10,6 +10,7 @@ from .registry import register
 from .simulation.observables import calc_expectation_value
 from .simulation.noise_models import create_depolarizing_noise_model
 from qbraid import transpile
+from .utils import validate_circuit_gates
 from time import perf_counter, process_time
 import multiprocessing
 
@@ -62,6 +63,11 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
     logger.info(
         f"Finished compiling. Wall Time: {wall_time:.4f}s, CPU Time: {cpu_time:.4f}s, Utilization: {cpu_utilization:.2%}"
     )
+
+    # Validate that the compiled circuit only contains the allowed basis gates.
+    # This check occurs after timing so it does not affect measured compilation
+    # performance.
+    validate_circuit_gates(compiled_circuit, {"rx", "ry", "rz", "h", "cx"})
 
     simulation_metrics = None
     if benchmark.simulate:
