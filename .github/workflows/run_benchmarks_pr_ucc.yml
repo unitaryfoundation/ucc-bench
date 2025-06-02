@@ -1,6 +1,10 @@
-# When triggered (by a PR in the ucc repo), run benchmarks and post a comment back detailing the results.
+# When triggered (by a PR in the ucc repo), run benchmarks and generates a comment detailing the results.
 # Unlike benchmarks on pushes to main, these results are not committed back to the repo.
 # The purpose here is to provide performance view before merging a PR.
+#
+# This job only runs and generates the comments. A subsequent run_benchmarks_pr_post will be
+# triggered to do the post. These are separate steps because this job is running 3rd party contributed
+# code, and should not have access to the secrets needed to post a PR comment.
 #
 # !!This workflow is triggered by PRs in the ucc repo and comments back to that repo.
 # !!For PRs to the ucc-bench repo, the there is a `run_benchmarks_pr.yml` workflow that
@@ -28,23 +32,6 @@ jobs:
       cancel-in-progress: true
 
     steps:
-
-      # Prepare a token of Github App to post the comment
-      # Note the private key needs to be PKCS#8 format, so
-      # follow https://github.com/gr2m/universal-github-app-jwt?tab=readme-ov-file#converting-openssh-to-pkcs8
-      # to convert to another format before adding it as a secret
-      # Run this step first to fail fast
-      - name: Generate token
-        id: generate-token
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ secrets.UCC_BENCH_APP_ID }}
-          private-key: ${{ secrets.UCC_BENCH_APP_PRIVATE_KEY }}
-          owner: unitaryfoundation
-          repositories: |
-            ucc-bench
-            ucc
-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Needed to walk ancestor commits
@@ -59,7 +46,13 @@ jobs:
         with:
           python-version-file: ".python-version"
 
-      - name: Run benchmarks and post PR comment
+      - name: Run benchmarks and save PR comment as build artifact
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-        run: bash .github/scripts/run_benchmarks_pr.sh ucc $RUNNER_LABEL ${{ github.event.client_payload.commit_hash }} ${{ github.event.client_payload.pr_number }}
+        run: bash .github/scripts/run_benchmarks_pr.sh ucc $RUNNER_LABEL ${{ github.event.client_payload.commit_hash }} ${{ github.event.client_payload.pr_number }} comment.json
+
+      - name: Save PR comment as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: comment.json
+          path: comment.json

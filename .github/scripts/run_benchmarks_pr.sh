@@ -9,8 +9,8 @@ if [[ ! -f ".github/scripts/run_benchmarks_pr.sh" ]]; then
   exit 1
 fi
 
-if [ "$#" -ne 4 ]; then
-    echo "Usage: $0 <REPO_NAME> <RUNNER_LABEL> <SHA_OR_UCC_NEW_SHA> <PR_NUMBER>"
+if [ "$#" -ne 5 ]; then
+    echo "Usage: $0 <REPO_NAME> <RUNNER_LABEL> <SHA_OR_UCC_NEW_SHA> <PR_NUMBER> <COMMENT_FILE.json>"
     exit 1
 fi
 
@@ -18,6 +18,7 @@ REPO_NAME=$1 # the name of the repository (e.g., "ucc-bench" or "ucc")
 RUNNER_LABEL=$2 # e.g. ucc-benchmarks-8-core-U22.04
 SHA_OR_UCC_NEW_SHA=$3 # the SHA of the commit in ucc or ucc-bench to run
 PR_NUMBER=$4 # the pull request number to post the comment to
+JSON_FILE=$5
 
 if [[ "$REPO_NAME" == "ucc-bench" ]]; then
   IS_UCC_BENCH=true
@@ -86,22 +87,24 @@ echo "::endgroup::"
 # Post benchmark diff comment
 echo "::group::Post benchmark diff comment"
 if [[ "$IS_UCC_BENCH" == false ]]; then
-  uv run python .github/scripts/post_benchmark_diff_comment.py \
-  --repo "ucc" \
+  uv run python .github/scripts/benchmark_diff_comment.py \
+  prepare --repo "ucc" \
   --pr "$PR_NUMBER" \
   --root_dir ./results \
   --runner_name $RUNNER_LABEL \
   --sha_base $ANCESTOR_SHA \
   --sha_new "$SHA_NEW" \
   --sha_ucc_base "$UCC_BASE_SHA" \
-  --sha_ucc_new "$UCC_NEW_SHA"
+  --sha_ucc_new "$UCC_NEW_SHA" \
+  --output "$JSON_FILE"
 else
-  uv run python .github/scripts/post_benchmark_diff_comment.py \
-  --repo "ucc-bench" \
+  uv run python .github/scripts/benchmark_diff_comment.py \
+  prepare --repo "ucc-bench" \
   --pr "$PR_NUMBER" \
   --root_dir ./results \
   --runner_name $RUNNER_LABEL \
   --sha_base $ANCESTOR_SHA \
-  --sha_new "$SHA_NEW"
+  --sha_new "$SHA_NEW" \
+  --output "$JSON_FILE"
 fi
 echo "::endgroup::"
