@@ -3,7 +3,8 @@ import requests
 import pandas as pd
 import sys
 import argparse
-from typing import Optional, Tuple
+import json
+from typing import Optional, Tuple, Dict, Any
 from ucc_bench.results import to_df_timing, SuiteResultsDatabase, SuiteResults
 
 DEFAULT_THRESHOLD = 10.0
@@ -150,62 +151,17 @@ def post_github_comment(
         sys.exit(1)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Post benchmark comparison summary to a GitHub PR.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-    parser.add_argument(
-        "--repo",
-        required=True,
-        choices=["ucc", "ucc-bench"],
-        help="Repository where the PR is (must be 'ucc' or 'ucc-bench')",
-    )
-    parser.add_argument("--pr", type=int, help="Pull request number")
-    parser.add_argument(
-        "--sha_base", required=True, help="SHA of the base commit in ucc-bench"
-    )
-    parser.add_argument(
-        "--sha_new", required=True, help="SHA of the new commit in ucc-bench"
-    )
-    parser.add_argument(
-        "--sha_ucc_base",
-        required=False,
-        help="If set, SHA of the commit in UCC repo that was used in ucc-bench@sha-base",
-    )
-    parser.add_argument(
-        "--sha_ucc_new",
-        required=False,
-        help="If set, SHA of the commit in UCC repo that the PR is based on (and is the version of ucc in ucc-bench@sha_new)",
-    )
-    parser.add_argument("--root_dir", required=True, help="Root directory for results")
-    parser.add_argument(
-        "--runner_name",
-        required=True,
-        help="Name of the benchmark runner",
-    )
-    parser.add_argument(
-        "--threshold",
-        type=float,
-        default=DEFAULT_THRESHOLD,
-        help="Percentage threshold to consider changes significant",
-    )
-    parser.add_argument(
-        "--dry-run",
-        dest="dry_run",
-        action="store_true",
-        help="Dry run (prepare comment body but do not post)",
-    )
-    args = parser.parse_args()
+def save_comment_to_file(filepath: str, data: Dict[str, Any]) -> None:
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
-    github_token: Optional[str] = os.environ.get("GH_TOKEN")
-    if not args.dry_run and not github_token:
-        print(
-            "Error: Environment variable GH_TOKEN must be set for posting comments.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
 
+def load_comment_from_file(filepath: str) -> Dict[str, Any]:
+    with open(filepath, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def generate_benchmark_comment(args) -> Dict[str, Any]:
     # Only commenting on timing results for now (not simulation ones)
     timing_results_db = SuiteResultsDatabase.from_root(
         args.root_dir, args.runner_name, "compilation_benchmarks"
@@ -225,17 +181,20 @@ def main() -> None:
                 "That benchmark run might still be going. You may need to wait for it to finish,"
                 " and then try rebase on top of the main branch to rerun the comparison."
             )
-
-        post_github_comment(
-            github_token, args.repo, args.pr, error_msg, args.dry_run, is_error=True
-        )
-        sys.exit(1)
+        return {
+            "repo": args.repo,
+            "pr": args.pr,
+            "body": error_msg,
+            "is_error": True,
+        }
     if results_new is None:
         error_msg = f"Results not found for new commit {args.sha_new} (runner: {args.runner_name})."
-        post_github_comment(
-            github_token, args.repo, args.pr, error_msg, args.dry_run, is_error=True
-        )
-        sys.exit(1)
+        return {
+            "repo": args.repo,
+            "pr": args.pr,
+            "body": error_msg,
+            "is_error": True,
+        }
 
     spec_old = results_old.suite_specification
     spec_new = results_new.suite_specification
@@ -243,29 +202,25 @@ def main() -> None:
         error_msg = (
             f"Benchmark suite IDs do not match ('{spec_old.id}' vs '{spec_new.id}')."
         )
-        post_github_comment(
-            github_token, args.repo, args.pr, error_msg, args.dry_run, is_error=True
-        )
-        sys.exit(1)
+        return {
+            "repo": args.repo,
+            "pr": args.pr,
+            "body": error_msg,
+            "is_error": True,
+        }
 
     df_old = to_df_timing(results_old)
     df_new = to_df_timing(results_new)
 
-    # Build comparison table and summarize changes
-    print(
-        f"Comparing results for runner '{args.runner_name}' between {args.sha_base[:7]} and {args.sha_new[:7]} using threshold {args.threshold}%..."
-    )
     comparison_df = build_comparison_table(df_old, df_new, threshold=args.threshold)
 
     if comparison_df.empty:
-        print("No common benchmarks found between the two result sets.")
         markdown_table = "No common benchmarks to compare."
         ct_impr, ct_reg, mq_impr, mq_reg = 0, 0, 0, 0
     else:
         ct_impr, ct_reg, mq_impr, mq_reg = summarize_changes(
             comparison_df, threshold=args.threshold
         )
-        # Drop raw columns before rendering the final markdown table
         comparison_df.drop(
             columns=["Compile Time Δ Raw", "MultiQ Gates Δ Raw"], inplace=True
         )
@@ -321,10 +276,103 @@ Baseline results:
 
 </details>
 """
+    return {
+        "repo": args.repo,
+        "pr": args.pr,
+        "body": message,
+        "is_error": False,
+    }
 
-    post_github_comment(github_token, args.repo, args.pr, message, args.dry_run)
 
-    print("Benchmark comparison script finished.")
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Prepare or post benchmark comparison summary to a GitHub PR.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    # Prepare subcommand
+    prepare_parser = subparsers.add_parser(
+        "prepare", help="Prepare and save benchmark comment/metadata to disk"
+    )
+    prepare_parser.add_argument(
+        "--output", required=True, help="Output file to save comment and metadata"
+    )
+    # ...add all original arguments to prepare_parser...
+    prepare_parser.add_argument(
+        "--repo",
+        required=True,
+        choices=["ucc", "ucc-bench"],
+        help="Repository where the PR is (must be 'ucc' or 'ucc-bench')",
+    )
+    prepare_parser.add_argument("--pr", type=int, help="Pull request number")
+    prepare_parser.add_argument(
+        "--sha_base", required=True, help="SHA of the base commit in ucc-bench"
+    )
+    prepare_parser.add_argument(
+        "--sha_new", required=True, help="SHA of the new commit in ucc-bench"
+    )
+    prepare_parser.add_argument(
+        "--sha_ucc_base",
+        required=False,
+        help="If set, SHA of the commit in UCC repo that was used in ucc-bench@sha-base",
+    )
+    prepare_parser.add_argument(
+        "--sha_ucc_new",
+        required=False,
+        help="If set, SHA of the commit in UCC repo that the PR is based on (and is the version of ucc in ucc-bench@sha_new)",
+    )
+    prepare_parser.add_argument(
+        "--root_dir", required=True, help="Root directory for results"
+    )
+    prepare_parser.add_argument(
+        "--runner_name", required=True, help="Name of the benchmark runner"
+    )
+    prepare_parser.add_argument(
+        "--threshold",
+        type=float,
+        default=DEFAULT_THRESHOLD,
+        help="Percentage threshold to consider changes significant",
+    )
+
+    # Post subcommand
+    post_parser = subparsers.add_parser(
+        "post", help="Post a previously prepared comment to GitHub"
+    )
+    post_parser.add_argument(
+        "--input", required=True, help="Input file with comment and metadata"
+    )
+    post_parser.add_argument(
+        "--dry-run",
+        dest="dry_run",
+        action="store_true",
+        help="Dry run (print but do not post)",
+    )
+
+    args = parser.parse_args()
+
+    if args.command == "prepare":
+        comment_data = generate_benchmark_comment(args)
+        save_comment_to_file(args.output, comment_data)
+        print(f"Benchmark comment and metadata saved to {args.output}")
+    elif args.command == "post":
+        github_token: Optional[str] = os.environ.get("GH_TOKEN")
+        if not args.dry_run and not github_token:
+            print(
+                "Error: Environment variable GH_TOKEN must be set for posting comments.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        comment_data = load_comment_from_file(args.input)
+        post_github_comment(
+            github_token,
+            comment_data["repo"],
+            comment_data["pr"],
+            comment_data["body"],
+            args.dry_run,
+            is_error=comment_data.get("is_error", False),
+        )
+        print("Benchmark comment posted (or printed in dry-run mode).")
 
 
 if __name__ == "__main__":

@@ -1,8 +1,12 @@
-# Run benchmarks on pull requests and post a comment back detailing the results.
+# Run benchmarks on pull requests and generate a comment to post back detailing the results.
 # Unlike benchmarks on pushes, these results are not committed back to the repo.
 # The purpose here is to provide performance view before merging a PR.
 # This will only be run if the PR has the label "preview-benchmark-results"
 # and will be skipped if the label is removed.
+#
+# This job only runs and generates the comments. A subsequent run_benchmarks_pr_post will be
+# triggered to do the post. These are separate steps because this job is running 3rd party contributed
+# code, and should not have access to the secrets needed to post a PR comment.
 #
 # !!This workflow is triggered by PRs in the ucc-bench repo. For PRs to the UCC
 # !!repo, the there is a another `run_benchmarks_pr_ucc.yml` workflow that is triggered
@@ -18,9 +22,6 @@ on:
       - labeled
       - unlabeled
 
-permissions:
-  pull-requests: write
-  contents: read
 # Set the runner name here for use in a later step, but also next to
 # the actual runs-on designation below so users know to change both together
 env:
@@ -36,23 +37,10 @@ jobs:
       cancel-in-progress: true
 
     steps:
-      # Prepare a token of Github App to post the comment
-      # Note the private key needs to be PKCS#8 format, so
-      # follow https://github.com/gr2m/universal-github-app-jwt?tab=readme-ov-file#converting-openssh-to-pkcs8
-      # to convert to another format before adding it as a secret
-      # Run this step first to fail fast
-      - name: Generate token
-        id: generate-token
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ secrets.UCC_BENCH_APP_ID }}
-          private-key: ${{ secrets.UCC_BENCH_APP_PRIVATE_KEY }}
-          owner: unitaryfoundation
-          repositories: ucc-bench
-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Needed to walk ancestor commits
+
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:
@@ -63,7 +51,12 @@ jobs:
         with:
           python-version-file: ".python-version"
 
-      - name: Run benchmarks and post PR comment
-        env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-        run: bash .github/scripts/run_benchmarks_pr.sh ucc-bench $RUNNER_LABEL ${{ github.sha }} ${{ github.event.pull_request.number }}
+      - name: Run benchmarks and generate PR comment
+        run: bash .github/scripts/run_benchmarks_pr.sh ucc-bench $RUNNER_LABEL ${{ github.sha }} ${{ github.event.pull_request.number }} comment.json
+
+      - name: Save PR comment as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: comment.json
+          path: comment.json
+

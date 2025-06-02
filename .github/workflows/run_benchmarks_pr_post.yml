@@ -1,0 +1,68 @@
+# After one of the `run_benchmarks_pr_ucc*yml` workflows completes, this
+# will dispatch to post the resulting comment back to the originating PR.
+# The triggering job will have saved the contents of the comment in a
+# comments.json build artifact file.
+#
+# We perform this is a separate step because this job needs elevated permissions
+# to post the comment, whereas the job to run the benchmarks runs contributed code
+# and shouldn't have access to such permissions.
+name: Post PR Benchmark Comparison comment
+
+on:
+  workflow_run:
+    workflows: ["Run ucc-bench PR Benchmark Comparison", "Run ucc-bench PR Benchmark Comparison"]
+    types: [completed]
+
+jobs:
+  post-benchmark-pr-comment:
+    runs-on: ubuntu-latest
+    steps:
+      # Prepare a token of Github App to post the comment
+      # Note the private key needs to be PKCS#8 format, so
+      # follow https://github.com/gr2m/universal-github-app-jwt?tab=readme-ov-file#converting-openssh-to-pkcs8
+      # to convert to another format before adding it as a secret
+      # Run this step first to fail fast
+      - name: Generate token
+        id: generate-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.UCC_BENCH_APP_ID }}
+          private-key: ${{ secrets.UCC_BENCH_APP_PRIVATE_KEY }}
+          owner: unitaryfoundation
+          repositories: |
+            ucc-bench
+            ucc
+
+      # Get the repository as of the main branch; we only need the script to post the comment
+      # and intentionally do not want to get any non-reviewed code involved, since that code could
+      # attempt to leak/misuse secrets
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install python dependencies
+        run: uv sync --all-extras --all-groups
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: comment.json
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Post the comment
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: uv run python .github/scripts/benchmark_diff_comment.py post --input comment.json
+
+

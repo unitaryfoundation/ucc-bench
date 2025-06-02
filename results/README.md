@@ -68,7 +68,8 @@ There are two related workflows, one for PRs to [`ucc`](../.github/workflows/run
 1. Upgrading the version of `ucc` if this is a PR to `ucc`
 2. Run the benchmarks on the updated code and commiting them to the ephemeral working branch
 3. Determining the hash of the baseline commit,
-4. Calling into a [python helper](../.github/scripts/post_benchmark_diff_comment.py) to diff the result files and post a comment to the PR.
+4. Calling into a [python helper](../.github/scripts/benchmark_diff_comment.py) to diff the result files and save the comment as markdown in a build step artifact
+5. A separate job is dispatched to do the final post. This job requires write permissions to post the comment to the PR, so it is intentionally separate from the prior steps, so that we are never running externally contributed code in a job that has access to secrets.
 
 The triggering workflow in `ucc` is defined here [here](https://github.com/unitaryfoundation/ucc/blob/main/.github/workflows/trigger-ucc-bench-pr.yml)
 
