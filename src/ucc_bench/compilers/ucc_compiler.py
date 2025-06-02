@@ -24,7 +24,7 @@ class UCCCompiler(BaseCompiler[QuantumCircuit]):
         return transpile(qasm, "qiskit")
 
     def compile(self, circuit: QuantumCircuit) -> QuantumCircuit:
-        return compile(circuit)
+        return compile(circuit, target_gateset={"rx", "ry", "rz", "h", "cx"})
 
     def count_multi_qubit_gates(self, circuit: QuantumCircuit) -> int:
         return circuit.num_nonlocal_gates()
