@@ -10,7 +10,7 @@ name: Post PR Benchmark Comparison comment
 
 on:
   workflow_run:
-    workflows: ["Run ucc-bench PR Benchmark Comparison", "Run ucc-bench PR Benchmark Comparison"]
+    workflows: ["Run ucc-bench PR Benchmark Comparison", "Run ucc PR Benchmark Comparison"]
     types: [completed]
 
 jobs:
