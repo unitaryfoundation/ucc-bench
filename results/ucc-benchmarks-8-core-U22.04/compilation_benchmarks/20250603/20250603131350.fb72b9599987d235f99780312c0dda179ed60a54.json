@@ -1,0 +1,563 @@
+{
+  "suite_specification": {
+    "spec_path": "benchmarks/compilation_benchmarks.toml",
+    "spec_version": "1.0",
+    "suite_version": "0.1",
+    "id": "compilation_benchmarks",
+    "description": "Base set of quantum compiler benchmarks for UCC project",
+    "compilers": [
+      {
+        "id": "ucc"
+      },
+      {
+        "id": "pytket-peep"
+      },
+      {
+        "id": "qiskit-default"
+      },
+      {
+        "id": "cirq"
+      },
+      {
+        "id": "pyqpanda3"
+      }
+    ],
+    "benchmarks": [
+      {
+        "id": "qaoa",
+        "description": "Quantum Approximate Optimization Algorithm of Barabási–Albert graph",
+        "qasm_file": "circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm",
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      },
+      {
+        "id": "qv",
+        "description": "Quantum Volume",
+        "qasm_file": "circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm",
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      },
+      {
+        "id": "qft",
+        "description": "Quantum Fourier Transform",
+        "qasm_file": "circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm",
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      },
+      {
+        "id": "square_heisenberg",
+        "description": "Heisenberg spin model on square lattice",
+        "qasm_file": "circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm",
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      },
+      {
+        "id": "prep_select",
+        "description": "GHZ state preparation",
+        "qasm_file": "circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "resolved_qasm_file": "benchmarks/circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": null
+      },
+      {
+        "id": "qcnn",
+        "description": "Quantum Convolutional Neural Network",
+        "qasm_file": "circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm",
+        "resolved_qasm_file": "benchmarks/circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": null
+      }
+    ]
+  },
+  "metadata": {
+    "uid": "fb72b9599987d235f99780312c0dda179ed60a54",
+    "uid_timestamp": "2025-06-03T13:13:50-04:00",
+    "run_start": "2025-06-03T17:14:17.626550",
+    "run_end": "2025-06-03T17:24:24.873227",
+    "runner_name": "ucc-benchmarks-8-core-U22.04",
+    "runner_specs": {
+      "os": "Linux",
+      "cpu": "x86_64",
+      "ram_gb": 31.340465545654297,
+      "physical_cores": 4
+    },
+    "runner_version": "0.1.0",
+    "runner_args": [
+      "/home/runner/work/ucc-bench/ucc-bench/.venv/bin/ucc-bench",
+      "./benchmarks/compilation_benchmarks.toml",
+      "--uid",
+      "fb72b9599987d235f99780312c0dda179ed60a54",
+      "--uid_time",
+      "2025-06-03T13:13:50-04:00",
+      "--log_level",
+      "INFO",
+      "-o",
+      "./results",
+      "--runner_name",
+      "ucc-benchmarks-8-core-U22.04",
+      "--ucc_hash",
+      "3a47049bd189f4bf0f3d2e407b1fea303abb1de1",
+      "--ucc_time",
+      "2025-06-02T21:19:03Z"
+    ],
+    "ucc_hash": "3a47049bd189f4bf0f3d2e407b1fea303abb1de1",
+    "ucc_timestamp": "2025-06-02T21:19:03Z"
+  },
+  "results": [
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.6"
+      },
+      "benchmark_id": "qaoa",
+      "run_start": "2025-06-03T17:14:20.299375",
+      "run_end": "2025-06-03T17:14:20.462459",
+      "compilation_metrics": {
+        "compilation_time_ms": 163.07777700421866,
+        "raw_multiq_gates": 1176,
+        "compiled_multiq_gates": 1176
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.6"
+      },
+      "benchmark_id": "qv",
+      "run_start": "2025-06-03T17:14:21.904333",
+      "run_end": "2025-06-03T17:14:23.497557",
+      "compilation_metrics": {
+        "compilation_time_ms": 1593.2183410041034,
+        "raw_multiq_gates": 15000,
+        "compiled_multiq_gates": 14856
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.6"
+      },
+      "benchmark_id": "qft",
+      "run_start": "2025-06-03T17:14:20.494443",
+      "run_end": "2025-06-03T17:14:20.961771",
+      "compilation_metrics": {
+        "compilation_time_ms": 467.3234119982226,
+        "raw_multiq_gates": 10050,
+        "compiled_multiq_gates": 2740
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.6"
+      },
+      "benchmark_id": "square_heisenberg",
+      "run_start": "2025-06-03T17:14:20.451033",
+      "run_end": "2025-06-03T17:14:20.524667",
+      "compilation_metrics": {
+        "compilation_time_ms": 73.62871999794152,
+        "raw_multiq_gates": 2160,
+        "compiled_multiq_gates": 540
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.6"
+      },
+      "benchmark_id": "prep_select",
+      "run_start": "2025-06-03T17:14:20.599990",
+      "run_end": "2025-06-03T17:14:21.786844",
+      "compilation_metrics": {
+        "compilation_time_ms": 1186.8494719965383,
+        "raw_multiq_gates": 9744,
+        "compiled_multiq_gates": 9702
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.6"
+      },
+      "benchmark_id": "qcnn",
+      "run_start": "2025-06-03T17:14:20.542816",
+      "run_end": "2025-06-03T17:14:20.582778",
+      "compilation_metrics": {
+        "compilation_time_ms": 39.95856599067338,
+        "raw_multiq_gates": 388,
+        "compiled_multiq_gates": 388
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.4.1"
+      },
+      "benchmark_id": "qaoa",
+      "run_start": "2025-06-03T17:14:20.993383",
+      "run_end": "2025-06-03T17:14:31.883085",
+      "compilation_metrics": {
+        "compilation_time_ms": 10889.696336002089,
+        "raw_multiq_gates": 1176,
+        "compiled_multiq_gates": 1176
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.4.1"
+      },
+      "benchmark_id": "qv",
+      "run_start": "2025-06-03T17:14:48.853984",
+      "run_end": "2025-06-03T17:18:19.436501",
+      "compilation_metrics": {
+        "compilation_time_ms": 210582.51083199866,
+        "raw_multiq_gates": 15000,
+        "compiled_multiq_gates": 14856
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.4.1"
+      },
+      "benchmark_id": "qft",
+      "run_start": "2025-06-03T17:14:24.624530",
+      "run_end": "2025-06-03T17:15:12.072786",
+      "compilation_metrics": {
+        "compilation_time_ms": 47448.2499309961,
+        "raw_multiq_gates": 10050,
+        "compiled_multiq_gates": 4498
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.4.1"
+      },
+      "benchmark_id": "square_heisenberg",
+      "run_start": "2025-06-03T17:14:24.658341",
+      "run_end": "2025-06-03T17:14:32.585005",
+      "compilation_metrics": {
+        "compilation_time_ms": 7926.658123004017,
+        "raw_multiq_gates": 2160,
+        "compiled_multiq_gates": 540
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.4.1"
+      },
+      "benchmark_id": "prep_select",
+      "run_start": "2025-06-03T17:14:34.875270",
+      "run_end": "2025-06-03T17:16:40.684893",
+      "compilation_metrics": {
+        "compilation_time_ms": 125809.61712100543,
+        "raw_multiq_gates": 9744,
+        "compiled_multiq_gates": 9698
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.4.1"
+      },
+      "benchmark_id": "qcnn",
+      "run_start": "2025-06-03T17:14:32.877891",
+      "run_end": "2025-06-03T17:14:37.270556",
+      "compilation_metrics": {
+        "compilation_time_ms": 4392.658857992501,
+        "raw_multiq_gates": 388,
+        "compiled_multiq_gates": 388
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "2.0.2"
+      },
+      "benchmark_id": "qaoa",
+      "run_start": "2025-06-03T17:14:37.393863",
+      "run_end": "2025-06-03T17:14:37.488181",
+      "compilation_metrics": {
+        "compilation_time_ms": 94.31283800222445,
+        "raw_multiq_gates": 1176,
+        "compiled_multiq_gates": 1176
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "2.0.2"
+      },
+      "benchmark_id": "qv",
+      "run_start": "2025-06-03T17:14:39.322844",
+      "run_end": "2025-06-03T17:14:48.295029",
+      "compilation_metrics": {
+        "compilation_time_ms": 8972.180113996728,
+        "raw_multiq_gates": 15000,
+        "compiled_multiq_gates": 14854
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "2.0.2"
+      },
+      "benchmark_id": "qft",
+      "run_start": "2025-06-03T17:14:48.615239",
+      "run_end": "2025-06-03T17:14:48.901541",
+      "compilation_metrics": {
+        "compilation_time_ms": 286.2972750008339,
+        "raw_multiq_gates": 10050,
+        "compiled_multiq_gates": 3570
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "2.0.2"
+      },
+      "benchmark_id": "square_heisenberg",
+      "run_start": "2025-06-03T17:14:48.955026",
+      "run_end": "2025-06-03T17:14:49.161081",
+      "compilation_metrics": {
+        "compilation_time_ms": 206.05077799700666,
+        "raw_multiq_gates": 2160,
+        "compiled_multiq_gates": 540
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "2.0.2"
+      },
+      "benchmark_id": "prep_select",
+      "run_start": "2025-06-03T17:14:49.287331",
+      "run_end": "2025-06-03T17:14:50.060147",
+      "compilation_metrics": {
+        "compilation_time_ms": 772.8112559998408,
+        "raw_multiq_gates": 9744,
+        "compiled_multiq_gates": 9708
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "2.0.2"
+      },
+      "benchmark_id": "qcnn",
+      "run_start": "2025-06-03T17:14:50.099966",
+      "run_end": "2025-06-03T17:14:50.146367",
+      "compilation_metrics": {
+        "compilation_time_ms": 46.39755601237994,
+        "raw_multiq_gates": 388,
+        "compiled_multiq_gates": 388
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.5.0"
+      },
+      "benchmark_id": "qaoa",
+      "run_start": "2025-06-03T17:14:51.710703",
+      "run_end": "2025-06-03T17:14:59.176819",
+      "compilation_metrics": {
+        "compilation_time_ms": 7466.111286994419,
+        "raw_multiq_gates": 1176,
+        "compiled_multiq_gates": 1176
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.5.0"
+      },
+      "benchmark_id": "qv",
+      "run_start": "2025-06-03T17:17:36.995951",
+      "run_end": "2025-06-03T17:21:56.148058",
+      "compilation_metrics": {
+        "compilation_time_ms": 259152.1018200001,
+        "raw_multiq_gates": 15000,
+        "compiled_multiq_gates": 14856
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.5.0"
+      },
+      "benchmark_id": "qft",
+      "run_start": "2025-06-03T17:15:31.209207",
+      "run_end": "2025-06-03T17:16:16.094050",
+      "compilation_metrics": {
+        "compilation_time_ms": 44884.83782399271,
+        "raw_multiq_gates": 10050,
+        "compiled_multiq_gates": 4648
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.5.0"
+      },
+      "benchmark_id": "square_heisenberg",
+      "run_start": "2025-06-03T17:16:28.790108",
+      "run_end": "2025-06-03T17:16:37.716269",
+      "compilation_metrics": {
+        "compilation_time_ms": 8926.15623299207,
+        "raw_multiq_gates": 2160,
+        "compiled_multiq_gates": 540
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.5.0"
+      },
+      "benchmark_id": "prep_select",
+      "run_start": "2025-06-03T17:16:59.512700",
+      "run_end": "2025-06-03T17:18:41.662070",
+      "compilation_metrics": {
+        "compilation_time_ms": 102149.36724898871,
+        "raw_multiq_gates": 9744,
+        "compiled_multiq_gates": 9712
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.5.0"
+      },
+      "benchmark_id": "qcnn",
+      "run_start": "2025-06-03T17:16:45.377746",
+      "run_end": "2025-06-03T17:16:49.020253",
+      "compilation_metrics": {
+        "compilation_time_ms": 3642.50132899906,
+        "raw_multiq_gates": 388,
+        "compiled_multiq_gates": 388
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "pyqpanda3",
+        "version": "0.2.2"
+      },
+      "benchmark_id": "qaoa",
+      "run_start": "2025-06-03T17:16:49.778770",
+      "run_end": "2025-06-03T17:16:49.811804",
+      "compilation_metrics": {
+        "compilation_time_ms": 33.02941800211556,
+        "raw_multiq_gates": 1176,
+        "compiled_multiq_gates": 1176
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "pyqpanda3",
+        "version": "0.2.2"
+      },
+      "benchmark_id": "qv",
+      "run_start": "2025-06-03T17:16:51.528593",
+      "run_end": "2025-06-03T17:16:51.980465",
+      "compilation_metrics": {
+        "compilation_time_ms": 451.86712000577245,
+        "raw_multiq_gates": 15000,
+        "compiled_multiq_gates": 14856
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "pyqpanda3",
+        "version": "0.2.2"
+      },
+      "benchmark_id": "qft",
+      "run_start": "2025-06-03T17:16:53.553223",
+      "run_end": "2025-06-03T17:16:53.634745",
+      "compilation_metrics": {
+        "compilation_time_ms": 81.5184650127776,
+        "raw_multiq_gates": 10050,
+        "compiled_multiq_gates": 2740
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "pyqpanda3",
+        "version": "0.2.2"
+      },
+      "benchmark_id": "square_heisenberg",
+      "run_start": "2025-06-03T17:16:53.832812",
+      "run_end": "2025-06-03T17:16:53.856218",
+      "compilation_metrics": {
+        "compilation_time_ms": 23.403329993016087,
+        "raw_multiq_gates": 2160,
+        "compiled_multiq_gates": 540
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "pyqpanda3",
+        "version": "0.2.2"
+      },
+      "benchmark_id": "prep_select",
+      "run_start": "2025-06-03T17:16:54.058550",
+      "run_end": "2025-06-03T17:16:54.147184",
+      "compilation_metrics": {
+        "compilation_time_ms": 88.62865599803627,
+        "raw_multiq_gates": 9744,
+        "compiled_multiq_gates": 9702
+      },
+      "simulation_metrics": null
+    },
+    {
+      "compiler": {
+        "id": "pyqpanda3",
+        "version": "0.2.2"
+      },
+      "benchmark_id": "qcnn",
+      "run_start": "2025-06-03T17:16:54.763182",
+      "run_end": "2025-06-03T17:16:54.778679",
+      "compilation_metrics": {
+        "compilation_time_ms": 15.493858998524956,
+        "raw_multiq_gates": 388,
+        "compiled_multiq_gates": 388
+      },
+      "simulation_metrics": null
+    }
+  ],
+  "compiler_versions": {
+    "ucc": "0.4.6",
+    "pytket-peep": "2.4.1",
+    "qiskit-default": "2.0.2",
+    "cirq": "1.5.0",
+    "pyqpanda3": "0.2.2"
+  }
+}
