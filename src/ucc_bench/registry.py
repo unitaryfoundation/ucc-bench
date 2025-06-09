@@ -2,6 +2,7 @@ from typing import Callable
 from qiskit.quantum_info import Operator
 from qiskit import QuantumCircuit
 from qiskit_aer.noise import NoiseModel
+from qiskit.transpiler import Target
 
 # To avoid circular imports between this module and compilers,
 # only import the BaseCompiler class when type checking.
@@ -15,6 +16,7 @@ class Registry:
     _compilers = {}
     _output_metric = {}
     _observables = {}
+    _target_devices = {}
 
     def compiler(self, id: str):
         """
@@ -104,6 +106,22 @@ class Registry:
         self, id: str
     ) -> Callable[[QuantumCircuit, QuantumCircuit, NoiseModel], float]:
         return self._output_metric[id]
+
+    def add_target_device(self, id: str, t: Target):
+        """
+        Add a given target device to the registry associated with the given id.
+        """
+
+        if id in self._target_devices:
+            raise ValueError(f"Target device {id} is already registered.")
+
+        self._target_devices[id] = t
+
+    def has_target_device(self, id: str) -> bool:
+        return id in self._target_devices
+
+    def get_target_device(self, id: str) -> Target:
+        return self._target_devices[id]
 
 
 # Instance to use to registry the above items

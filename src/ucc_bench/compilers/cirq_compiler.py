@@ -1,8 +1,9 @@
 from .base_compiler import BaseCompiler
 import cirq
-from typing import List
+from typing import List, Optional
 import warnings
 from ..registry import register
+from qiskit.transpiler import Target
 
 
 class BenchmarkTargetGateset(cirq.TwoQubitCompilationTargetGateset):
@@ -104,7 +105,12 @@ class CirqCompiler(BaseCompiler[cirq.Circuit]):
     def version(cls) -> str:
         return cirq.__version__
 
-    def compile(self, circuit: cirq.Circuit) -> cirq.Circuit:
+    def compile(
+        self, circuit: cirq.Circuit, target_device: Optional[Target] = None
+    ) -> cirq.Circuit:
+        if target_device is not None:
+            raise ValueError("Cirq benchmark does not support target devices yet.")
+
         with warnings.catch_warnings(action="ignore", category=FutureWarning):
             # Cirq 1.5 release added the warning:
             # "FutureWarning: In cirq 1.6 the default value of `use_repetition_ids` will change to

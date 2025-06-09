@@ -4,6 +4,8 @@ from qiskit import (
     transpile as qiskit_transpile,
     __version__ as qiskit_version,
 )
+from qiskit.transpiler import Target
+from typing import Optional
 from qbraid import transpile
 
 from ..registry import register
@@ -25,11 +27,14 @@ class QiskitCompiler(BaseCompiler[QuantumCircuit]):
         # Specify since we have -default suffix
         return transpile(qasm, "qiskit")
 
-    def compile(self, circuit: QuantumCircuit) -> QuantumCircuit:
+    def compile(
+        self, circuit: QuantumCircuit, target_device: Optional[Target] = None
+    ) -> QuantumCircuit:
         return qiskit_transpile(
             circuit,
             optimization_level=3,
             basis_gates=["rz", "rx", "ry", "h", "cx"],
+            target=target_device,
         )
 
     def count_multi_qubit_gates(self, circuit: QuantumCircuit) -> int:
