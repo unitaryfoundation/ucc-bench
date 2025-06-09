@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Optional
 from qbraid import transpile
+from qiskit.transpiler import Target
 
 # Define a generic type variable for a circuit, that concrete implementations
 # will define for each library type
@@ -43,7 +44,9 @@ class BaseCompiler(ABC, Generic[CircuitType]):
         return transpile(circuit, "qasm2")
 
     @abstractmethod
-    def compile(self, circuit: CircuitType) -> CircuitType:
+    def compile(
+        self, circuit: CircuitType, target_device: Optional[Target] = None
+    ) -> CircuitType:
         """Compile the given circuit"""
         pass
 

@@ -67,6 +67,7 @@ class BenchmarkResult(BaseModel):
     run_end: datetime
     compilation_metrics: CompilationMetrics
     simulation_metrics: Optional[SimulationMetrics] = None
+    target_device_id: Optional[str] = None
 
 
 class SuiteResults(BaseModel):
@@ -135,6 +136,7 @@ def to_df_timing(suite_results: SuiteResults) -> pd.DataFrame:
         {
             "compiler": result.compiler.id,
             "benchmark_id": result.benchmark_id,
+            "target_device_id": result.target_device_id,
             "raw_multiq_gates": result.compilation_metrics.raw_multiq_gates,
             "compile_time_ms": result.compilation_metrics.compilation_time_ms,
             "compiled_multiq_gates": result.compilation_metrics.compiled_multiq_gates,
@@ -153,6 +155,7 @@ def to_df_timing_detailed(suite_results: SuiteResults) -> pd.DataFrame:
         {
             "compiler": result.compiler.id,
             "benchmark_id": result.benchmark_id,
+            "target_device_id": result.target_device_id,
             "raw_multiq_gates": result.compilation_metrics.raw_multiq_gates,
             "compile_time_ms": result.compilation_metrics.compilation_time_ms,
             "compiled_multiq_gates": result.compilation_metrics.compiled_multiq_gates,
@@ -174,6 +177,7 @@ def to_df_simulation(suite_results: SuiteResults) -> pd.DataFrame:
         {
             "compiler": result.compiler.id,
             "benchmark_id": result.benchmark_id,
+            "target_device_id": result.target_device_id,
             "measurement_id": result.simulation_metrics.measurement_id,
             "uncompiled_ideal": result.simulation_metrics.uncompiled_ideal,
             "compiled_ideal": result.simulation_metrics.compiled_ideal,

@@ -36,6 +36,24 @@ class SimulationSpec(BaseModel):
         return value
 
 
+class TargetDeviceSpec(BaseModel):
+    """
+    Represents a target device to compile the circuit for.
+
+    Attributes:
+        The name of the target device, as defined in the registry.
+    """
+
+    id: str
+
+    @field_validator("id", mode="after")
+    @classmethod
+    def is_valid_target_device(cls, value: str) -> str:
+        if not register.has_target_device(value):
+            raise ValueError(f"Unknown target device: {value}")
+        return value
+
+
 class BenchmarkSpec(BaseModel):
     """
     Represents a specific benchmark (circuit+metrics) to run.
@@ -74,6 +92,7 @@ class BenchmarkSuite(BaseModel):
     description: str
     compilers: List[CompilerSpec] = Field(default_factory=list)
     benchmarks: List[BenchmarkSpec] = Field(default_factory=list)
+    target_devices: List[TargetDeviceSpec] = Field(default_factory=list)
 
     @classmethod
     def load_toml(cls, path: str) -> "BenchmarkSuite":
@@ -84,21 +103,15 @@ class BenchmarkSuite(BaseModel):
             return BenchmarkSuite.model_validate(raw)
 
     @model_validator(mode="after")
-    def check_benchmarks_unique(self):
-        set_ids = set()
-        for benchmark in self.benchmarks:
-            if benchmark.id in set_ids:
-                raise ValueError(f"Duplicate benchmark id: {benchmark.id}")
-            set_ids.add(benchmark.id)
-        return self
-
-    @model_validator(mode="after")
-    def check_compilers_unique(self):
-        set_ids = set()
-        for compiler in self.compilers:
-            if compiler.id in set_ids:
-                raise ValueError(f"Duplicate compiler: {compiler.id}")
-            set_ids.add(compiler.id)
+    def check_ids_unique(self):
+        """Check that ids are unique for compilers, benchmarks, and target_devices."""
+        for field in ["benchmarks", "compilers", "target_devices"]:
+            items = getattr(self, field, [])
+            set_ids = set()
+            for item in items:
+                if item.id in set_ids:
+                    raise ValueError(f"Duplicate {field[:-1]} id: {item.id}")
+                set_ids.add(item.id)
         return self
 
     @model_validator(mode="after")

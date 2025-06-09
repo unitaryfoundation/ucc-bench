@@ -1,7 +1,12 @@
 import pytest
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from ucc_bench.suite import BenchmarkSuite, CompilerSpec, BenchmarkSpec
+from ucc_bench.suite import (
+    BenchmarkSuite,
+    CompilerSpec,
+    BenchmarkSpec,
+    TargetDeviceSpec,
+)
 
 
 def test_validate_valid_suite():
@@ -98,6 +103,29 @@ def test_validate_invalid_qasm_file_path():
                         id="bench1",
                         description="Benchmark 1",
                         qasm_file=temp_path / "nonexistent.qasm",
+                    )
+                ],
+            )
+
+
+def test_validate_unregistered_target_device():
+    with TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+        qasm_file = temp_path / "valid.qasm"
+        qasm_file.touch()
+
+        with pytest.raises(ValueError, match="Unknown target device: unknown_target"):
+            BenchmarkSuite(
+                spec_path=temp_path / "suite.toml",
+                spec_version="1.0",
+                suite_version="1.0",
+                id="suite1",
+                description="A suite with unregistered target",
+                compilers=[CompilerSpec(id="ucc")],
+                target_devices=[TargetDeviceSpec(id="unknown_target")],
+                benchmarks=[
+                    BenchmarkSpec(
+                        id="bench1", description="Benchmark 1", qasm_file=qasm_file
                     )
                 ],
             )

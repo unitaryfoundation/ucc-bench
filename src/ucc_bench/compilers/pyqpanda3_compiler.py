@@ -1,5 +1,7 @@
 from .base_compiler import BaseCompiler
 from ..registry import register
+from typing import Optional
+from qiskit.transpiler import Target
 
 try:
     from pyqpanda3 import __version__ as pyqpanda_version
@@ -35,7 +37,13 @@ if PYQPANDA3_AVAILABLE:
         def native_to_qasm(self, circuit: QProg) -> str:
             return convert_qprog_to_qasm(circuit)
 
-        def compile(self, circuit: QProg) -> QProg:
+        def compile(
+            self, circuit: QProg, target_device: Optional[Target] = None
+        ) -> QProg:
+            if target_device is not None:
+                raise ValueError(
+                    "Pyqpanda3 benchmark does not support target devices yet."
+                )
             transpiler = Transpiler()
             return transpiler.transpile(
                 circuit,
@@ -66,7 +74,7 @@ else:
         def native_to_qasm(self, circuit):
             raise NotImplementedError("pyqpanda3 is not supported on this platform.")
 
-        def compile(self, circuit):
+        def compile(self, circuit, target_device=None):
             raise NotImplementedError("pyqpanda3 is not supported on this platform.")
 
         def count_multi_qubit_gates(self, circuit):

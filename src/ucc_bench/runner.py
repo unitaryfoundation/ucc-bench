@@ -10,12 +10,18 @@ from .registry import register
 from .simulation.observables import calc_expectation_value
 from .simulation.noise_models import create_depolarizing_noise_model
 from qbraid import transpile
-from .utils import validate_circuit_gates
 from time import perf_counter, process_time
 import multiprocessing
+from qiskit.transpiler import Target
+from .utils import validate_circuit_gates
 
 
-def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResult:
+def run_task(
+    compiler: BaseCompiler,
+    benchmark: BenchmarkSpec,
+    target_device: Optional[Target] = None,
+    target_device_id: Optional[str] = None,
+) -> BenchmarkResult:
     """
     Run a single benchmark against the given compiler.
     """
@@ -23,7 +29,7 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
     class ContextualLogger(LoggerAdapter):
         def process(self, msg, kwargs):
             return (
-                f"[{self.extra['benchmark_id']}][{self.extra['compiler_id']}] {msg}",
+                f"[{self.extra['benchmark_id']}][{self.extra['compiler_id']}][{self.extra['target_device_id']}] {msg}",
                 kwargs,
             )
 
@@ -31,9 +37,16 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
     # get the logger locally versus at module scope
     logger = logging.getLogger(__name__)
     logger = ContextualLogger(
-        logger, extra={"benchmark_id": benchmark.id, "compiler_id": compiler.id()}
+        logger,
+        extra={
+            "benchmark_id": benchmark.id,
+            "compiler_id": compiler.id(),
+            "target_device_id": target_device_id,
+        },
     )
-    print(f"Running benchmark '{benchmark.id}' with compiler '{compiler.id()}'")
+    print(
+        f"Running benchmark '{benchmark.id}' with compiler '{compiler.id()}' for target device '{target_device_id}'"
+    )
 
     start_transpile = datetime.now()
     raw_circuit = compiler.qasm_to_native(
@@ -50,7 +63,7 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
     start_compile_wall = perf_counter()
     start_compile_cpu = process_time()
 
-    compiled_circuit = compiler.compile(raw_circuit)
+    compiled_circuit = compiler.compile(raw_circuit, target_device=target_device)
 
     end_compile_cpu = process_time()
     end_compile_wall = perf_counter()
@@ -67,7 +80,8 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
     # Validate that the compiled circuit only contains the allowed basis gates.
     # This check occurs after timing so it does not affect measured compilation
     # performance.
-    validate_circuit_gates(compiled_circuit, {"rx", "ry", "rz", "h", "cx"})
+    if not target_device:
+        validate_circuit_gates(compiled_circuit, {"rx", "ry", "rz", "h", "cx"})
 
     simulation_metrics = None
     if benchmark.simulate:
@@ -104,7 +118,9 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
                 f"Unknown measurement '{benchmark.simulate.measurement}' for benchmark '{benchmark.id}'"
             )
 
-    print(f"Completed benchmark '{benchmark.id}' with compiler '{compiler.id()}'")
+    print(
+        f"Completed benchmark '{benchmark.id}' with compiler '{compiler.id()}' for target device '{target_device_id}'"
+    )
 
     return BenchmarkResult(
         compiler=CompilerInfo(id=compiler.id(), version=compiler.version()),
@@ -117,6 +133,7 @@ def run_task(compiler: BaseCompiler, benchmark: BenchmarkSpec) -> BenchmarkResul
             compiled_multiq_gates=compiler.count_multi_qubit_gates(compiled_circuit),
         ),
         simulation_metrics=simulation_metrics,
+        target_device_id=target_device_id,
     )
 
 
@@ -155,12 +172,32 @@ def run_suite(
         for compiler in suite.compilers:
             if only_compiler and compiler.id != only_compiler:
                 continue
+
             compiler_cls = register.get_compiler(compiler.id)
-            for benchmark in suite.benchmarks:
-                if only_benchmark and benchmark.id != only_benchmark:
-                    continue
-                # Submit tasks to the executor
-                tasks.append(executor.submit(run_task, compiler_cls(), benchmark))
+            target_devices = suite.target_devices or [
+                None
+            ]  # Default to None if no target devices specified
+
+            for target_device_spec in target_devices:
+                target_device = (
+                    register.get_target_device(target_device_spec.id)
+                    if target_device_spec
+                    else None
+                )
+                for benchmark in suite.benchmarks:
+                    if only_benchmark and benchmark.id != only_benchmark:
+                        continue
+
+                    # Submit tasks to the executor
+                    tasks.append(
+                        executor.submit(
+                            run_task,
+                            compiler_cls(),
+                            benchmark,
+                            target_device,
+                            target_device_spec.id if target_device else None,
+                        )
+                    )
 
         # Collect results as tasks complete
         for future in tasks:
