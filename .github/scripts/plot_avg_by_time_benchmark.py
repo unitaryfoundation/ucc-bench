@@ -222,6 +222,7 @@ def patch_legacy_data(df, root_dir, runner_name):
     df_legacy["compile_time_ms"] = df_legacy["compile_time"] * 1000
     df_legacy["benchmark_id"] = df_legacy["circuit_name"]
     df_legacy["uid_timestamp"] = pd.to_datetime(df_legacy["date"], utc=True)
+    df_legacy["target_device_id"] = None
     df_legacy = df_legacy[df.columns]
     df_legacy.sort_values("uid_timestamp", inplace=True)
 
