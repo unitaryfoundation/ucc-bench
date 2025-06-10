@@ -34,7 +34,7 @@ class QiskitCompiler(BaseCompiler[QuantumCircuit]):
             circuit,
             optimization_level=3,
             basis_gates=["rz", "rx", "ry", "h", "cx"],
-            target=target_device,
+            coupling_map=target_device.build_coupling_map() if target_device else None,
         )
 
     def count_multi_qubit_gates(self, circuit: QuantumCircuit) -> int:

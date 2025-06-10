@@ -71,6 +71,12 @@ def main() -> None:
         "--only_benchmark",
         help="Run only the specified benchmark.",
     )
+
+    parser.add_argument(
+        "--only_target_device",
+        help="Run only the specified target device.",
+    )
+
     parser.add_argument(
         "--ucc_hash",
         help="Hash of commit of UCC being tested. This is used to track the version of UCC being benchmarked.",
@@ -99,6 +105,7 @@ def main() -> None:
         num_parallel,
         only_compiler=args.only_compiler,
         only_benchmark=args.only_benchmark,
+        only_target_device=args.only_target_device,
     )
     run_end = datetime.now()
 
