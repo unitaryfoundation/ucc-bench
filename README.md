@@ -29,7 +29,7 @@ See the [`uv` docs](https://docs.astral.sh/uv/) for information on installing `u
 ## Usage (Running a benchmark suite)
 
 Benchmarks are defined as a TOML file. The top-level `benchmarks` directory contains
-benchmark specifications.
+benchmark specifications. Today that includes `compilation_benchmarks.toml`, `layout_benchmarks.toml`, and `simulation_benchmarks.toml`.
 
 Benchmark suites are run using the `ucc-bench` utility (which is an entry to `ucc_bench.main:main`). To
 see invocation options, you can run the command below
@@ -193,6 +193,8 @@ between runs. The `ucc-bench` application generally stores benchmark results as 
 in path `{out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.json`. There are also sibling
 CSV files showing a summary of performance data. See the [`README.md`](./results/README.md)
 for more information on how those results are stored and relate to git history.
+
+At this time, only the `compilation` and `simulation` benchmark suites are run on an automated basis. To explore `layout` benchmarks, you should follow the instructions above to run locally.
 
 ## License
 
