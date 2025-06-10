@@ -80,8 +80,7 @@ def run_task(
     # Validate that the compiled circuit only contains the allowed basis gates.
     # This check occurs after timing so it does not affect measured compilation
     # performance.
-    if not target_device:
-        validate_circuit_gates(compiled_circuit, {"rx", "ry", "rz", "h", "cx"})
+    validate_circuit_gates(compiled_circuit, {"rx", "ry", "rz", "h", "cx"})
 
     simulation_metrics = None
     if benchmark.simulate:
@@ -152,6 +151,7 @@ def run_suite(
     num_parallel: int,
     only_compiler: Optional[str] = None,
     only_benchmark: Optional[str] = None,
+    only_target_device: Optional[str] = None,
 ) -> List[BenchmarkResult]:
     """
     Run an entire benchmark suite against all compilers specified in the suite and return the results.
@@ -179,6 +179,9 @@ def run_suite(
             ]  # Default to None if no target devices specified
 
             for target_device_spec in target_devices:
+                if only_target_device and target_device_spec.id != only_target_device:
+                    continue
+
                 target_device = (
                     register.get_target_device(target_device_spec.id)
                     if target_device_spec
