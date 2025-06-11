@@ -1,4 +1,12 @@
 from qbraid import transpile
+from qiskit.quantum_info import Operator
+
+
+def validate_circuit_equiv(input, output):
+    input_qc = transpile(input, "qiskit")
+    output_qc = transpile(output, "qiskit")
+
+    return Operator(input_qc) == Operator(output_qc)
 
 
 def validate_circuit_gates(circuit, allowed_gates=None):

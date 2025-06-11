@@ -13,7 +13,7 @@ from qbraid import transpile
 from time import perf_counter, process_time
 import multiprocessing
 from qiskit.transpiler import Target
-from .utils import validate_circuit_gates
+from .utils import validate_circuit_gates, validate_circuit_equiv
 
 
 def run_task(
@@ -81,6 +81,12 @@ def run_task(
     # This check occurs after timing so it does not affect measured compilation
     # performance.
     validate_circuit_gates(compiled_circuit, {"rx", "ry", "rz", "h", "cx"})
+
+    # VAlide logical equivalance
+    if not validate_circuit_equiv(raw_circuit, compiled_circuit):
+        logger.warning(
+            "Compiled circuit is not logically equivalent to the raw circuit."
+        )
 
     simulation_metrics = None
     if benchmark.simulate:
