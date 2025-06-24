@@ -34,8 +34,8 @@ jobs:
 
       - name: Run benchmark plot script
         run: |
-          uv run python .github/scripts/plot_latest_benchmark.py results ${RUNNER_LABEL}
-          uv run python .github/scripts/plot_avg_by_time_benchmark.py results ${RUNNER_LABEL}
+          uv run python plotting/plot_latest_benchmark.py results ${RUNNER_LABEL}
+          uv run python plotting/plot_avg_by_time_benchmark.py results ${RUNNER_LABEL}
 
       - name: Configure Git
         run: |

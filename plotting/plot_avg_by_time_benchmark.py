@@ -235,7 +235,9 @@ def patch_legacy_data(df, root_dir, runner_name):
 
 def main():
     # Parse command-line arguments
-    parser = argparse.ArgumentParser(description="Plot latest benchmark results.")
+    parser = argparse.ArgumentParser(
+        description="Plot latest benchmark results.",
+    )
     parser.add_argument("root_dir", type=str, help="Root directory of the benchmarks.")
     parser.add_argument("runner_name", type=str, help="Name of the runner.")
     args = parser.parse_args()
