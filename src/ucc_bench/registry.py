@@ -53,6 +53,12 @@ class Registry:
     def get_compiler(self, id: str) -> "BaseCompiler":
         return self._compilers[id]
 
+    def get_compilers(self) -> set[str]:
+        """
+        Returns a list of all registered compiler ids.
+        """
+        return set(self._compilers.keys())
+
     def observable(self, id: str):
         """
         Decorator to register a function that generates an observable Operator.

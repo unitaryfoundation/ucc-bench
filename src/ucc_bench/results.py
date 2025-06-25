@@ -164,7 +164,6 @@ def to_df_timing_detailed(suite_results: SuiteResults) -> pd.DataFrame:
         }
         for result in suite_results.results
     ]
-    # Create a Pandas DataFrame and write it to a CSV file
     df = pd.DataFrame(timing_data)
     df["uid_timestamp"] = pd.to_datetime(df["uid_timestamp"], utc=True)
     return df
@@ -188,6 +187,30 @@ def to_df_simulation(suite_results: SuiteResults) -> pd.DataFrame:
         if result.simulation_metrics
     ]
     df = pd.DataFrame(measurement_data)
+    return df
+
+
+def to_df_simulation_detailed(suite_results: SuiteResults) -> pd.DataFrame:
+    """Return a DataFrame of the simulation results from the benchmark suite."""
+
+    measurement_data = [
+        {
+            "compiler": result.compiler.id,
+            "benchmark_id": result.benchmark_id,
+            "target_device_id": result.target_device_id,
+            "measurement_id": result.simulation_metrics.measurement_id,
+            "uncompiled_ideal": result.simulation_metrics.uncompiled_ideal,
+            "compiled_ideal": result.simulation_metrics.compiled_ideal,
+            "uncompiled_noisy": result.simulation_metrics.uncompiled_noisy,
+            "compiled_noisy": result.simulation_metrics.compiled_noisy,
+            "compiler_version": result.compiler.version,
+            "uid_timestamp": suite_results.metadata.uid_timestamp,
+        }
+        for result in suite_results.results
+        if result.simulation_metrics
+    ]
+    df = pd.DataFrame(measurement_data)
+    df["uid_timestamp"] = pd.to_datetime(df["uid_timestamp"], utc=True)
     return df
 
 

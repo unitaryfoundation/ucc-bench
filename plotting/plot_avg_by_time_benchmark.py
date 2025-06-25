@@ -3,7 +3,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
 from pathlib import Path
-from ucc_bench.results import SuiteResultsDatabase, to_df_timing_detailed
+from ucc_bench.results import (
+    SuiteResultsDatabase,
+    to_df_timing_detailed,
+    to_df_simulation_detailed,
+)
+
+from plotting.shared import calculate_abs_relative_error, get_compiler_colormap
 
 
 def annotate_and_adjust(
@@ -233,38 +239,19 @@ def patch_legacy_data(df, root_dir, runner_name):
     return df
 
 
-def main():
-    # Parse command-line arguments
-    parser = argparse.ArgumentParser(
-        description="Plot latest benchmark results.",
-    )
-    parser.add_argument("root_dir", type=str, help="Root directory of the benchmarks.")
-    parser.add_argument("runner_name", type=str, help="Name of the runner.")
-    args = parser.parse_args()
-
-    root_dir = args.root_dir
-    runner_name = args.runner_name
-
+def plot_compilation_over_time(root_dir, runner_name):
     timing_results_db = SuiteResultsDatabase.from_root(
         root_dir, runner_name, "compilation_benchmarks"
     )
-
-    # Gets time ordered list of results when at least one compiler version
-    # changed from the prior run.
     timing_results = timing_results_db.get_versions_changed()
     df = pd.concat((to_df_timing_detailed(d) for d in timing_results))
 
-    # Bring in old data from original `ucc` runs
     df = patch_legacy_data(df, root_dir, runner_name)
-
-    # Filter data to be after Dec 2024 when dedicated runner was created
     df = df[df["uid_timestamp"] > "2024-12-16"]
 
-    # Add calculated columns
     df["compile_time"] = df["compile_time_ms"] / 1000
     df["compiled_ratio"] = df["compiled_multiq_gates"] / df["raw_multiq_gates"]
 
-    # Calculate average compile time and compiled ratio
     avg_df = (
         df.groupby(["uid_timestamp", "compiler"])
         .agg(
@@ -277,15 +264,12 @@ def main():
         .reset_index()
     )
 
-    # Detect version changes that we will annotate
     version_changes = []
     last_versions = {}
-
     for _, row in avg_df.iterrows():
         compiler = row["compiler"]
         version = row["compiler_version"]
         timestamp = row["uid_timestamp"]
-
         if compiler not in last_versions or version != last_versions[compiler]:
             version_changes.append(
                 {
@@ -297,13 +281,8 @@ def main():
                 }
             )
             last_versions[compiler] = version
-
     version_changes_df = pd.DataFrame(version_changes)
-
-    # Use a consistent color map for both plots
     sorted_compilers = sorted(avg_df["compiler"].unique())
-    colors = plt.get_cmap("tab10", len(sorted_compilers))
-    color_map = {compiler: colors(i) for i, compiler in enumerate(sorted_compilers)}
 
     fig, (ax1, ax2) = plt.subplots(
         2,
@@ -316,7 +295,7 @@ def main():
         ax1,
         sorted_compilers,
         avg_df,
-        color_map,
+        get_compiler_colormap(),
         version_changes_df,
         metric="compiled_ratio",
         y_label="Compiled Ratio",
@@ -329,7 +308,7 @@ def main():
         ax2,
         sorted_compilers,
         avg_df,
-        color_map,
+        get_compiler_colormap(),
         version_changes_df,
         metric="compile_time",
         y_label="Compile Time (s, log scale)",
@@ -338,18 +317,143 @@ def main():
         y_scale=[1.0, 1.9],
     )
 
-    # Create a single legend for both plots
     fig.legend(
-        sorted_compilers,  # Use the sorted compiler names for the legend
-        loc="lower center",  # Place legend at the bottom center of the figure
-        bbox_to_anchor=(0.5, 0.5),  # Position between the two plots
-        ncol=4,  # Arrange legend items in 4 columns
+        sorted_compilers,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.5),
+        ncol=4,
         borderaxespad=0.0,
     )
 
     filename = Path(root_dir) / runner_name / "avg_compiler_benchmarks_over_time.png"
     print(f"Saving plot to {filename}")
     fig.savefig(filename, bbox_inches="tight", dpi=150)
+    plt.close(fig)
+
+
+def plot_simulation_over_time(root_dir, runner_name):
+    sim_results_db = SuiteResultsDatabase.from_root(
+        root_dir, runner_name, "simulation_benchmarks"
+    )
+    sim_results = sim_results_db.get_versions_changed()
+    if not sim_results:
+        print("No simulation benchmark data found.")
+        return
+
+    df = pd.concat((to_df_simulation_detailed(d) for d in sim_results))
+    df = df[df["uid_timestamp"] > "2025-06-01"]
+
+    # Compute relative errors
+    df["rel_err_ideal"] = calculate_abs_relative_error(
+        df["compiled_ideal"], df["uncompiled_ideal"]
+    )
+    df["rel_err_noisy"] = calculate_abs_relative_error(
+        df["compiled_noisy"], df["uncompiled_noisy"]
+    )
+
+    avg_df = (
+        df.groupby(["uid_timestamp", "compiler"])
+        .agg(
+            {
+                "rel_err_ideal": "mean",
+                "rel_err_noisy": "mean",
+                "compiler_version": "first",
+            }
+        )
+        .reset_index()
+    )
+
+    version_changes = []
+    last_versions = {}
+    for _, row in avg_df.iterrows():
+        compiler = row["compiler"]
+        version = row["compiler_version"]
+        timestamp = row["uid_timestamp"]
+        if compiler not in last_versions or version != last_versions[compiler]:
+            version_changes.append(
+                {
+                    "compiler": compiler,
+                    "uid_timestamp": timestamp,
+                    "compiler_version": version,
+                    "rel_err_ideal": row["rel_err_ideal"],
+                    "rel_err_noisy": row["rel_err_noisy"],
+                }
+            )
+            last_versions[compiler] = version
+    version_changes_df = pd.DataFrame(version_changes)
+
+    sorted_compilers = sorted(avg_df["compiler"].unique())
+
+    fig, (ax1, ax2) = plt.subplots(
+        2,
+        1,
+        figsize=(8, 8),
+        sharex=True,
+    )
+
+    plot_and_annotate_metric(
+        ax1,
+        sorted_compilers,
+        avg_df,
+        get_compiler_colormap(),
+        version_changes_df,
+        metric="rel_err_ideal",
+        y_label="Abs Relative Error",
+        title="Average Observable Error (Noiseless Sim)",
+        y_log=False,
+        y_scale=[1.1, 1.3],
+    )
+
+    plot_and_annotate_metric(
+        ax2,
+        sorted_compilers,
+        avg_df,
+        get_compiler_colormap(),
+        version_changes_df,
+        metric="rel_err_noisy",
+        y_label="Abs Relative Error",
+        title="Average Observable Error (Noisy Sim)",
+        y_log=False,
+        y_scale=[1.1, 1.3],
+    )
+
+    fig.legend(
+        sorted_compilers,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.5),
+        ncol=4,
+        borderaxespad=0.0,
+    )
+
+    filename = Path(root_dir) / runner_name / "avg_simulation_benchmarks_over_time.png"
+    print(f"Saving plot to {filename}")
+    fig.savefig(filename, bbox_inches="tight", dpi=150)
+    plt.close(fig)
+
+
+def main():
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(
+        description="Plot average benchmark results over time.",
+    )
+    parser.add_argument("root_dir", type=str, help="Root directory of the benchmarks.")
+    parser.add_argument("runner_name", type=str, help="Name of the runner.")
+    parser.add_argument(
+        "--plot",
+        type=str,
+        choices=["all", "compilation", "simulation"],
+        default="all",
+        help="Which plot(s) to generate.",
+    )
+    args = parser.parse_args()
+
+    root_dir = args.root_dir
+    runner_name = args.runner_name
+
+    if args.plot in ["all", "compilation"]:
+        plot_compilation_over_time(root_dir, runner_name)
+    if args.plot in ["all", "simulation"]:
+        plot_simulation_over_time(root_dir, runner_name)
 
 
 if __name__ == "__main__":
