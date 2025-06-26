@@ -86,6 +86,31 @@ def generate_computational_basis_observable(
     return Operator.from_label("Z" * num_qubits)
 
 
+@register.observable("ghz_state_projector")
+def generate_ghz_state_projector(num_qubits: int) -> Operator:
+    """Generates the projector for the GHZ state |0...0> + |1...1>."""
+    ghz_state = Statevector.from_label("0" * num_qubits) + Statevector.from_label(
+        "1" * num_qubits
+    )
+    ghz_state /= np.sqrt(2)
+    return ghz_state.to_operator()
+
+
+@register.observable("uniform_superposition_projector")
+def generate_uniform_superposition_projector(num_qubits: int) -> Operator:
+    """Generates the projector for the uniform superposition state."""
+    raw_vec = np.ones(2**num_qubits) / np.sqrt(2**num_qubits)
+    return Statevector(raw_vec).to_operator()
+
+
+@register.observable("prep_select_all_ones")
+def generate_prep_select_all_ones_observable(num_qubits: int) -> Operator:
+    """Generate a projector that is uniform superposition over computational basis but with (-1) phase on the all ones"""
+    raw_vec = np.ones(2**num_qubits) / np.sqrt(2**num_qubits)
+    raw_vec[-1] *= -1
+    return Statevector(raw_vec).to_operator()
+
+
 def lattice_to_qubit_mapping(nnodes):
     """Generate qubit mapping for the square Heisenberg problem Hamiltonian."""
     lattice = np.arange(nnodes * nnodes).reshape(

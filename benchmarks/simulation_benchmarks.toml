@@ -49,7 +49,7 @@ simulate.measurement = "heavy_output"
 id = "qft"
 description = "Quantum Fourier Transform"
 qasm_file = "circuits/benchpress/qft_N010_basis_rz_rx_ry_cx.qasm"
-simulate.measurement = "computational_basis"
+simulate.measurement = "uniform_superposition_projector"
 
 [[benchmarks]]
 id="square_heisenberg"
@@ -59,9 +59,9 @@ simulate.measurement = "hamlib_heisenberg_pbc-qubitnodes_Lx_Ly_h-0.5"
 
 [[benchmarks]]
 id="prep_select"
-description = "GHZ state preparation"
+description = "Prepare and grover select all 1s state"
 qasm_file = "circuits/ucc/prep_select_N10_ghz_basis_rz_rx_ry_h_cx.qasm"
-simulate.measurement = "computational_basis"
+simulate.measurement = "prep_select_all_ones"
 
 [[benchmarks]]
 id="qcnn"

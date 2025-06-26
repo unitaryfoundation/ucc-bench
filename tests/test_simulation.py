@@ -4,6 +4,9 @@ from ucc_bench.simulation.noise_models import get_n_qubit_gateset
 from ucc_bench.simulation.observables import (
     generate_qcnn_observable,
     generate_computational_basis_observable,
+    generate_ghz_state_projector,
+    generate_uniform_superposition_projector,
+    generate_prep_select_all_ones_observable,
 )
 
 
@@ -63,3 +66,24 @@ def test_generate_qcnn_observable():
     assert generate_qcnn_observable(6) == SparsePauliOp(
         ["ZXZIII", "IZXZII", "IIZXZI", "IIIZXZ"]
     )
+
+
+def test_generate_ghz_state_projector():
+    expected = (
+        1 / 2 * Operator([[1, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0], [1, 0, 0, 1]])
+    )
+    assert generate_ghz_state_projector(2) == expected
+
+
+def test_generate_uniform_superposition_projector():
+    expected = (
+        1 / 4 * Operator([[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]])
+    )
+    assert generate_uniform_superposition_projector(2) == expected
+
+
+def test_generate_prep_select_all_ones():
+    expected = (
+        1 / 4 * Operator([[1, 1, 1, -1], [1, 1, 1, -1], [1, 1, 1, -1], [-1, -1, -1, 1]])
+    )
+    assert generate_prep_select_all_ones_observable(2) == expected
