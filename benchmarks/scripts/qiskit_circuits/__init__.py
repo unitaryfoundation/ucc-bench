@@ -3,4 +3,5 @@ from .circuits import (
     VQE_ansatz as VQE_ansatz,
     qaoa_ising_ansatz as qaoa_ising_ansatz,
     random_clifford_circuit as random_clifford_circuit,
+    qec_bitflip_code as qec_bitflip_code,
 )

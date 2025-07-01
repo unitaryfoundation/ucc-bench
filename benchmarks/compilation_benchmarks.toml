@@ -56,3 +56,8 @@ qasm_file = "circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm"
 id="qcnn"
 description="Quantum Convolutional Neural Network"
 qasm_file="circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm"
+
+[[benchmarks]]
+id = "bitflip_code"
+description = "3-qubit bit-flip code with measurements"
+qasm_file = "circuits/ucc/bitflip_code_N3_basis_rx_cx_measure.qasm"
