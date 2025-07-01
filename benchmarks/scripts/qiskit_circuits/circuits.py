@@ -285,6 +285,13 @@ def apply_correction_bit(circuit, qreg_data, creg_syndrome):
     return circuit
 
 
+def apply_final_readout(circuit, qreg_data, creg_data):
+    """Read out the final measurements"""
+    circuit.barrier(qreg_data)
+    circuit.measure(qreg_data, creg_data)
+    return circuit
+
+
 def qec_bitflip_code(apply_correction=True, measure_all=False) -> QuantumCircuit:
     """
     Returns a QuantumCircuit implementing the 3-qubit bit-flip code with error correction. Modified from https://quantum.cloud.ibm.com/docs/en/tutorials/repetition-codes
@@ -310,20 +317,3 @@ def qec_bitflip_code(apply_correction=True, measure_all=False) -> QuantumCircuit
     if measure_all:
         circuit = apply_final_readout(circuit, qreg_data, creg_data)
     return circuit
-
-
-def apply_final_readout(circuit, qreg_data, creg_data):
-    """Read out the final measurements"""
-    circuit.barrier(qreg_data)
-    circuit.measure(qreg_data, creg_data)
-    return circuit
-    return qc
-
-
-if __name__ == "__main__":
-    # Example usage
-    qc = qec_bitflip_code()
-    print(qc)
-    # You can also save the circuit to a QASM file or visualize it
-    # qc.save("bitflip_code.qasm")
-    # qc.draw(output='mpl')  # Requires matplotlib
