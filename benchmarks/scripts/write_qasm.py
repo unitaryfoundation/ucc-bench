@@ -2,12 +2,13 @@ import os
 
 from qbraid.transpiler import transpile as translate
 from qiskit import transpile as qiskit_transpile
-
+import pyqasm
 
 def write_qasm(
     circuit,
     circuit_name,
     version="2",
+    unroll=False,
     basis_gates=[],
     folder="../qasm_circuits",
 ):
@@ -22,14 +23,25 @@ def write_qasm(
     # Generate QASM string
     qasm_string = translate(decomp_circuit, "qasm" + version)
 
+    if unroll:
+        # Do semantic parsing and validation
+        module = pyqasm.loads(qasm_string)
+        module.validate()
+        
+        # Unroll any conditionals or loops
+        module.unroll()
+        qasm_string = pyqasm.dumps(module)
+    
     # Get the absolute path of the current script
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Create the absolute path for the folder where QASM files will be saved
-    abs_folder = os.path.abspath(os.path.join(script_dir, folder))
-
     # Construct the filename with the given circuit name and version
-    filename = os.path.join(abs_folder, f"qasm{version}/ucc/{circuit_name}")
+    # Save all files in benchmarks/circuits/ucc/
+    repo_root = os.path.abspath(os.path.join(script_dir, '../..'))
+    print(repo_root)
+    ucc_circuits_dir = os.path.join(repo_root, 'benchmarks', 'circuits', 'ucc')
+    os.makedirs(ucc_circuits_dir, exist_ok=True)
+    filename = os.path.join(ucc_circuits_dir, circuit_name)
 
     # Append basis gates to the filename if they are provided
     if basis_gates:
