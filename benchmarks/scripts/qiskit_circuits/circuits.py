@@ -244,12 +244,10 @@ def qec_bitflip_code():
 
     # Initialize |1> state
     qc.x(qreg_data[0])
-    qc.barrier(qreg_data)
 
     # Encode bit-flip (repetition code)
     qc.cx(qreg_data[0], qreg_data[1])
     qc.cx(qreg_data[0], qreg_data[2])
-    qc.barrier(qreg_data)
 
     # Syndrome measurement (parity checks)
     qc.cx(qreg_data[0], qreg_measure[0])
@@ -270,6 +268,12 @@ def qec_bitflip_code():
 
     qc.barrier(qreg_data)
 
-    # Final readout
-    qc.measure(qreg_data, creg_data)
     return qc
+
+if __name__ == "__main__":
+    # Example usage
+    qc = qec_bitflip_code()
+    print(qc)
+    # You can also save the circuit to a QASM file or visualize it
+    # qc.save("bitflip_code.qasm")
+    # qc.draw(output='mpl')  # Requires matplotlib
