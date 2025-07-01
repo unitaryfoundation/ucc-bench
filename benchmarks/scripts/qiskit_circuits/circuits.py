@@ -261,9 +261,13 @@ def qec_bitflip_code():
     qc.barrier(qreg_data, qreg_measure)
 
     # Correction (classically controlled)
-    qc.x(qreg_data[0]).c_if(creg_syndrome, 3)
-    qc.x(qreg_data[1]).c_if(creg_syndrome, 1)
-    qc.x(qreg_data[2]).c_if(creg_syndrome, 2)
+    if creg_syndrome == 3:
+        qc.x(qreg_data[0])
+    if creg_syndrome == 1:
+        qc.x(qreg_data[1])
+    if creg_syndrome == 2:
+        qc.x(qreg_data[2])
+
     qc.barrier(qreg_data)
 
     # Final readout
