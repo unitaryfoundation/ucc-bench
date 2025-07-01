@@ -4,6 +4,7 @@ from qbraid.transpiler import transpile as translate
 from qiskit import transpile as qiskit_transpile
 import pyqasm
 
+
 def write_qasm(
     circuit,
     circuit_name,
@@ -27,19 +28,19 @@ def write_qasm(
         # Do semantic parsing and validation
         module = pyqasm.loads(qasm_string)
         module.validate()
-        
+
         # Unroll any conditionals or loops
         module.unroll()
         qasm_string = pyqasm.dumps(module)
-    
+
     # Get the absolute path of the current script
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Construct the filename with the given circuit name and version
     # Save all files in benchmarks/circuits/ucc/
-    repo_root = os.path.abspath(os.path.join(script_dir, '../..'))
+    repo_root = os.path.abspath(os.path.join(script_dir, "../.."))
     print(repo_root)
-    ucc_circuits_dir = os.path.join(repo_root, 'benchmarks', 'circuits', 'ucc')
+    ucc_circuits_dir = os.path.join(repo_root, "benchmarks", "circuits", "ucc")
     os.makedirs(ucc_circuits_dir, exist_ok=True)
     filename = os.path.join(ucc_circuits_dir, circuit_name)
 

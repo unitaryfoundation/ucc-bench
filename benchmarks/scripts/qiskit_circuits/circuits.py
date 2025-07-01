@@ -270,6 +270,7 @@ def qec_bitflip_code():
 
     return qc
 
+
 if __name__ == "__main__":
     # Example usage
     qc = qec_bitflip_code()

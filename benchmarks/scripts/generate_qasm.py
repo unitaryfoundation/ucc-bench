@@ -5,16 +5,16 @@
 # Prepare an N-qubit GHZ state and select the all ones state.
 
 from write_qasm import write_qasm
-from cirq_circuits.circuits import cirq_prep_select
-from qiskit_circuits import qcnn_circuit, qaoa_ising_ansatz, qec_bitflip_code
-from numpy import log2, ceil
+from qiskit_circuits import qec_bitflip_code
 
 
 # ### QEC Bit-flip code (OpenQASM 3)
 bitflip_qc = qec_bitflip_code()
 
 filename = "bitflip_code_N3"
-write_qasm(bitflip_qc, circuit_name=filename, basis_gates=["rx", "cx", "measure"], version="3")
+write_qasm(
+    bitflip_qc, circuit_name=filename, basis_gates=["rx", "cx", "measure"], version="3"
+)
 
 # ### Prepare & Select
 # num_qubits = 25
@@ -48,4 +48,3 @@ write_qasm(bitflip_qc, circuit_name=filename, basis_gates=["rx", "cx", "measure"
 # filename = f"QAOA_Ising_ansatz_N{num_qubits}_{num_layers}layers"
 
 # write_qasm(circuit, circuit_name=filename, version="3")
-
