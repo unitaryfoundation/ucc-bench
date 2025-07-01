@@ -6,7 +6,7 @@ repos:
     # Run the linter first, as fixing will change files that need to be
     # formatted after
     - id: ruff
-      args: [ --fix ]
+      args: [ --fix  --all-files]
     # Run the formatter.
     - id: ruff-format
       args: [ --all-files]
