@@ -236,6 +236,7 @@ def initialize_qubits(
     circuit: QuantumCircuit, qreg_data: QuantumRegister
 ) -> QuantumCircuit:
     """Initialize qubit to |1>"""
+    circuit.reset(qreg_data[0])
     circuit.x(qreg_data[0])
     circuit.barrier(qreg_data)
     return circuit
@@ -259,6 +260,7 @@ def measure_syndrome_bit(circuit, qreg_data, qreg_measure, creg_measure, creg_sy
     avoid another round of qubit measurement if we used
     the `reset` instruction.
     """
+    circuit.barrier(*qreg_data, *qreg_measure)
     circuit.cx(qreg_data[0], qreg_measure[0])
     circuit.cx(qreg_data[1], qreg_measure[0])
     circuit.cx(qreg_data[0], qreg_measure[1])
@@ -300,15 +302,17 @@ def qec_bitflip_code(apply_correction=True, measure_all=False) -> QuantumCircuit
     qreg_measure = QuantumRegister(2)
     creg_data = ClassicalRegister(3, name="data")
     creg_syndrome = ClassicalRegister(2, name="syndrome")
+    creg_measure = ClassicalRegister(2, name="measure")
     state_data = qreg_data[0]
     ancillas_data = qreg_data[1:]
 
-    circuit = QuantumCircuit(qreg_data, qreg_measure, creg_data, creg_syndrome)
-
+    circuit = QuantumCircuit(
+        qreg_data, qreg_measure, creg_data, creg_syndrome, creg_measure
+    )
     circuit = initialize_qubits(circuit, qreg_data)
     circuit = encode_bit_flip(circuit, state_data, ancillas_data)
     circuit = measure_syndrome_bit(
-        circuit, qreg_data, qreg_measure, creg_syndrome, creg_syndrome
+        circuit, qreg_data, qreg_measure, creg_measure, creg_syndrome
     )
 
     if apply_correction:
