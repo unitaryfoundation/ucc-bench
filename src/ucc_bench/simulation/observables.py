@@ -223,12 +223,3 @@ def generate_qcnn_observable(num_qubits):
         pauli_strings.append("".join(pauli_string))
     qcnn_observable = SparsePauliOp(pauli_strings)
     return qcnn_observable
-
-
-@register.observable("bitflip_code")
-def bitflip_code_observable(num_qubits: int) -> Operator:
-    """
-    Observable for the QEC bit-flip code: measures Z on all data qubits (computational basis parity).
-    For 3-qubit code, this is equivalent to measuring ZZZ.
-    """
-    return Operator.from_label("Z" * num_qubits)
