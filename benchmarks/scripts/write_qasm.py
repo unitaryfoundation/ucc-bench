@@ -1,15 +1,12 @@
 import os
-
 from qbraid.transpiler import transpile as translate
 from qiskit import transpile as qiskit_transpile
-import pyqasm
 
 
 def write_qasm(
     circuit,
     circuit_name,
     version="2",
-    unroll=False,
     basis_gates=[],
     folder="../qasm_circuits",
 ):
@@ -23,15 +20,6 @@ def write_qasm(
 
     # Generate QASM string
     qasm_string = translate(decomp_circuit, "qasm" + version)
-
-    if unroll:
-        # Do semantic parsing and validation
-        module = pyqasm.loads(qasm_string)
-        module.validate()
-
-        # Unroll any conditionals or loops
-        module.unroll()
-        qasm_string = pyqasm.dumps(module)
 
     # Get the absolute path of the current script
     script_dir = os.path.dirname(os.path.abspath(__file__))
