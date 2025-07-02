@@ -1,0 +1,24 @@
+spec_version = "1.0"
+suite_version = "0.1"
+id = "dynamic_circuit_benchmarks"
+description = "Benchmarks to measure compiler performance on circuits containing dynamic operations"
+
+# --------- Compilers ----------
+# For now, restricting to qiskit derived compilers which support OpenQASM 3
+[[compilers]]
+id = "ucc"
+[[compilers]]
+id = "qiskit-default"
+
+# --------- Target Devices ----------
+[[target_devices]]
+id = "ibm_fake_washington"
+
+[[target_devices]]
+id = "ibm_fake_brooklyn"
+
+# --------- Benchmarks ----------
+[[benchmarks]]
+id = "bitflip_code"
+description = "3-qubit bit-flip code with measurements"
+qasm_file = "circuits/ucc/bitflip_code_N3_basis_rx_cx_measure.qasm"
