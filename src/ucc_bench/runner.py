@@ -15,6 +15,9 @@ import multiprocessing
 from qiskit.transpiler import Target
 from .utils import validate_circuit_gates
 
+# module-level logger that can be used before dispatching to worker processes
+logger = logging.getLogger(__name__)
+
 
 def run_task(
     compiler: BaseCompiler,
@@ -174,6 +177,11 @@ def run_suite(
                 continue
 
             compiler_cls = register.get_compiler(compiler.id)
+            if not compiler_cls.is_supported():
+                logger.warning(
+                    f"Compiler '{compiler.id}' is not supported on this platform. Skipping."
+                )
+                continue
             target_devices = suite.target_devices or [
                 None
             ]  # Default to None if no target devices specified

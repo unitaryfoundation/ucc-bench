@@ -27,6 +27,10 @@ if PYQPANDA3_AVAILABLE:
         """
 
         @classmethod
+        def is_supported(cls) -> bool:
+            return True
+
+        @classmethod
         def version(cls) -> str:
             return pyqpanda_version
 
@@ -63,6 +67,10 @@ else:
         """
         Placeholder for pyqpanda3 compiler on unsupported platforms.
         """
+
+        @classmethod
+        def is_supported(cls) -> bool:
+            return False
 
         @classmethod
         def version(cls) -> str:

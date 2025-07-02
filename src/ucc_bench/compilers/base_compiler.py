@@ -14,6 +14,14 @@ class BaseCompiler(ABC, Generic[CircuitType]):
     """
 
     @classmethod
+    def is_supported(cls) -> bool:
+        """
+        Check if the compiler is supported for the current environment.
+        Defaults to True, but can be overridden by subclasses
+        """
+        return True
+
+    @classmethod
     @abstractmethod
     def id(cls) -> str:
         """Return the id of the compiler; this will automatically be implemented
@@ -26,7 +34,6 @@ class BaseCompiler(ABC, Generic[CircuitType]):
         """Return the version of the compiler"""
         pass
 
-    @abstractmethod
     def qasm_to_native(self, qasm: str) -> CircuitType:
         """
         Convert a QASM string to the native circuit type of this compiler
@@ -36,7 +43,6 @@ class BaseCompiler(ABC, Generic[CircuitType]):
         """
         return transpile(qasm, self.id())
 
-    @abstractmethod
     def native_to_qasm(self, circuit: CircuitType) -> str:
         """
         Convert a native circuit to a QASM string
