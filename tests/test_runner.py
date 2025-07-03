@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
 
-from qiskit import QuantumCircuit
+from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 
 from ucc_bench.runner import run_task
 from ucc_bench.utils import validate_circuit_gates
@@ -13,6 +13,7 @@ from ucc_bench import registry
 def test_validate_circuit_gates_accepts_allowed_gates():
     qc = QuantumCircuit(2)
     qc.h(0)
+    qc.reset(0)
     qc.cx(0, 1)
     qc.rx(0.1, 0)
     qc.ry(0.2, 1)
@@ -20,6 +21,31 @@ def test_validate_circuit_gates_accepts_allowed_gates():
 
     # Should not raise
     validate_circuit_gates(qc)
+
+
+def test_validate_circuit_gates_accepts_classical_logic():
+    qreg = QuantumRegister(2)
+    creg = ClassicalRegister(1)
+    qc = QuantumCircuit(qreg, creg)
+
+    qc.barrier(0, 1)
+    qc.delay(100, 0)
+    qc.measure_all()
+    with qc.if_test((creg, 1)):
+        qc.x(qreg)
+
+    # Should not raise
+    validate_circuit_gates(qc)
+
+
+def test_validate_circuit_gates_rejects_disallowed_gates():
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.cx(0, 1)
+    qc.t(0)  # T gate is not in the allowed set
+
+    with pytest.raises(ValueError):
+        validate_circuit_gates(qc)
 
 
 def test_run_task_gate_check_passes(tmp_path: Path):
