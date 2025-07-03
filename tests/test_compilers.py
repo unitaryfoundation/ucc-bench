@@ -125,4 +125,4 @@ def test_cirq_benchmark_target_gateset_random_circuit():
     )
     # Check if the compiled circuit uses only the expected gates
     expected_gates = cirq.Gateset(cirq.CNOT, cirq.Rx, cirq.Ry, cirq.Rz, cirq.H)
-    assert expected_gates.validate(c_new), "Cirq compilation had unsupported gatges"
+    assert expected_gates.validate(c_new), "Cirq compilation had unsupported gates"

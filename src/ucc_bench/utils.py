@@ -30,7 +30,7 @@ def validate_circuit_gates(circuit, allowed_gates=None):
         and instr.operation.name
         not in {"measure", "barrier", "reset", "delay", "if_else"}
     }
-    print(invalid_gates)
+
     if invalid_gates:
         raise ValueError(
             f"Compiled circuit contained unsupported gates: {sorted(invalid_gates)}"
