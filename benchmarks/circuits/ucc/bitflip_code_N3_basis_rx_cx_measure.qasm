@@ -7,6 +7,8 @@ qubit[3] q0;
 qubit[2] q1;
 reset q0[0];
 rx(pi) q0[0];
+reset q0[1];
+reset q0[2];
 barrier q0[0], q0[1], q0[2];
 cx q0[0], q0[1];
 cx q0[0], q0[2];

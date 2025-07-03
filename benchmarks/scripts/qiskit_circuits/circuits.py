@@ -236,7 +236,6 @@ def initialize_qubits(
     circuit: QuantumCircuit, qreg_data: QuantumRegister
 ) -> QuantumCircuit:
     """Initialize qubit to |1>"""
-    circuit.reset(qreg_data[0])
     circuit.x(qreg_data[0])
     circuit.barrier(qreg_data)
     return circuit
@@ -309,7 +308,14 @@ def qec_bitflip_code(apply_correction=True, measure_all=False) -> QuantumCircuit
     circuit = QuantumCircuit(
         qreg_data, qreg_measure, creg_data, creg_syndrome, creg_measure
     )
+
+    # Reset the state and ancilla qubits to ensure a clean start
+    circuit.reset(state_data)
+    for ancilla in ancillas_data:
+        circuit.reset(ancilla)
+
     circuit = initialize_qubits(circuit, qreg_data)
+
     circuit = encode_bit_flip(circuit, state_data, ancillas_data)
     circuit = measure_syndrome_bit(
         circuit, qreg_data, qreg_measure, creg_measure, creg_syndrome
