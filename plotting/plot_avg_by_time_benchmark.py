@@ -9,7 +9,7 @@ from ucc_bench.results import (
     to_df_simulation_detailed,
 )
 
-from plotting.shared import calculate_abs_relative_error, get_compiler_colormap
+from shared import calculate_abs_relative_error, get_compiler_colormap
 
 
 def annotate_and_adjust(

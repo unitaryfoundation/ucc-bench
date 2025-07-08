@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from ucc_bench.results import SuiteResultsDatabase, to_df_timing, to_df_simulation
 
-from plotting.shared import calculate_abs_relative_error, get_compiler_colormap
+from shared import calculate_abs_relative_error, get_compiler_colormap
 
 BAR_WIDTH = 0.2
 

@@ -1,6 +1,6 @@
-import matplotlib.pyplot as plt
 from ucc_bench.registry import register
 import pandas as pd
+import seaborn as sns
 
 
 def calculate_abs_relative_error(
@@ -13,5 +13,5 @@ def calculate_abs_relative_error(
 def get_compiler_colormap() -> dict[str, tuple]:
     """Returns a dictionary mapping compiler names to unique colors."""
     compilers = register.get_compilers()
-    colormap = plt.get_cmap("tab10", len(compilers))
-    return {compiler: colormap(i) for i, compiler in enumerate(compilers)}
+    colormap = sns.color_palette("colorblind", n_colors=len(compilers))
+    return {compiler: colormap[i] for i, compiler in enumerate(compilers)}
