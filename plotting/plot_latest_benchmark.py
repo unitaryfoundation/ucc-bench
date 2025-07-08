@@ -11,9 +11,22 @@ BAR_WIDTH = 0.2
 
 
 def generate_plot(
-    df: pd.DataFrame, plot_configs: list[dict], latest_date: str, out_path: Path
+    df: pd.DataFrame,
+    plot_configs: list[dict],
+    latest_date: str,
+    out_path: Path,
+    use_pdf: bool = False,
 ):
     """Generic plotting function to create bar charts for benchmark data."""
+    # Configure matplotlib for LaTeX output if PDF export is requested
+    if use_pdf:
+        plt.rcParams.update(
+            {
+                "text.usetex": True,  # for matching math & fonts (optional)
+                "font.family": "serif",
+            }
+        )
+
     circuit_names = sorted(df["benchmark_id"].unique())
     x_positions = range(len(circuit_names))
     circuit_name_to_index = {name: i for i, name in enumerate(circuit_names)}
@@ -49,11 +62,13 @@ def generate_plot(
 
     plt.tight_layout()
     print(f"Saving plot to {out_path}")
-    fig.savefig(out_path)
+    fig.savefig(out_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 
-def plot_compilation(df: pd.DataFrame, latest_date: str, out_path: Path):
+def plot_compilation(
+    df: pd.DataFrame, latest_date: str, out_path: Path, use_pdf: bool = False
+):
     """Generates and saves plots for compilation benchmark data."""
     plot_configs = [
         {
@@ -67,10 +82,12 @@ def plot_compilation(df: pd.DataFrame, latest_date: str, out_path: Path):
             "ylabel": "Compiled Gate Count",
         },
     ]
-    generate_plot(df, plot_configs, latest_date, out_path)
+    generate_plot(df, plot_configs, latest_date, out_path, use_pdf)
 
 
-def plot_simulation(df: pd.DataFrame, latest_date: str, out_path: Path):
+def plot_simulation(
+    df: pd.DataFrame, latest_date: str, out_path: Path, use_pdf: bool = False
+):
     """Generates and saves plots for simulation benchmark data."""
     df_sim = df.copy()
     df_sim["rel_err_ideal"] = calculate_abs_relative_error(
@@ -92,7 +109,7 @@ def plot_simulation(df: pd.DataFrame, latest_date: str, out_path: Path):
             "ylabel": "Absolute Relative Error",
         },
     ]
-    generate_plot(df_sim, plot_configs, latest_date, out_path)
+    generate_plot(df_sim, plot_configs, latest_date, out_path, use_pdf)
 
 
 def main():
@@ -113,6 +130,11 @@ def main():
         default="all",
         help="Which plot(s) to generate.",
     )
+    parser.add_argument(
+        "--pdf",
+        action="store_true",
+        help="Export plots as PDF files with LaTeX formatting instead of PNG.",
+    )
     args = parser.parse_args()
 
     # --- Plot Compilation Benchmarks ---
@@ -132,12 +154,13 @@ def main():
         if "compile_time_ms" in df.columns:
             df["compile_time"] = df["compile_time_ms"] / 1000.0
 
+        file_ext = "pdf" if args.pdf else "png"
         out_path = (
             args.root_dir
             / args.runner_name
-            / "latest_compiler_benchmarks_by_circuit.png"
+            / f"latest_compiler_benchmarks_by_circuit.{file_ext}"
         )
-        plot_compilation(df, latest_date, out_path)
+        plot_compilation(df, latest_date, out_path, args.pdf)
 
     # --- Plot Simulation Benchmarks ---
     if args.plot in ["all", "simulation"]:
@@ -154,12 +177,13 @@ def main():
 
         df = to_df_simulation(suite_results)
 
+        file_ext = "pdf" if args.pdf else "png"
         out_path = (
             args.root_dir
             / args.runner_name
-            / "latest_simulation_benchmarks_by_circuit.png"
+            / f"latest_simulation_benchmarks_by_circuit.{file_ext}"
         )
-        plot_simulation(df, latest_date, out_path)
+        plot_simulation(df, latest_date, out_path, args.pdf)
 
 
 if __name__ == "__main__":
