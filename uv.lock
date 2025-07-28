@@ -144,7 +144,7 @@ wheels = [
 
 [[package]]
 name = "cirq"
-version = "1.5.0"
+version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cirq-aqt" },
@@ -155,24 +155,24 @@ dependencies = [
     { name = "cirq-web" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/db/d7/5dff0e4d5e697118c44b702da1bdcfc85a7822adb13d8a93c4d1fd23a06e/cirq-1.5.0-py3-none-any.whl", hash = "sha256:c710e5be35087a6d2457dcb1ecb93a0a492a98bb3b27e8a14b8a3a9ad14dca3c", size = 10916, upload-time = "2025-04-10T18:06:11.906Z" },
+    { url = "https://files.pythonhosted.org/packages/b8/be/5e98546f54a73546508340aedbfdbbe850d66bb6eb19519454184feaeaaf/cirq-1.6.0-py3-none-any.whl", hash = "sha256:640afd0fbe4a5e038b96da34ce3aa08c39b04aa0e4be1a155e8ed2b5db198984", size = 11079, upload-time = "2025-07-23T04:03:27.515Z" },
 ]
 
 [[package]]
 name = "cirq-aqt"
-version = "1.5.0"
+version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cirq-core" },
     { name = "requests" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/aa/f8/0b4b7a496d4fb1ec2ff675430d8c18b39896891f4bc7c34ff9d756fe5adf/cirq_aqt-1.5.0-py3-none-any.whl", hash = "sha256:c3bcb4251cff03e344cd6dc4744afe9bd1dfd84da5d9fde9413adfedf8c3cc36", size = 31983, upload-time = "2025-04-10T18:06:01.118Z" },
+    { url = "https://files.pythonhosted.org/packages/71/c4/5495fe4c23f22c9bc2c4aeb22de5c77d27a4ba8aab9be7c93256fae8d466/cirq_aqt-1.6.0-py3-none-any.whl", hash = "sha256:e3a29f681d0a4161af027c42479db8f98ab9af1bcbb45486c3e6947010e15f1f", size = 32234, upload-time = "2025-07-23T04:03:22.507Z" },
 ]
 
 [[package]]
 name = "cirq-core"
-version = "1.5.0"
+version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
@@ -188,12 +188,12 @@ dependencies = [
     { name = "typing-extensions" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/15/1e/ce461c2c75a029c47c10e0f2f95e0a694cedd4f2888b70b8e3fbcf806972/cirq_core-1.5.0-py3-none-any.whl", hash = "sha256:104a574c766011c979e897f0fb5e90eb69a2b58ec1dc389a73495e63124923d0", size = 1969788, upload-time = "2025-04-10T18:05:57.196Z" },
+    { url = "https://files.pythonhosted.org/packages/8b/bf/3a068a61c4a2d71b64cf1dda7aa8211dc91a23c84b7cf9c4439f3baea78a/cirq_core-1.6.0-py3-none-any.whl", hash = "sha256:0a5d5a53c8e4d82b0afcf59ebb47956b0df2c714f15ee1e1d36bccf7f33cc734", size = 2017366, upload-time = "2025-07-23T04:03:30.436Z" },
 ]
 
 [[package]]
 name = "cirq-google"
-version = "1.5.0"
+version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cirq-core" },
@@ -203,42 +203,42 @@ dependencies = [
     { name = "typedunits" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c4/19/c7d9ae022d5b899326cb10af436230a3bae7db3f3de31b83364e7c352d15/cirq_google-1.5.0-py3-none-any.whl", hash = "sha256:e8092a248a62fe130e14bc47830d63a6d26f4e586f9572de70dfd82c1cde70a5", size = 597497, upload-time = "2025-04-10T18:06:15.067Z" },
+    { url = "https://files.pythonhosted.org/packages/da/fa/165f7f16d58292ca46ef55b955085732c9f2dec600d0bcce9a0ee134416f/cirq_google-1.6.0-py3-none-any.whl", hash = "sha256:ed6e767fa944f7083e7749d24f25e8f64d6b05b5093f2d7fdf70947800d0368b", size = 670762, upload-time = "2025-07-23T04:03:25.017Z" },
 ]
 
 [[package]]
 name = "cirq-ionq"
-version = "1.5.0"
+version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cirq-core" },
     { name = "requests" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/81/1b/9e6fab8120a9cc56c9354edd175be3fd3d73d819123b8cccbc1c6fe4ed2c/cirq_ionq-1.5.0-py3-none-any.whl", hash = "sha256:00316ca8baf76fca1bd9ac7b48589858fbfadf3a8e5be22fa102e4714beec21a", size = 72010, upload-time = "2025-04-10T18:06:03.74Z" },
+    { url = "https://files.pythonhosted.org/packages/ad/cc/89595ac375a5a7fcb3d692a0791cf03e3d9a10779250426d516ec685027e/cirq_ionq-1.6.0-py3-none-any.whl", hash = "sha256:9a64a033a29266491cdf1851fee9a1d25616961e7b8e62bc928e71f31798aedf", size = 73491, upload-time = "2025-07-23T04:03:10.05Z" },
 ]
 
 [[package]]
 name = "cirq-pasqal"
-version = "1.5.0"
+version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cirq-core" },
     { name = "requests" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/46/c1/2d66eb8fd920c804736be056d9b712530edbc5e6a1bbd7644bbd9616c347/cirq_pasqal-1.5.0-py3-none-any.whl", hash = "sha256:cce81c59688612b07a01a1490b3a358a644a4e7c6cd23ce81255bf439800db06", size = 33762, upload-time = "2025-04-10T18:06:17.923Z" },
+    { url = "https://files.pythonhosted.org/packages/8b/1d/dca72ee84968900c06509f45a194a843a2ddd3cc10271f1dc2508dadb572/cirq_pasqal-1.6.0-py3-none-any.whl", hash = "sha256:a2cc64a641552b19bff094d75cfc0935616c62f7ef3dd8b29ba94893ffb62a93", size = 33912, upload-time = "2025-07-23T04:03:13.092Z" },
 ]
 
 [[package]]
 name = "cirq-web"
-version = "1.5.0"
+version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cirq-core" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cc/fe/b831f5640a5369538a78b9b661eaa735e72d02cd08aa74f026fb54b732c9/cirq_web-1.5.0-py3-none-any.whl", hash = "sha256:47b931a8c8dbebde4775c6e82dc404c178b7592a24456e485e43ae823660984e", size = 425059, upload-time = "2025-04-10T18:06:06.672Z" },
+    { url = "https://files.pythonhosted.org/packages/61/ae/6b7cb35bfb29455e3fbdfc1aef9b2d150efddfd910922d56ad65e909de95/cirq_web-1.6.0-py3-none-any.whl", hash = "sha256:0b6a90456ba3c2c9c74f88c5228197dad66d0120112d9277ffb3116e87927701", size = 430509, upload-time = "2025-07-23T04:03:17.588Z" },
 ]
 
 [[package]]
