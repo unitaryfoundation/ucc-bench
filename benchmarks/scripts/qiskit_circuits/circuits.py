@@ -57,7 +57,7 @@ def multi_control_circuit(num_qubits):
     """A circuit with multi-control X-gates
 
     Parameters:
-        N (int): Number of qubits
+        num_qubits (int): Number of qubits
 
     Returns:
         QuantumCircuit: Output circuit
