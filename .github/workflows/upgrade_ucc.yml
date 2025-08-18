@@ -37,7 +37,7 @@ jobs:
           echo "SHORT_UCC_SHA=$SHORT_UCC_SHA" >> $GITHUB_OUTPUT
 
       - name: Checkout ucc-bench
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: main
           ssh-key: ${{ secrets.DEPLOY_KEY }}

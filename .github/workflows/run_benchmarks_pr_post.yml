@@ -37,7 +37,7 @@ jobs:
       # Get the repository as of the main branch; we only need the script to post the comment
       # and intentionally do not want to get any non-reviewed code involved, since that code could
       # attempt to leak/misuse secrets
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: main
 
