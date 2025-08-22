@@ -83,7 +83,8 @@ def run_task(
     # Validate that the compiled circuit only contains the allowed basis gates.
     # This check occurs after timing so it does not affect measured compilation
     # performance.
-    validate_circuit_gates(compiled_circuit, {"rx", "ry", "rz", "h", "cx"})
+    if target_device is None:
+        validate_circuit_gates(compiled_circuit, {"rx", "ry", "rz", "h", "cx"})
 
     simulation_metrics = None
     if benchmark.simulate:
