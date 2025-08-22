@@ -21,7 +21,7 @@ placed here for users who want to run them on local results or customize the out
 
 - **Typical Use Cases:**
   - To visualize results from the latest official benchmark run.
-  - To plot results from a custom or local run by specifying a CSV file.
+  - To plot results from a custom or local run by specifying a CSV file. *Note that by default, results from local benchmark runs are saved in ucc/.local_results.
 
 ### 2. `plot_avg_by_time_benchmark.py`
 
