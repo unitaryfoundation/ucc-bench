@@ -276,6 +276,8 @@ class SuiteResultsDatabase:
         """
         Return the results with the most recent uid timestamp.
         """
+        if len(self._suite_results_time_ordered) == 0:
+            raise ValueError("No benchmark results were found")
         latest_result = self._suite_results_time_ordered[-1]
         return latest_result
 
