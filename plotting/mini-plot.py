@@ -5,10 +5,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_compiled_metrics(csv_path, compiled_ideal_line=False):
+def plot_compiled_metrics(
+    csv_path, compiled_ideal_line=False, uncompiled_noisy_line=False
+):
     """
     Plot compiled_ideal and compiled_noisy for each compiler and benchmark as subplots.
     If compiled_ideal_line is True, plot compiled_ideal as a horizontal line instead of a bar.
+    If uncompiled_noisy_line is True, plot uncompiled_noisy as a horizontal line instead of a bar.
     """
     df = pd.read_csv(csv_path)
     benchmarks = df["benchmark_id"].unique()
@@ -20,7 +23,7 @@ def plot_compiled_metrics(csv_path, compiled_ideal_line=False):
     axes = axes.flatten()
 
     bar_width = 0.25
-    group_gap = 0.5
+    group_gap = 0.15
     index = np.arange(len(compilers)) * (3 * bar_width + group_gap)
     # Use shared colormap for compilers
     compiler_colors = get_compiler_colormap()
@@ -45,23 +48,27 @@ def plot_compiled_metrics(csv_path, compiled_ideal_line=False):
                 )
             for j, compiler in enumerate(compilers):
                 base = index[j]
+                # Plot compiled_ideal as bar or line
                 if not compiled_ideal_line:
                     ax.bar(
                         base - bar_width,
                         bars_ideal[j],
                         bar_width,
-                        label="compiled_ideal" if j == 0 else "",
+                        label="ideal" if j == 0 else "",
                         color=compiler_colors.get(compiler, "#4C72B0"),
                         alpha=0.7,
                     )
-                ax.bar(
-                    base,
-                    bars_uncompiled_noisy[j],
-                    bar_width,
-                    label="uncompiled_noisy" if j == 0 else "",
-                    color=compiler_colors.get(compiler, "#55A868"),
-                    alpha=0.5,
-                )
+                # Plot uncompiled_noisy as bar or line
+                if not uncompiled_noisy_line:
+                    ax.bar(
+                        base,
+                        bars_uncompiled_noisy[j],
+                        bar_width,
+                        label="uncompiled_noisy" if j == 0 else "",
+                        color=compiler_colors.get(compiler, "#55A868"),
+                        alpha=0.5,
+                    )
+                # compiled_noisy always as bar
                 ax.bar(
                     base + bar_width,
                     bars_noisy[j],
@@ -71,15 +78,27 @@ def plot_compiled_metrics(csv_path, compiled_ideal_line=False):
                     alpha=1.0,
                     hatch="//",
                 )
+            # Draw horizontal line for compiled_ideal if requested
             if compiled_ideal_line:
-                # Draw horizontal line for compiled_ideal (should be same for all compilers)
                 ideal_val = bars_ideal[0] if bars_ideal else np.nan
                 ax.axhline(
                     ideal_val,
                     color="black",
                     linestyle="--",
                     linewidth=2,
-                    label="compiled_ideal",
+                    label="ideal",
+                )
+            # Draw horizontal line for uncompiled_noisy if requested
+            if uncompiled_noisy_line:
+                uncompiled_noisy_val = (
+                    bars_uncompiled_noisy[0] if bars_uncompiled_noisy else np.nan
+                )
+                ax.axhline(
+                    uncompiled_noisy_val,
+                    color="red",
+                    linestyle="--",
+                    linewidth=2,
+                    label="uncompiled_noisy",
                 )
             ax.set_xticks(index)
             ax.set_xticklabels(compilers, rotation=30)
@@ -140,7 +159,7 @@ def plot_relative_error(csv_path):
     plt.show()
 
 
-filename = "/Users/jordansullivan/UnitaryFoundation/ucc-bench/.local_results/Jordans-MacBook-Pro.local/simulation_benchmarks/20250923/20250923143451.3f7ae11a-a6df-47fa-bd17-b2df504bfd61.simulation.csv"
+filename = "/Users/jordansullivan/UnitaryFoundation/ucc-bench/.local_results/Jordans-MacBook-Pro.local/simulation_benchmarks/20250923/20250923144414.98be5c07-8a2a-40d4-9720-2ea4fdc23f7e.simulation.csv"
 
 # plot_relative_error(filename)
-plot_compiled_metrics(filename, compiled_ideal_line=True)
+plot_compiled_metrics(filename, compiled_ideal_line=True, uncompiled_noisy_line=True)
