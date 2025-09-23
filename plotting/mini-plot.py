@@ -1,8 +1,55 @@
-from shared import get_compiler_colormap
-
+import glob
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from shared import get_compiler_colormap
+
+
+def plot_compiled_ratio(csv_path):
+    """
+    Plot the ratio of compiled_multiq_gates/raw_multiq_gates for each compiler and benchmark as subplots.
+    """
+    df = pd.read_csv(csv_path)
+    benchmarks = df["benchmark_id"].unique()
+    compilers = df["compiler"].unique()
+    n_benchmarks = len(benchmarks)
+    ncols = 3
+    nrows = int(np.ceil(n_benchmarks / ncols))
+    # Compute ratio: compiled_multiq_gates / raw_multiq_gates
+    df["compiled_ratio"] = df["compiled_multiq_gates"] / df["raw_multiq_gates"]
+
+    fig, axes = plt.subplots(nrows, ncols, figsize=(5 * ncols, 4 * nrows), sharex=True)
+    axes = axes.flatten()
+    index = np.arange(len(compilers))
+    compiler_colors = get_compiler_colormap()
+
+    for i, ax in enumerate(axes):
+        if i < n_benchmarks:
+            benchmark = benchmarks[i]
+            sub = df[df["benchmark_id"] == benchmark]
+            ratios = []
+            for j, compiler in enumerate(compilers):
+                row = sub[sub["compiler"] == compiler]
+                ratios.append(
+                    row["compiled_ratio"].values[0] if not row.empty else np.nan
+                )
+                ax.bar(
+                    j,
+                    ratios[-1],
+                    color=compiler_colors.get(compiler, "#4C72B0"),
+                    width=0.5,
+                )
+            ax.set_xticks(index)
+            ax.set_xticklabels(compilers, rotation=30)
+            ax.set_title(f"Benchmark: {benchmark}")
+            ax.set_ylabel("Compiled Ratio (compiled/raw)")
+            # ax.set_yscale("log")
+        else:
+            ax.set_title("")
+    plt.suptitle("Compiled Ratio", fontsize=16)
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.show()
 
 
 def plot_compiled_metrics(
@@ -103,7 +150,8 @@ def plot_compiled_metrics(
             ax.set_xticks(index)
             ax.set_xticklabels(compilers, rotation=30)
             ax.set_title(f"Benchmark: {benchmark}")
-            ax.set_ylabel("Value")
+            ax.set_ylabel("Value (log scale)")
+            # ax.set_yscale("log")
             ax.legend()
         else:
             ax.set_title("")
@@ -152,6 +200,7 @@ def plot_relative_error(csv_path):
             ax.set_title(f"Benchmark: {benchmark}")
             ax.set_ylabel("Relative Error")
             ax.axhline(0, color="black", linewidth=0.8, linestyle="--")
+            # ax.set_yscale("log")
         else:
             ax.set_title("")
     plt.suptitle("Relative Error", fontsize=16)
@@ -159,7 +208,28 @@ def plot_relative_error(csv_path):
     plt.show()
 
 
-filename = "/Users/jordansullivan/UnitaryFoundation/ucc-bench/.local_results/Jordans-MacBook-Pro.local/simulation_benchmarks/20250923/20250923144414.98be5c07-8a2a-40d4-9720-2ea4fdc23f7e.simulation.csv"
+def get_latest_csv(search_dir, suffix):
+    files = glob.glob(os.path.join(search_dir, f"**/*{suffix}"), recursive=True)
+    if not files:
+        return None
+    files.sort(key=os.path.getmtime, reverse=True)
+    return files[0]
 
-plot_relative_error(filename)
-# plot_compiled_metrics(filename, compiled_ideal_line=True, uncompiled_noisy_line=True)
+
+if __name__ == "__main__":
+    base_dir = "/Users/jordansullivan/UnitaryFoundation/ucc-bench/.local_results/Jordans-MacBook-Pro.local/"
+    latest_sim = get_latest_csv(base_dir, ".simulation.csv")
+    latest_comp = get_latest_csv(base_dir, ".compilation.csv")
+
+    if latest_sim:
+        print(f"Plotting latest simulation file: {latest_sim}")
+        # plot_compiled_metrics(latest_sim, compiled_ideal_line=True, uncompiled_noisy_line=True)
+        # plot_relative_error(latest_sim)
+    else:
+        print("No simulation CSV found.")
+
+    if latest_comp:
+        print(f"Plotting latest compilation file: {latest_comp}")
+        plot_compiled_ratio(latest_comp)
+    else:
+        print("No compilation CSV found.")
