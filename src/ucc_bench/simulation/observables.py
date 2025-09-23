@@ -12,6 +12,7 @@ from math import sqrt
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Operator, Statevector, SparsePauliOp
 from qiskit_aer import AerSimulator
+from qiskit_aer.noise import NoiseModel
 import numpy as np
 from ..registry import register
 from ..results import SimulationMetrics
@@ -22,21 +23,23 @@ from ..results import SimulationMetrics
 # ----------------------------------------------------
 
 
-def simulate_density_matrix(circuit: QuantumCircuit, simulator: AerSimulator):
-    """Simulates the given quantum circuit using a density matrix simulator using the passed simulator and returns the density matrix."""
-    print(simulator.properties)
-    # Check the simulator is a density matrix simulator
-    if simulator.name != "aer_simulator_density_matrix":
-        raise ValueError("Simulator must be a density matrix simulator")
-
-    return simulator.run(circuit, shots=5000).result().data()["density_matrix"]
+def simulate_density_matrix_with_noise(
+    circuit: QuantumCircuit, noise_model: NoiseModel
+):
+    """Simulates the given quantum circuit using a density matrix simulator with a specified noise model."""
+    simulator = AerSimulator(
+        method="density_matrix",
+        noise_model=noise_model,
+        max_parallel_threads=1,
+    )
+    return simulator.run(circuit).result().data()["density_matrix"]
 
 
 def calc_expectation_value(
     observable: Operator,
     uncompiled_circuit: QuantumCircuit,
     compiled_circuit: QuantumCircuit,
-    simulator: AerSimulator,
+    noise_model: NoiseModel,
 ) -> SimulationMetrics:
     """Calculates the ideal and noisy expectation value of the observable for uncompiled and compiled circuits."""
 
@@ -50,8 +53,12 @@ def calc_expectation_value(
     uncompiled_circuit.save_density_matrix()
     compiled_circuit.save_density_matrix()
 
-    uncompiled_density_matrix = simulate_density_matrix(uncompiled_circuit, simulator)
-    compiled_density_matrix = simulate_density_matrix(compiled_circuit, simulator)
+    uncompiled_density_matrix = simulate_density_matrix_with_noise(
+        uncompiled_circuit, noise_model
+    )
+    compiled_density_matrix = simulate_density_matrix_with_noise(
+        compiled_circuit, noise_model
+    )
     uncompiled_noisy = np.real(uncompiled_density_matrix.expectation_value(observable))
     compiled_noisy = np.real(compiled_density_matrix.expectation_value(observable))
 

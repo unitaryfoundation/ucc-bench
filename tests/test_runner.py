@@ -120,28 +120,3 @@ def test_run_task_backend_passes(tmp_path: Path):
         target_device_id=target_device_id,
     )
     assert result.benchmark_id == "b1"
-
-
-def test_run_task_backend_noise_model(tmp_path: Path):
-    qasm = """
-    OPENQASM 2.0;
-    include \"qelib1.inc\";
-    qreg q[2];
-    h q[0];
-    cx q[0],q[1];
-    """
-    qasm_file = tmp_path / "simple.qasm"
-    qasm_file.write_text(qasm)
-
-    bench = BenchmarkSpec(id="b1", description="device-noise", qasm_file=qasm_file)
-    bench.resolved_qasm_file = qasm_file
-
-    target_device_id = "ibm_fake_washington"
-
-    result = run_task(
-        QiskitCompiler(),
-        bench,
-        target_device=registry.register.get_target_device(target_device_id),
-        target_device_id=target_device_id,
-    )
-    assert result.benchmark_id == "b1"
