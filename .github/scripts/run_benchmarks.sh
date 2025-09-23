@@ -82,4 +82,3 @@ run_bench() {
 # Run the benchmarks
 run_bench ./benchmarks/compilation_benchmarks.toml
 run_bench ./benchmarks/simulation_benchmarks.toml
-run_bench ./benchmarks/dynamic_circuit_benchmarks.toml
