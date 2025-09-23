@@ -4,7 +4,8 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [
-    { name = "Brad Chase", email = "brad@unitary.foundation" }
+    { name = "Brad Chase", email = "brad@unitary.foundation" },
+    { name = "Jordan Sullivan", email = "jordan@unitary.foundation" }
 ]
 requires-python = ">=3.12"
 dependencies = [
@@ -21,7 +22,6 @@ dependencies = [
     "adjusttext>=1.3.0",
     "qiskit-ibm-runtime>=0.40.1",
     "seaborn>=0.13.2",
-    "pre-commit>=4.3.0",
 ]
 
 [build-system]
