@@ -76,7 +76,7 @@ def plot_compiled_metrics(csv_path, compiled_ideal_line=False):
                 ideal_val = bars_ideal[0] if bars_ideal else np.nan
                 ax.axhline(
                     ideal_val,
-                    color="#4C72B0",
+                    color="black",
                     linestyle="--",
                     linewidth=2,
                     label="compiled_ideal",
@@ -140,7 +140,7 @@ def plot_relative_error(csv_path):
     plt.show()
 
 
-filename = "/Users/jordansullivan/UnitaryFoundation/ucc-bench/.local_results/Jordans-MacBook-Pro.local/simulation_benchmarks/20250923/20250923132910.88041582-295a-445d-a6e7-a3ce91596514.simulation.csv"
+filename = "/Users/jordansullivan/UnitaryFoundation/ucc-bench/.local_results/Jordans-MacBook-Pro.local/simulation_benchmarks/20250923/20250923143451.3f7ae11a-a6df-47fa-bd17-b2df504bfd61.simulation.csv"
 
 # plot_relative_error(filename)
 plot_compiled_metrics(filename, compiled_ideal_line=True)
