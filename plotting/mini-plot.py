@@ -6,6 +6,67 @@ import numpy as np
 from shared import get_compiler_colormap
 
 
+def plot_multiq_gate_counts(csv_path):
+    """
+    Plot compiled_multiq_gates and raw_multiq_gates side-by-side for each compiler and benchmark as subplots.
+    Compiled bars have hatch marks.
+    """
+    df = pd.read_csv(csv_path)
+    benchmarks = df["benchmark_id"].unique()
+    compilers = df["compiler"].unique()
+    n_benchmarks = len(benchmarks)
+    ncols = 3
+    nrows = int(np.ceil(n_benchmarks / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(5 * ncols, 4 * nrows), sharex=True)
+    axes = axes.flatten()
+    bar_width = 0.35
+    index = np.arange(len(compilers))
+    compiler_colors = get_compiler_colormap()
+
+    for i, ax in enumerate(axes):
+        if i < n_benchmarks:
+            benchmark = benchmarks[i]
+            sub = df[df["benchmark_id"] == benchmark]
+            compiled_counts = []
+            raw_counts = []
+            for compiler in compilers:
+                row = sub[sub["compiler"] == compiler]
+                compiled_counts.append(
+                    row["compiled_multiq_gates"].values[0] if not row.empty else np.nan
+                )
+                raw_counts.append(
+                    row["raw_multiq_gates"].values[0] if not row.empty else np.nan
+                )
+            for j, compiler in enumerate(compilers):
+                ax.bar(
+                    index[j] - bar_width / 2,
+                    raw_counts[j],
+                    bar_width,
+                    label="raw_multiq_gates" if j == 0 else "",
+                    color=compiler_colors.get(compiler, "#55A868"),
+                    alpha=0.7,
+                )
+                ax.bar(
+                    index[j] + bar_width / 2,
+                    compiled_counts[j],
+                    bar_width,
+                    label="compiled_multiq_gates" if j == 0 else "",
+                    color=compiler_colors.get(compiler, "#4C72B0"),
+                    alpha=0.7,
+                    hatch="//",
+                )
+            ax.set_xticks(index)
+            ax.set_xticklabels(compilers, rotation=30)
+            ax.set_title(f"Benchmark: {benchmark}")
+            ax.set_ylabel("Multi-Qubit Gate Count")
+            ax.legend()
+        else:
+            ax.set_title("")
+    plt.suptitle("Compiled vs Raw Multi-Qubit Gates", fontsize=16)
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.show()
+
+
 def plot_compiled_ratio(csv_path):
     """
     Plot the ratio of compiled_multiq_gates/raw_multiq_gates for each compiler and benchmark as subplots.
@@ -217,7 +278,7 @@ def get_latest_csv(search_dir, suffix):
 
 
 if __name__ == "__main__":
-    base_dir = "/Users/jordansullivan/UnitaryFoundation/ucc-bench/.local_results/Jordans-MacBook-Pro.local/"
+    base_dir = "/Users/jordansullivan/UnitaryFoundation/ucc-bench/.local_results/Jordans-MacBook-Pro.local/compilation_benchmarks"
     latest_sim = get_latest_csv(base_dir, ".simulation.csv")
     latest_comp = get_latest_csv(base_dir, ".compilation.csv")
 
@@ -231,5 +292,6 @@ if __name__ == "__main__":
     if latest_comp:
         print(f"Plotting latest compilation file: {latest_comp}")
         plot_compiled_ratio(latest_comp)
+        plot_multiq_gate_counts(latest_comp)
     else:
         print("No compilation CSV found.")
