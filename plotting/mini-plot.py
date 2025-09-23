@@ -76,7 +76,7 @@ def plot_compiled_metrics(
                     label="compiled_noisy" if j == 0 else "",
                     color=compiler_colors.get(compiler, "#DD8452"),
                     alpha=1.0,
-                    hatch="//",
+                    # hatch="//",ƒ
                 )
             # Draw horizontal line for compiled_ideal if requested
             if compiled_ideal_line:
@@ -122,9 +122,9 @@ def plot_relative_error(csv_path):
     ncols = 3
     nrows = int(np.ceil(n_benchmarks / ncols))
     # Compute relative error: (compiled_noisy - uncompiled_ideal) / uncompiled_ideal
-    df["relative_error"] = (df["uncompiled_ideal"] - df["compiled_noisy"]) / df[
-        "uncompiled_ideal"
-    ]
+    df["relative_error"] = abs(
+        (df["uncompiled_ideal"] - df["compiled_noisy"]) / df["uncompiled_ideal"]
+    )
 
     fig, axes = plt.subplots(nrows, ncols, figsize=(5 * ncols, 4 * nrows), sharex=True)
     axes = axes.flatten()
@@ -161,5 +161,5 @@ def plot_relative_error(csv_path):
 
 filename = "/Users/jordansullivan/UnitaryFoundation/ucc-bench/.local_results/Jordans-MacBook-Pro.local/simulation_benchmarks/20250923/20250923144414.98be5c07-8a2a-40d4-9720-2ea4fdc23f7e.simulation.csv"
 
-# plot_relative_error(filename)
-plot_compiled_metrics(filename, compiled_ideal_line=True, uncompiled_noisy_line=True)
+plot_relative_error(filename)
+# plot_compiled_metrics(filename, compiled_ideal_line=True, uncompiled_noisy_line=True)
