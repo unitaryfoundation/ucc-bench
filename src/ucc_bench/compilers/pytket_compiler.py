@@ -11,7 +11,7 @@ from pytket import Circuit as PytketCircuit
 from qbraid import transpile
 from ..registry import register
 from typing import Optional
-from qiskit.transpiler import Target
+from qiskit.providers import Backend
 
 
 @register.compiler("pytket-peep")
@@ -31,7 +31,7 @@ class PytketPeepCompiler(BaseCompiler[PytketCircuit]):
         return transpile(qasm, "pytket")
 
     def compile(
-        self, circuit: PytketCircuit, target_device: Optional[Target] = None
+        self, circuit: PytketCircuit, target_device: Optional[Backend] = None
     ) -> PytketCircuit:
         if target_device is not None:
             raise ValueError("Pytket benchmark does not support target devices yet.")

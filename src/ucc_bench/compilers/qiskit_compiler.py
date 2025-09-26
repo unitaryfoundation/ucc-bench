@@ -4,7 +4,7 @@ from qiskit import (
     transpile as qiskit_transpile,
     __version__ as qiskit_version,
 )
-from qiskit.transpiler import Target
+from qiskit.providers import Backend
 from typing import Optional
 from qbraid import transpile
 
@@ -28,14 +28,18 @@ class QiskitCompiler(BaseCompiler[QuantumCircuit]):
         return transpile(qasm, "qiskit")
 
     def compile(
-        self, circuit: QuantumCircuit, target_device: Optional[Target] = None
+        self, circuit: QuantumCircuit, target_device: Optional[Backend] = None
     ) -> QuantumCircuit:
-        return qiskit_transpile(
-            circuit,
-            optimization_level=3,
-            basis_gates=["rz", "rx", "ry", "h", "cx"],
-            coupling_map=target_device.build_coupling_map() if target_device else None,
-        )
+        if target_device is not None:
+            return qiskit_transpile(
+                circuit,
+                optimization_level=3,
+                backend=target_device,
+            )
+        else:
+            return qiskit_transpile(
+                circuit, optimization_level=3, basis_gates=["rz", "rx", "ry", "h", "cx"]
+            )
 
     def count_multi_qubit_gates(self, circuit: QuantumCircuit) -> int:
         return circuit.num_nonlocal_gates()
