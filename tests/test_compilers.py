@@ -76,6 +76,9 @@ def test_compiler(compiler_class, expected_circuit_type, expected_id, qasm_code)
     compiled_qasm = compiler.native_to_qasm(compiled_circuit)
     circuit_qiskit = transpile(qasm_code, "qiskit")
     compiled_circuit_qiskit = transpile(compiled_qasm, "qiskit")
+
+    print(Operator(circuit_qiskit))
+    print(Operator(compiled_circuit_qiskit))
     assert Operator(circuit_qiskit).equiv(Operator(compiled_circuit_qiskit), atol=1e-6)
 
 
