@@ -99,7 +99,7 @@ def run_task(
 
         if target_device is not None:
             # Use the noise model from the target device if available
-            noise_model = NoiseModel.from_backend(target_device.target)
+            noise_model = NoiseModel.from_backend(target_device)
             simulator = AerSimulator(method="density_matrix", noise_model=noise_model)
         else:
             # Use the standard depolarizing noise model if no target device
