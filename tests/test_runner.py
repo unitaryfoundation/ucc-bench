@@ -128,8 +128,8 @@ def test_run_task_backend_passes(tmp_path: Path):
     [
         (5, "ibm_fake_manila"),
         (7, "ibm_fake_jakarta"),
-        # (15, "ibm_fake_melbourne"),
-        (27, "ibm_fake_aukland"),
+        (15, "ibm_fake_melbourne"),
+        # (27, "ibm_fake_algiers"),
     ],
 )
 def test_run_task_backend_noise(tmp_path: Path, n: int, device_name: str):

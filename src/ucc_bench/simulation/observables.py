@@ -23,12 +23,7 @@ NUM_SHOTS = 5000
 
 
 def simulate_density_matrix(circuit: QuantumCircuit, simulator: AerSimulator):
-    """Simulates the given quantum circuit using a density matrix simulator using the passed simulator and returns the density matrix."""
-    print(simulator.properties)
-    # Check the simulator is a density matrix simulator
-    if simulator.name != "aer_simulator_density_matrix":
-        raise ValueError("Simulator must be a density matrix simulator")
-
+    """Simulates the given quantum circuit using the passed simulator and returns the density matrix."""
     return simulator.run(circuit, shots=NUM_SHOTS).result().data()["density_matrix"]
 
 
