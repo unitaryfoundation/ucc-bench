@@ -6,7 +6,7 @@ from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from ucc_bench.runner import run_task
 from ucc_bench.utils import validate_circuit_gates
 from ucc_bench.compilers import QiskitCompiler
-from ucc_bench.suite import BenchmarkSpec
+from ucc_bench.suite import BenchmarkSpec, SimulationSpec
 from ucc_bench import registry
 
 
@@ -133,7 +133,12 @@ def test_run_task_backend_noise_model(tmp_path: Path):
     qasm_file = tmp_path / "simple.qasm"
     qasm_file.write_text(qasm)
 
-    bench = BenchmarkSpec(id="b1", description="device-noise", qasm_file=qasm_file)
+    bench = BenchmarkSpec(
+        id="b1",
+        description="device-noise",
+        qasm_file=qasm_file,
+        simulate=SimulationSpec(measurement="heavy_output"),
+    )
     bench.resolved_qasm_file = qasm_file
 
     target_device_id = "ibm_fake_washington"

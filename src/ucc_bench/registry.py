@@ -2,7 +2,7 @@ from typing import Callable
 from qiskit.quantum_info import Operator
 from qiskit import QuantumCircuit
 from qiskit_aer import AerSimulator
-from qiskit.transpiler import Target
+from qiskit.providers import Backend
 
 # To avoid circular imports between this module and compilers,
 # only import the BaseCompiler class when type checking.
