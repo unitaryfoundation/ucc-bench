@@ -57,6 +57,7 @@ def run_task(
     raw_circuit = compiler.qasm_to_native(
         open(benchmark.resolved_qasm_file, "r").read()
     )
+
     end_transpile = datetime.now()
     logger.info(
         f"Finished transpiling. Duration: {(end_transpile - start_transpile).total_seconds()} seconds."

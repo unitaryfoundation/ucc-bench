@@ -1,7 +1,7 @@
 from .base_compiler import BaseCompiler
 from ..registry import register
 from typing import Optional
-from qiskit.transpiler import Target
+from qiskit.providers import Backend
 
 try:
     from pyqpanda3 import __version__ as pyqpanda_version
@@ -42,7 +42,7 @@ if PYQPANDA3_AVAILABLE:
             return convert_qprog_to_qasm(circuit)
 
         def compile(
-            self, circuit: QProg, target_device: Optional[Target] = None
+            self, circuit: QProg, target_device: Optional[Backend] = None
         ) -> QProg:
             if target_device is not None:
                 raise ValueError(

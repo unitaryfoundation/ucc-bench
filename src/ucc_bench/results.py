@@ -1,11 +1,14 @@
-from pydantic import BaseModel, computed_field
 from functools import cached_property
 from typing import List, Optional
 from datetime import datetime
 from pathlib import Path
+from collections import defaultdict
+
+from pydantic import BaseModel, computed_field
+
+
 from .suite import BenchmarkSuite
 import pandas as pd
-from collections import defaultdict
 
 
 class RunnerSpecs(BaseModel):
