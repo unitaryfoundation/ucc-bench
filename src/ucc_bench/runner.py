@@ -100,13 +100,15 @@ def run_task(
         if target_device is not None:
             # Use the noise model from the target device if available
             noise_model = NoiseModel.from_backend(target_device)
-            simulator = AerSimulator(method="density_matrix", noise_model=noise_model)
+            simulator = AerSimulator(
+                method="statevector", noise_model=noise_model, max_parallel_threads=8
+            )
         else:
             # Use the standard depolarizing noise model if no target device
             noise_model = create_depolarizing_noise_model(
                 raw_circuit_qiskit, compiled_circuit_qiskit
             )
-            simulator = AerSimulator(method="density_matrix", noise_model=noise_model)
+            simulator = AerSimulator(method="statevector", noise_model=noise_model)
 
         if register.has_observable(benchmark.simulate.measurement):
             observable = register.get_observable(benchmark.simulate.measurement)

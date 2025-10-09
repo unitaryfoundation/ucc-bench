@@ -124,9 +124,15 @@ def test_run_task_backend_passes(tmp_path: Path):
 
 # Parameterize over number of qubits and corresponding device
 @pytest.mark.parametrize(
-    "n, device_name", [(5, "ibm_fake_manila"), (7, "ibm_fake_jakarta")]
+    "n, device_name",
+    [
+        (5, "ibm_fake_manila"),
+        (7, "ibm_fake_jakarta"),
+        # (15, "ibm_fake_melbourne"),
+        (27, "ibm_fake_aukland"),
+    ],
 )
-def test_run_task_backend_noise_jakar(tmp_path: Path, n: int, device_name: str):
+def test_run_task_backend_noise(tmp_path: Path, n: int, device_name: str):
     qasm = f"""
 OPENQASM 2.0;
 include \"qelib1.inc\";
