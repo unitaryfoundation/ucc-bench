@@ -3,7 +3,7 @@ import cirq
 from typing import List, Optional
 import warnings
 from ..registry import register
-from qiskit.transpiler import Target
+from qiskit.providers import Backend
 
 
 class BenchmarkTargetGateset(cirq.TwoQubitCompilationTargetGateset):
@@ -106,7 +106,7 @@ class CirqCompiler(BaseCompiler[cirq.Circuit]):
         return cirq.__version__
 
     def compile(
-        self, circuit: cirq.Circuit, target_device: Optional[Target] = None
+        self, circuit: cirq.Circuit, target_device: Optional[Backend] = None
     ) -> cirq.Circuit:
         if target_device is not None:
             raise ValueError("Cirq benchmark does not support target devices yet.")

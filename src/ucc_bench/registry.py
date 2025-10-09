@@ -113,7 +113,7 @@ class Registry:
     ) -> Callable[[QuantumCircuit, QuantumCircuit, AerSimulator], float]:
         return self._output_metric[id]
 
-    def add_target_device(self, id: str, t: Target):
+    def add_target_device(self, id: str, t: Backend):
         """
         Add a given target device to the registry associated with the given id.
         """
@@ -126,7 +126,7 @@ class Registry:
     def has_target_device(self, id: str) -> bool:
         return id in self._target_devices
 
-    def get_target_device(self, id: str) -> Target:
+    def get_target_device(self, id: str) -> Backend:
         return self._target_devices[id]
 
 

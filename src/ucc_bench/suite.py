@@ -1,8 +1,10 @@
 import tomllib
 from pathlib import Path
+from typing import List, Optional
+
 from pydantic import BaseModel
 from pydantic import Field, model_validator, field_validator
-from typing import List, Optional
+
 
 from .registry import register
 
@@ -118,15 +120,13 @@ class BenchmarkSuite(BaseModel):
     def canonicalize_and_validate_qasm_paths(self):
         """Ensure all qasm_file paths are valid and relative to spec_path."""
         for benchmark in self.benchmarks:
-            # Resolve qasm_file relative to spec_path
             if benchmark.resolved_qasm_file is None:
                 benchmark.resolved_qasm_file = (
                     self.spec_path.parent / benchmark.qasm_file
                 )
-
-            # Check if the resolved path exists and is a file
             if not benchmark.resolved_qasm_file.is_file():
                 raise ValueError(
-                    f"qasm_file for benchmark '{benchmark.id}' does not point to a valid file: {benchmark.resolved_qasm_file}"
+                    "qasm_file for benchmark "
+                    f"'{benchmark.id}' does not point to a valid file: {benchmark.resolved_qasm_file}"
                 )
         return self

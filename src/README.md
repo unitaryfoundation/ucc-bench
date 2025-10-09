@@ -13,3 +13,11 @@ This document gives a high-level overview of the modules in `ucc-bench`
 * * `noise_models.py`: Defines functions to create noise models (currently a standard depolarizing model).
 * * `observables.py`: Provides functions to calculate expectation values and includes implementations of registered observables (computational_basis, qaoa).
 * * `heavy_output_prob.py`: Implements the Heavy Output Probability metric as a registered output metric.
+
+## Circuit Unoptimization
+
+We provide a dedicated suite at `benchmarks/compilation_benchmarks_unoptimized.toml`
+containing circuits that have already been processed by the "elementary" quantum
+unoptimization recipe (arXiv:2311.03805). The resulting QASM lives in
+`benchmarks/circuits/unoptimized`. If the recipe parameters change, regenerate the
+artefacts by running `uv run python benchmarks/scripts/generate_unoptimized_circuits.py`.

@@ -1,12 +1,18 @@
-import pytest
 from pathlib import Path
 from tempfile import TemporaryDirectory
+
+import numpy as np
+import pytest
+from qiskit import QuantumCircuit
+from qiskit.quantum_info import Operator
+
 from ucc_bench.suite import (
     BenchmarkSuite,
-    CompilerSpec,
     BenchmarkSpec,
+    CompilerSpec,
     TargetDeviceSpec,
 )
+from ucc_bench.unoptimization import unoptimize_circuit
 
 
 def test_validate_valid_suite():
@@ -129,3 +135,28 @@ def test_validate_unregistered_target_device():
                     )
                 ],
             )
+
+
+def test_unoptimization_preserves_unitary_and_introduces_complexity():
+    """Smoke test the unoptimization recipe on a seeded three-qubit circuit."""
+
+    qc = QuantumCircuit(3)
+    qc.h(0)
+    qc.cx(0, 1)
+    qc.cx(1, 2)
+    qc.h(2)
+
+    reference = Operator(qc).data
+
+    unoptimized = unoptimize_circuit(
+        qc,
+        iterations=1,
+        strategy="concatenated",
+        decomposition_method="default",
+        optimization_level=1,
+        seed=7,
+        synthesize=False,
+    )
+
+    assert unoptimized.size() > qc.size()
+    assert np.allclose(Operator(unoptimized).data, reference)
