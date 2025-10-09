@@ -20,11 +20,17 @@ id = "qiskit-default"
 id = "cirq"
 
 # --------- Target Devices ----------
+# 5 qubits
 [[target_devices]]
-id = "ibm_fake_washington"
+id = "ibm_fake_manila"
 
+# 7 qubits
 [[target_devices]]
-id = "ibm_fake_brooklyn"
+id = "ibm_fake_jakarta"
+
+# 15 qubits (currently too large to simulate)
+# [[target_devices]]
+# id = "ibm_fake_melbourne"
 
 # --------- Benchmarks ----------
 # Define the set of individual benchmarks
