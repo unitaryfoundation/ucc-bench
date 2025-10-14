@@ -1,6 +1,6 @@
 import tomllib
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 from pydantic import BaseModel
 from pydantic import Field, model_validator, field_validator
@@ -56,6 +56,37 @@ class TargetDeviceSpec(BaseModel):
         return value
 
 
+class GeneratorSpec(BaseModel):
+    """
+    Specification for a circuit generator function.
+
+    Attributes:
+        name: The name of the generator function, as defined in the registry.
+        params: A dictionary of parameters to pass to the generator function.
+    """
+
+    name: str
+    params: Dict[str, Any] = {}
+
+    @model_validator(mode="after")
+    def validate_generator_and_params(self):
+        """
+        Validates that the generator exists in the registry and that
+        the provided parameters match the generator's function signature.
+        """
+        if not register.has_generator(self.name):
+            raise ValueError(f"Unknown generator name: '{self.name}'")
+
+        # Now validate the parameters against the registered generator's signature
+        registry_spec = register.get_generator(self.name)
+        try:
+            registry_spec.validate_params(self.params)
+        except ValueError as e:
+            # Re-raise the validation error from the registry so pydantic can catch it.
+            raise e
+        return self
+
+
 class BenchmarkSpec(BaseModel):
     """
     Represents a specific benchmark (circuit+metrics) to run.
@@ -64,11 +95,19 @@ class BenchmarkSpec(BaseModel):
         id: The id of the benchmark, used to identify the benchmark
         description: A human-readable description of the benchmark
         qasm_file: The path to the QASM file containing the benchmark circuit. This path is relative to the spec file itself.
+        generator: Specification for a circuit generator function and associated arguments
+        resolved_qasm_file: The absolute path to the QASM file, resolved relative to the spec file.
+        simulate: An optional specification of how to simulate the circuit and what measurements to take
+
+    Note:
+        Either qasm_file or generator must be specified, but not both.
+        Resolved_qasm_file is populated automatically and should not be set by the user
     """
 
     id: str
     description: str
-    qasm_file: Path
+    qasm_file: Optional[Path] = None
+    generator: Optional[GeneratorSpec] = None
     resolved_qasm_file: Optional[Path] = None
     simulate: Optional[SimulationSpec] = None
 
@@ -120,13 +159,16 @@ class BenchmarkSuite(BaseModel):
     def canonicalize_and_validate_qasm_paths(self):
         """Ensure all qasm_file paths are valid and relative to spec_path."""
         for benchmark in self.benchmarks:
-            if benchmark.resolved_qasm_file is None:
-                benchmark.resolved_qasm_file = (
-                    self.spec_path.parent / benchmark.qasm_file
-                )
-            if not benchmark.resolved_qasm_file.is_file():
-                raise ValueError(
-                    "qasm_file for benchmark "
-                    f"'{benchmark.id}' does not point to a valid file: {benchmark.resolved_qasm_file}"
-                )
+            if (benchmark.qasm_file is None) == (benchmark.generator is None):
+                raise ValueError("Provide exactly one of 'qasm_file' or 'generator'.")
+            if benchmark.qasm_file is not None:
+                if benchmark.resolved_qasm_file is None:
+                    benchmark.resolved_qasm_file = (
+                        self.spec_path.parent / benchmark.qasm_file
+                    )
+                if not benchmark.resolved_qasm_file.is_file():
+                    raise ValueError(
+                        "qasm_file for benchmark "
+                        f"'{benchmark.id}' does not point to a valid file: {benchmark.resolved_qasm_file}"
+                    )
         return self
