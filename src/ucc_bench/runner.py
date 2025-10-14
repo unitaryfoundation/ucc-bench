@@ -155,6 +155,7 @@ def run_task(
         ),
         simulation_metrics=simulation_metrics,
         target_device_id=target_device_id,
+        benchmark_spec=benchmark,
     )
 
 

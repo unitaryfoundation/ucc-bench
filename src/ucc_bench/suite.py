@@ -145,8 +145,8 @@ class BenchmarkSuite(BaseModel):
 
     @model_validator(mode="after")
     def check_ids_unique(self):
-        """Check that ids are unique for compilers, benchmarks, and target_devices."""
-        for field in ["benchmarks", "compilers", "target_devices"]:
+        """Check that ids are unique for compilers, benchmarks and target_devices."""
+        for field in ["compilers", "benchmarks", "target_devices"]:
             items = getattr(self, field, [])
             set_ids = set()
             for item in items:
