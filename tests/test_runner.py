@@ -1,3 +1,4 @@
+from tempfile import TemporaryDirectory
 import pytest
 from pathlib import Path
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
@@ -5,7 +6,7 @@ from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from ucc_bench.runner import run_task
 from ucc_bench.utils import validate_circuit_gates
 from ucc_bench.compilers import QiskitCompiler
-from ucc_bench.suite import BenchmarkSpec, SimulationSpec
+from ucc_bench.suite import BenchmarkSpec, SimulationSpec, BenchmarkSuite, CompilerSpec
 from ucc_bench import registry
 
 
@@ -65,6 +66,9 @@ def test_run_task_gate_check_passes(tmp_path: Path):
         QiskitCompiler(), bench, target_device=None, target_device_id=None
     )
     assert result.benchmark_id == "b1"
+    assert result.target_device_id is None
+    assert result.benchmark_spec is not None
+    assert result.benchmark_spec.id == "b1"
 
 
 def test_run_task_gate_check_fails(tmp_path: Path):
@@ -157,3 +161,31 @@ def test_run_task_backend_noise(tmp_path: Path, device_name: str):
         target_device_id=device_name,
     )
     assert result.simulation_metrics.compiled_noisy is not None
+    assert result.target_device_id == device_name
+    assert result.benchmark_spec is not None
+    assert result.benchmark_spec.id == "b1"
+
+
+def test_validate_duplicate_benchmark_ids():
+    with TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+        qasm_file = temp_path / "valid.qasm"
+        qasm_file.touch()
+
+        with pytest.raises(ValueError, match="Duplicate benchmark id: bench1"):
+            BenchmarkSuite(
+                spec_path=temp_path / "suite.toml",
+                spec_version="1.0",
+                suite_version="1.0",
+                id="suite1",
+                description="A suite with duplicate benchmark IDs",
+                compilers=[CompilerSpec(id="ucc")],
+                benchmarks=[
+                    BenchmarkSpec(
+                        id="bench1", description="Benchmark 1", qasm_file=qasm_file
+                    ),
+                    BenchmarkSpec(
+                        id="bench1", description="Benchmark 2", qasm_file=qasm_file
+                    ),
+                ],
+            )

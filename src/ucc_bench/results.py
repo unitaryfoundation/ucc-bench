@@ -7,7 +7,7 @@ from collections import defaultdict
 from pydantic import BaseModel, computed_field
 
 
-from .suite import BenchmarkSuite
+from .suite import BenchmarkSuite, BenchmarkSpec
 import pandas as pd
 
 
@@ -72,6 +72,7 @@ class BenchmarkResult(BaseModel):
     compilation_metrics: Optional[CompilationMetrics] = None
     simulation_metrics: Optional[SimulationMetrics] = None
     target_device_id: Optional[str] = None
+    benchmark_spec: Optional[BenchmarkSpec] = None
 
 
 class SuiteResults(BaseModel):
