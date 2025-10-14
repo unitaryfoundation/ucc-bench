@@ -11,7 +11,9 @@ from ucc_bench.suite import (
     BenchmarkSpec,
     CompilerSpec,
     TargetDeviceSpec,
+    GeneratorSpec,
 )
+from ucc_bench.registry import register
 from ucc_bench.unoptimization import unoptimize_circuit
 
 
@@ -160,3 +162,45 @@ def test_unoptimization_preserves_unitary_and_introduces_complexity():
 
     assert unoptimized.size() > qc.size()
     assert np.allclose(Operator(unoptimized).data, reference)
+
+
+@pytest.fixture(scope="module")
+def registered_generators():
+    @register.generator("dummy_gen")
+    def dummy_gen(n, alpha=1, beta=2):
+        return QuantumCircuit(n)
+
+    @register.generator("required_param_gen")
+    def required_param_gen(n, gamma):
+        return QuantumCircuit(n)
+
+    yield  # --- tests run here ---
+
+    register.clear()
+
+
+@pytest.mark.usefixtures("registered_generators")
+class TestGeneratorSpecs:
+    def test_generatorspec_valid(self):
+        spec = GeneratorSpec(name="dummy_gen", params={"alpha": 5, "beta": 10})
+        # Should not raise
+        assert spec.name == "dummy_gen"
+        assert spec.params["alpha"] == 5
+        assert spec.params["beta"] == 10
+
+    def test_generatorspec_unknown_generator(self):
+        with pytest.raises(ValueError, match="Unknown generator name: 'not_a_gen'"):
+            GeneratorSpec(name="not_a_gen", params={})
+
+    def test_generatorspec_unknown_param(self):
+        with pytest.raises(
+            ValueError, match="Unknown parameter\(s\) for generator 'dummy_gen': foo"
+        ):
+            GeneratorSpec(name="dummy_gen", params={"foo": 1})
+
+    def test_generatorspec_missing_required_param(self):
+        with pytest.raises(
+            ValueError,
+            match="Missing required parameter for generator 'required_param_gen': gamma",
+        ):
+            GeneratorSpec(name="required_param_gen", params={})

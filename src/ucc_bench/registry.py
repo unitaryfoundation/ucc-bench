@@ -1,4 +1,6 @@
-from typing import Callable
+import inspect
+from dataclasses import dataclass, field
+from typing import Callable, Any, Dict
 from qiskit.quantum_info import Operator
 from qiskit import QuantumCircuit
 from qiskit_aer import AerSimulator
@@ -12,11 +14,131 @@ if TYPE_CHECKING:
     from .compilers.base_compiler import BaseCompiler
 
 
+#### Information for circuit generator functions that can take arbitrary params##
+@dataclass
+class ParameterSpec:
+    """Stores metadata about a single parameter of a generator function."""
+
+    name: str
+    annotation: Any
+    default: Any
+    required: bool
+
+
+@dataclass
+class GeneratorSpec:
+    """
+    Stores the generator function and metadata about its parameters,
+    captured at registration time.
+    """
+
+    id: str
+    func: Callable[..., QuantumCircuit]
+    size_param: str  # The name of the first parameter, e.g., 'n' for number of qubits
+    params: Dict[str, ParameterSpec] = field(default_factory=dict)
+
+    def validate_params(self, provided_params: Dict[str, Any]):
+        """
+        Validates a dictionary of parameters against the function's signature.
+        """
+        provided_keys = set(provided_params.keys())
+        expected_keys = set(self.params.keys())
+
+        # Check for unknown parameters
+        unknown_params = provided_keys - expected_keys
+        if unknown_params:
+            raise ValueError(
+                f"Unknown parameter(s) for generator '{self.id}': {', '.join(unknown_params)}. "
+                f"Available parameters are: {', '.join(expected_keys)}"
+            )
+
+        # Check for missing required parameters
+        for name, spec in self.params.items():
+            if spec.required and name not in provided_params:
+                raise ValueError(
+                    f"Missing required parameter for generator '{self.id}': {name}"
+                )
+
+
 class Registry:
-    _compilers = {}
-    _output_metric = {}
-    _observables = {}
-    _target_devices = {}
+    def __init__(self):
+        self._compilers = {}
+        self._output_metric = {}
+        self._observables = {}
+        self._target_devices = {}
+        self._generators = {}
+
+    def clear(self):
+        """Clears all registered items. Primarily for testing purposes."""
+        self._compilers.clear()
+        self._output_metric.clear()
+        self._observables.clear()
+        self._target_devices.clear()
+        self._generators.clear()
+
+    def generator(self, id: str):
+        """
+        Decorator to register a circuit generator function.
+
+        The decorated function's signature must have a single positional argument
+        representing the problem size (e.g., number of qubits), followed by
+        any number of keyword arguments.
+
+        This decorator inspects the function's signature to capture metadata
+        about its keyword arguments, which can be used later for validation.
+        """
+
+        def decorator(func: Callable[..., QuantumCircuit]):
+            if id in self._generators:
+                raise ValueError(f"Generator {id} is already registered.")
+
+            sig = inspect.signature(func)
+            params = list(sig.parameters.values())
+
+            if not params:
+                raise TypeError(
+                    f"Generator function '{func.__name__}' must have at least one "
+                    "parameter for problem size."
+                )
+
+            # The first parameter is considered the problem size argument.
+            size_param_name = params[0].name
+            spec = GeneratorSpec(id=id, func=func, size_param=size_param_name)
+
+            # The remaining parameters are treated as optional keyword arguments.
+            for p in params[1:]:
+                if p.kind not in (
+                    inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                    inspect.Parameter.KEYWORD_ONLY,
+                ):
+                    raise TypeError(
+                        f"Generator '{func.__name__}' optional parameters must be "
+                        f"keyword-addressable, but '{p.name}' is not."
+                    )
+
+                is_required = p.default is inspect.Parameter.empty
+                spec.params[p.name] = ParameterSpec(
+                    name=p.name,
+                    annotation=p.annotation
+                    if p.annotation is not inspect.Parameter.empty
+                    else Any,
+                    default=p.default if not is_required else None,
+                    required=is_required,
+                )
+
+            self._generators[id] = spec
+            return func
+
+        return decorator
+
+    def has_generator(self, id: str) -> bool:
+        return id in self._generators
+
+    def get_generator(self, id: str) -> GeneratorSpec:
+        """Returns the specification for the registered generator."""
+        if not self.has_generator(id):
+            raise ValueError(f"Generator '{id}' is not registered.")
+        return self._generators[id]
 
     def compiler(self, id: str):
         """
