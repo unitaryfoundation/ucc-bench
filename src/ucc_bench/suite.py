@@ -1,7 +1,7 @@
 import tomllib
 from pathlib import Path
 from typing import List, Optional, Dict, Any
-
+from qiskit import QuantumCircuit
 from pydantic import BaseModel
 from pydantic import Field, model_validator, field_validator
 
@@ -85,6 +85,16 @@ class GeneratorSpec(BaseModel):
             # Re-raise the validation error from the registry so pydantic can catch it.
             raise e
         return self
+
+    def uid(self) -> str:
+        """Generate a unique identifier for this generator spec based on its name and parameters."""
+        param_str = ",".join(f"{k}={v}" for k, v in sorted(self.params.items()))
+        return f"{self.name}({param_str})" if param_str else self.name
+
+    def generate_circuit(self) -> QuantumCircuit:
+        """Generate a QuantumCircuit using the specified generator and parameters."""
+        registry_spec = register.get_generator(self.name)
+        return registry_spec.func(**self.params)
 
 
 class BenchmarkSpec(BaseModel):
