@@ -8,3 +8,5 @@ from .pyqpanda3_compiler import (
     PyQPanda3Compiler as PyQPanda3Compiler,
     PYQPANDA3_AVAILABLE as PYQPANDA3_AVAILABLE,
 )
+
+DEFAULT_GATESET = {"rx", "ry", "rz", "h", "cx"}

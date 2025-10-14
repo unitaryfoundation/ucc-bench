@@ -6,12 +6,13 @@ import logging
 from logging import LoggerAdapter
 from concurrent.futures import ProcessPoolExecutor
 from .suite import BenchmarkSuite, BenchmarkSpec
-from .compilers import BaseCompiler
+from .compilers import BaseCompiler, DEFAULT_GATESET
 from .results import BenchmarkResult, CompilerInfo, CompilationMetrics
 from .registry import register
 from .simulation.observables import calc_expectation_value
 from .simulation.noise_models import create_depolarizing_noise_model
 from qbraid import transpile
+from qiskit import transpile as qiskit_transpile
 from time import perf_counter, process_time
 import multiprocessing
 from qiskit.transpiler import Target
@@ -19,6 +20,7 @@ from qiskit_aer import AerSimulator
 from qiskit_aer.noise import NoiseModel
 from .utils import validate_circuit_gates
 from concurrent.futures import as_completed
+from qiskit.qasm2 import dumps
 
 # module-level logger that can be used before dispatching to worker processes
 logger = logging.getLogger(__name__)
@@ -29,6 +31,7 @@ def run_task(
     benchmark: BenchmarkSpec,
     target_device: Optional[Target] = None,
     target_device_id: Optional[str] = None,
+    generated_circuit_cache: dict[str, str] = None,
 ) -> BenchmarkResult:
     """
     Run a single benchmark against the given compiler.
@@ -57,9 +60,12 @@ def run_task(
     )
 
     start_transpile = datetime.now()
-    raw_circuit = compiler.qasm_to_native(
-        open(benchmark.resolved_qasm_file, "r").read()
-    )
+    if benchmark.generator is None:
+        raw_circuit = compiler.qasm_to_native(
+            open(benchmark.resolved_qasm_file, "r").read()
+        )
+    else:
+        raw_circuit = compiler.qasm_to_native(generated_circuit_cache[benchmark.id])
 
     end_transpile = datetime.now()
     logger.info(
@@ -90,7 +96,7 @@ def run_task(
     # This check occurs after timing so it does not affect measured compilation
     # performance.
     if target_device is None:
-        validate_circuit_gates(compiled_circuit, {"rx", "ry", "rz", "h", "cx"})
+        validate_circuit_gates(compiled_circuit, DEFAULT_GATESET)
 
     simulation_metrics = None
     if benchmark.simulate:
@@ -197,6 +203,35 @@ def run_suite(
     results = []
     future_to_context = {}
 
+    generated_circuit_cache = {}
+    logging.info(f"Preparing to run benchmark suite '{suite.id}'")
+    logging.info("Generating circuits for benchmarks with generators")
+    for benchmark in suite.benchmarks:
+        if only_benchmark and benchmark.id != only_benchmark:
+            continue
+        if benchmark.generator:
+            start_gen = perf_counter()
+            generated_circuit = benchmark.generator.generate_circuit()
+            end_gen = perf_counter()
+            duration_gen = end_gen - start_gen
+            logging.info(
+                f"Generated circuit for benchmark '{benchmark.id}' in {duration_gen:.4f} seconds."
+            )
+            start_qasm = perf_counter()
+            generated_circuit_cache[benchmark.id] = dumps(
+                qiskit_transpile(
+                    generated_circuit, basis_gates=DEFAULT_GATESET, optimization_level=0
+                )
+            )
+            end_qasm = perf_counter()
+            duration_gen = end_qasm - start_qasm
+            logging.info(
+                f"Converted generated circuit to QASM for benchmark '{benchmark.id}' in {duration_gen:.4f} seconds."
+            )
+            logger.info(
+                f"Generated circuit is {len(generated_circuit_cache[benchmark.id]) / 1e6} megabytes."
+            )
+
     # Ensure that the multiprocessing module uses the 'spawn' method for creating new processes
     # This helps ensure consistency because each process will start with a fresh Python interpreter
     # versus a fork of the current one.
@@ -241,6 +276,7 @@ def run_suite(
                         benchmark,
                         target_device,
                         target_device_spec.id if target_device else None,
+                        generated_circuit_cache,
                     )
                     future_to_context[future] = {
                         "compiler_id": compiler.id,
