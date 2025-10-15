@@ -10,7 +10,7 @@ from .registry import register
 
 
 @register.generator("prep_select")
-def prep_select_circuit(N: int, target_state: int) -> QuantumCircuit:
+def prep_select_circuit(N: int, target_state: int = 1) -> QuantumCircuit:
     """
     Prepare a "preparation and selection" circuit on N qubits to select the target_state.
     This is like an oracle step in a Grover's search algorithm.

@@ -105,8 +105,7 @@ class Registry:
             size_param_name = params[0].name
             spec = GeneratorSpec(id=id, func=func, size_param=size_param_name)
 
-            # The remaining parameters are treated as optional keyword arguments.
-            for p in params[1:]:
+            for p in params:
                 if p.kind not in (
                     inspect.Parameter.POSITIONAL_OR_KEYWORD,
                     inspect.Parameter.KEYWORD_ONLY,
@@ -139,6 +138,12 @@ class Registry:
         if not self.has_generator(id):
             raise ValueError(f"Generator '{id}' is not registered.")
         return self._generators[id]
+
+    def get_generators(self) -> list[str]:
+        """
+        Returns a list of all registered generator ids.
+        """
+        return sorted(list(self._generators.keys()))
 
     def compiler(self, id: str):
         """

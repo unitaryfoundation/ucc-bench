@@ -19,13 +19,20 @@ def test_generator_registration_and_retrieval():
     assert isinstance(spec, GeneratorSpec)
     assert spec.id == "dummy_gen"
     assert spec.size_param == "N"
-    assert set(spec.params.keys()) == {"param1", "param2"}
+    assert set(spec.params.keys()) == {"N", "param1", "param2"}
     # Validate params
-    spec.validate_params({"param1": 5, "param2": 10})
+    spec.validate_params({"N": 3, "param1": 5, "param2": 10})
+
+    # extra/unknown parameter
     with pytest.raises(ValueError):
-        spec.validate_params({"param1": 5, "unknown": 1})
+        spec.validate_params({"N": 3, "param1": 5, "unknown": 1})
+
+    # N and param1 are required
     with pytest.raises(ValueError):
-        spec.validate_params({})  # param1 is required
+        spec.validate_params({})
+
+    with pytest.raises(ValueError):
+        spec.validate_params({"n": 3})
 
 
 def test_duplicate_generator_registration():
