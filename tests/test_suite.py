@@ -157,7 +157,7 @@ def registered_generators():
 @pytest.mark.usefixtures("registered_generators")
 class TestGeneratorSpecs:
     def test_generatorspec_valid(self):
-        spec = GeneratorSpec(name="dummy_gen", params={"alpha": 5, "beta": 10})
+        spec = GeneratorSpec(name="dummy_gen", params={"n": 3, "alpha": 5, "beta": 10})
         # Should not raise
         assert spec.name == "dummy_gen"
         assert spec.params["alpha"] == 5
@@ -171,11 +171,11 @@ class TestGeneratorSpecs:
         with pytest.raises(
             ValueError, match="Unknown parameter\(s\) for generator 'dummy_gen': foo"
         ):
-            GeneratorSpec(name="dummy_gen", params={"foo": 1})
+            GeneratorSpec(name="dummy_gen", params={"n": 3, "foo": 1})
 
     def test_generatorspec_missing_required_param(self):
         with pytest.raises(
             ValueError,
-            match="Missing required parameter for generator 'required_param_gen': gamma",
+            match="Missing required parameter for generator 'required_param_gen': n",
         ):
             GeneratorSpec(name="required_param_gen", params={})

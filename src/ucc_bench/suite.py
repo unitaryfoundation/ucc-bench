@@ -136,7 +136,7 @@ class BenchmarkSuite(BaseModel):
         benchmarks: A list of benchmarks to run
     """
 
-    spec_path: Path
+    spec_path: Optional[Path] = None
     spec_version: str
     suite_version: str
     id: str

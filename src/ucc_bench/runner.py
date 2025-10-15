@@ -20,7 +20,7 @@ from qiskit_aer import AerSimulator
 from qiskit_aer.noise import NoiseModel
 from .utils import validate_circuit_gates
 from concurrent.futures import as_completed
-from qiskit.qasm2 import dumps
+from qiskit.qasm3 import dumps
 
 # module-level logger that can be used before dispatching to worker processes
 logger = logging.getLogger(__name__)
