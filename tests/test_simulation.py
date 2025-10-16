@@ -57,8 +57,12 @@ def test_get_n_qubit_gateset_ignores_measurements():
 
 
 def test_generate_computational_basis_observable():
-    assert generate_computational_basis_observable(4) == Operator.from_label("ZZZZ")
-    assert generate_computational_basis_observable(6) == Operator.from_label("ZZZZZZ")
+    assert generate_computational_basis_observable(4) == SparsePauliOp.from_operator(
+        Operator.from_label("ZZZZ")
+    )
+    assert generate_computational_basis_observable(6) == SparsePauliOp.from_operator(
+        Operator.from_label("ZZZZZZ")
+    )
 
 
 def test_generate_qcnn_observable():
@@ -72,7 +76,7 @@ def test_generate_ghz_state_projector():
     expected = (
         1 / 2 * Operator([[1, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0], [1, 0, 0, 1]])
     )
-    assert generate_ghz_state_projector(2) == expected
+    assert generate_ghz_state_projector(2) == SparsePauliOp.from_operator(expected)
 
 
 def test_generate_uniform_superposition_projector():
