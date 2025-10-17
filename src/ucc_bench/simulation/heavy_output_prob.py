@@ -6,7 +6,6 @@ it is a metric on the distribution of measurement results.
 """
 
 from qiskit import QuantumCircuit
-from qiskit_aer.noise import NoiseModel
 from qiskit_aer import AerSimulator
 import numpy as np
 import math
@@ -22,8 +21,8 @@ NUM_SHOTS = 1024
 
 def get_heavy_bitstrings(circuit: QuantumCircuit) -> Set[str]:
     """Calculate the set of heavy bitstrings for a given circuit."""
-    # Don't use parallel threads to avoid issues in higher level parallelism
-    # in the benchmarks
+    # Don't use parallel threads to avoid issues in higher level parallelism in the benchmarks
+    # For Ideal simulation, no noise model
     simulator = AerSimulator(method="statevector", max_parallel_threads=1)
     result = simulator.run(circuit, shots=NUM_SHOTS).result()
     counts = list(result.get_counts().items())
@@ -32,14 +31,12 @@ def get_heavy_bitstrings(circuit: QuantumCircuit) -> Set[str]:
 
 
 def estimate_heavy_output_prob(
-    circuit: QuantumCircuit, noise_model: NoiseModel
+    circuit: QuantumCircuit, simulator: AerSimulator
 ) -> float:
     heavy_bitstrings = get_heavy_bitstrings(circuit)
-    simulator = AerSimulator(
-        method="statevector",
-        noise_model=noise_model,
-        max_parallel_threads=1,
-    )
+    if simulator is None:
+        # For Ideal simulation, no noise model
+        simulator = AerSimulator(method="statevector", max_parallel_threads=1)
     result = simulator.run(circuit, shots=NUM_SHOTS).result()
     heavy_counts = sum(
         result.get_counts().get(bitstring, 0) for bitstring in heavy_bitstrings
@@ -54,7 +51,7 @@ def estimate_heavy_output_prob(
 def calc_heavy_output_observables(
     uncompiled_circuit: QuantumCircuit,
     compiled_circuit: QuantumCircuit,
-    noise_model: NoiseModel,
+    simulator: AerSimulator,
 ) -> SimulationMetrics:
     # Ensure circuits are measured at the end to generate bitstrings
     uncompiled_circuit.measure_all()
@@ -62,8 +59,8 @@ def calc_heavy_output_observables(
 
     uncompiled_ideal = estimate_heavy_output_prob(uncompiled_circuit, None)
     compiled_ideal = estimate_heavy_output_prob(compiled_circuit, None)
-    uncompiled_noisy = estimate_heavy_output_prob(uncompiled_circuit, noise_model)
-    compiled_noisy = estimate_heavy_output_prob(compiled_circuit, noise_model)
+    uncompiled_noisy = estimate_heavy_output_prob(uncompiled_circuit, simulator)
+    compiled_noisy = estimate_heavy_output_prob(compiled_circuit, simulator)
 
     return SimulationMetrics(
         uncompiled_ideal=uncompiled_ideal,

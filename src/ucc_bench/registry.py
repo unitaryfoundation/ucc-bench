@@ -1,7 +1,7 @@
 from typing import Callable
 from qiskit.quantum_info import Operator
 from qiskit import QuantumCircuit
-from qiskit_aer.noise import NoiseModel
+from qiskit_aer import AerSimulator
 from qiskit.providers import Backend
 
 # To avoid circular imports between this module and compilers,
@@ -95,7 +95,7 @@ class Registry:
         """
 
         def decorator(
-            func: Callable[[QuantumCircuit, QuantumCircuit, NoiseModel], float],
+            func: Callable[[QuantumCircuit, QuantumCircuit, AerSimulator], float],
         ):
             if id in self._output_metric:
                 raise ValueError(f"Output metric {id} is already registered.")
@@ -110,7 +110,7 @@ class Registry:
 
     def get_output_metric(
         self, id: str
-    ) -> Callable[[QuantumCircuit, QuantumCircuit, NoiseModel], float]:
+    ) -> Callable[[QuantumCircuit, QuantumCircuit, AerSimulator], float]:
         return self._output_metric[id]
 
     def add_target_device(self, id: str, t: Backend):

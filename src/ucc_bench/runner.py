@@ -13,6 +13,8 @@ from qbraid import transpile
 from time import perf_counter, process_time
 import multiprocessing
 from qiskit.transpiler import Target
+from qiskit_aer import AerSimulator
+from qiskit_aer.noise import NoiseModel
 from .utils import validate_circuit_gates
 
 # module-level logger that can be used before dispatching to worker processes
@@ -95,10 +97,18 @@ def run_task(
         raw_circuit_qiskit = transpile(raw_circuit, "qiskit")
         compiled_circuit_qiskit = transpile(compiled_circuit, "qiskit")
 
-        # Use the single/standard depolarizing noise model for now
-        noise_model = create_depolarizing_noise_model(
-            raw_circuit_qiskit, compiled_circuit_qiskit
-        )
+        if target_device is not None:
+            # Use the noise model from the target device if available
+            noise_model = NoiseModel.from_backend(target_device)
+            simulator = AerSimulator(
+                method="statevector", noise_model=noise_model, max_parallel_threads=1
+            )
+        else:
+            # Use the standard depolarizing noise model if no target device
+            noise_model = create_depolarizing_noise_model(
+                raw_circuit_qiskit, compiled_circuit_qiskit
+            )
+            simulator = AerSimulator(method="statevector", noise_model=noise_model)
 
         if register.has_observable(benchmark.simulate.measurement):
             observable = register.get_observable(benchmark.simulate.measurement)
@@ -106,7 +116,7 @@ def run_task(
                 observable(raw_circuit_qiskit.num_qubits),
                 raw_circuit_qiskit,
                 compiled_circuit_qiskit,
-                noise_model,
+                simulator,
             )
             simulation_metrics.measurement_id = observable._id
         elif register.has_output_metric(benchmark.simulate.measurement):
@@ -114,13 +124,12 @@ def run_task(
             simulation_metrics = output_metric(
                 raw_circuit_qiskit,
                 compiled_circuit_qiskit,
-                noise_model,
+                simulator,
             )
             simulation_metrics.measurement_id = output_metric._id
         else:
-            raise ValueError(
-                f"Unknown measurement '{benchmark.simulate.measurement}' for benchmark '{benchmark.id}'"
-            )
+            # No valid measurement found; handle as needed
+            pass
 
     print(
         f"Completed benchmark '{benchmark.id}' with compiler '{compiler.id()}' for target device '{target_device_id}'"

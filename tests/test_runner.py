@@ -1,12 +1,11 @@
 import pytest
 from pathlib import Path
-
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 
 from ucc_bench.runner import run_task
 from ucc_bench.utils import validate_circuit_gates
 from ucc_bench.compilers import QiskitCompiler
-from ucc_bench.suite import BenchmarkSpec
+from ucc_bench.suite import BenchmarkSpec, SimulationSpec
 from ucc_bench import registry
 
 
@@ -120,3 +119,41 @@ def test_run_task_backend_passes(tmp_path: Path):
         target_device_id=target_device_id,
     )
     assert result.benchmark_id == "b1"
+
+
+# Parameterize over number of qubits and corresponding device
+@pytest.mark.parametrize(
+    "n, device_name",
+    [
+        (5, "ibm_fake_manila"),
+        (7, "ibm_fake_jakarta"),
+    ],
+)
+def test_run_task_backend_noise(tmp_path: Path, n: int, device_name: str):
+    qasm = f"""
+OPENQASM 2.0;
+include \"qelib1.inc\";
+qreg q[{n}];
+h q[0];
+cx q[0],q[1];
+"""
+    qasm_file = tmp_path / "simple.qasm"
+    qasm_file.write_text(qasm)
+
+    bench = BenchmarkSpec(
+        id="b1",
+        description="device-noise",
+        qasm_file=qasm_file,
+        simulate=SimulationSpec(measurement="computational_basis"),
+    )
+    bench.resolved_qasm_file = qasm_file
+
+    target_device_id = device_name
+
+    result = run_task(
+        QiskitCompiler(),
+        bench,
+        target_device=registry.register.get_target_device(target_device_id),
+        target_device_id=target_device_id,
+    )
+    assert result.simulation_metrics.compiled_noisy is not None
