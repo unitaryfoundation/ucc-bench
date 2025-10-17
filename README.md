@@ -58,6 +58,8 @@ Here, if not specified as a command line argument, `uid` is randomly generated U
 
 When run as a GitHub action for the standard results, we expect this to be the Git hash of the and Git hash date of the corresponding commit.
 
+By default, if an individual benchmark in the suite fails for some reason, an error will be printed but the remaining benchmarks will run and save their results. To fail the entire run on a single benchmark failure, set the `--strict` flag.
+
 ### Common Workflows
 
 #### Adding a New Compiler

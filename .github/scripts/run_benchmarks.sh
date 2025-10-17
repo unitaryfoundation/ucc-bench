@@ -75,6 +75,8 @@ run_bench() {
     --log_level INFO \
     -o $out_dir \
     --runner_name "$runner_name" \
+    --strict \
+    --log-stderr \
     ${ucc_hash:+--ucc_hash "$ucc_hash"} \
     ${ucc_commit_date:+--ucc_time "$ucc_commit_date"}
 }
