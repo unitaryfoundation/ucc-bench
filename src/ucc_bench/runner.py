@@ -1,3 +1,4 @@
+import traceback
 from typing import List, Optional
 from datetime import datetime
 import logging
@@ -14,6 +15,7 @@ from time import perf_counter, process_time
 import multiprocessing
 from qiskit.transpiler import Target
 from .utils import validate_circuit_gates
+from concurrent.futures import as_completed
 
 # module-level logger that can be used before dispatching to worker processes
 logger = logging.getLogger(__name__)
@@ -131,6 +133,7 @@ def run_task(
         benchmark_id=benchmark.id,
         run_start=start_compile_dt,
         run_end=end_compile_dt,
+        failed=False,
         compilation_metrics=CompilationMetrics(
             compilation_time_ms=wall_time * 1000,
             raw_multiq_gates=compiler.count_multi_qubit_gates(raw_circuit),
@@ -157,12 +160,13 @@ def run_suite(
     only_compiler: Optional[str] = None,
     only_benchmark: Optional[str] = None,
     only_target_device: Optional[str] = None,
+    strict: bool = False,
 ) -> List[BenchmarkResult]:
     """
     Run an entire benchmark suite against all compilers specified in the suite and return the results.
     """
     results = []
-    tasks = []
+    future_to_context = {}
 
     # Ensure that the multiprocessing module uses the 'spawn' method for creating new processes
     # This helps ensure consistency because each process will start with a fresh Python interpreter
@@ -202,18 +206,62 @@ def run_suite(
                         continue
 
                     # Submit tasks to the executor
-                    tasks.append(
-                        executor.submit(
-                            run_task,
-                            compiler_cls(),
-                            benchmark,
-                            target_device,
-                            target_device_spec.id if target_device else None,
-                        )
+                    future = executor.submit(
+                        run_task,
+                        compiler_cls(),
+                        benchmark,
+                        target_device,
+                        target_device_spec.id if target_device else None,
+                    )
+                    future_to_context[future] = {
+                        "compiler_id": compiler.id,
+                        "compiler_version": compiler_cls().version(),
+                        "benchmark_id": benchmark.id,
+                        "target_device": target_device_spec.id
+                        if target_device
+                        else None,
+                    }
+
+        for future in as_completed(future_to_context):
+            context = future_to_context[future]
+            try:
+                result = future.result()
+                results.append(result)
+            except Exception as e:
+                if strict:
+                    raise RuntimeError(f"Error in task with context: {context}") from e
+                else:
+                    tb = e.__traceback__
+                    last_frame = traceback.extract_tb(tb)[-1]
+                    filename = last_frame.filename
+                    lineno = last_frame.lineno
+
+                    error_location = f"in {filename}:{lineno}"
+                    # print full error to log with traceback
+                    logging.error(
+                        f"Task failed for context: {context}. Error: '{e}'",
+                        exc_info=True,
                     )
 
-        # Collect results as tasks complete
-        for future in tasks:
-            results.append(future.result())
+                    # print summary to console
+                    print(
+                        f"Task failed for context: {context}. "
+                        f"Continuing in non-strict mode. Error: '{e}' {error_location}"
+                    )
+                    results.append(
+                        BenchmarkResult(
+                            compiler=CompilerInfo(
+                                id=context["compiler_id"],
+                                version=context["compiler_version"],
+                            ),
+                            benchmark_id=context["benchmark_id"],
+                            run_start=datetime.now(),
+                            run_end=datetime.now(),
+                            failed=True,
+                            compilation_metrics=None,
+                            simulation_metrics=None,
+                            target_device_id=context["target_device"],
+                        )
+                    )
 
     return results

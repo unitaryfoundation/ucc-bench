@@ -68,7 +68,8 @@ class BenchmarkResult(BaseModel):
     benchmark_id: str
     run_start: datetime
     run_end: datetime
-    compilation_metrics: CompilationMetrics
+    failed: Optional[bool] = False
+    compilation_metrics: Optional[CompilationMetrics] = None
     simulation_metrics: Optional[SimulationMetrics] = None
     target_device_id: Optional[str] = None
 
@@ -145,6 +146,7 @@ def to_df_timing(suite_results: SuiteResults) -> pd.DataFrame:
             "compiled_multiq_gates": result.compilation_metrics.compiled_multiq_gates,
         }
         for result in suite_results.results
+        if not result.failed
     ]
     # Create a Pandas DataFrame and write it to a CSV file
     df = pd.DataFrame(timing_data)
@@ -166,6 +168,7 @@ def to_df_timing_detailed(suite_results: SuiteResults) -> pd.DataFrame:
             "uid_timestamp": suite_results.metadata.uid_timestamp,
         }
         for result in suite_results.results
+        if not result.failed
     ]
     df = pd.DataFrame(timing_data)
     df["uid_timestamp"] = pd.to_datetime(df["uid_timestamp"], utc=True)
@@ -187,7 +190,7 @@ def to_df_simulation(suite_results: SuiteResults) -> pd.DataFrame:
             "compiled_noisy": result.simulation_metrics.compiled_noisy,
         }
         for result in suite_results.results
-        if result.simulation_metrics
+        if not result.failed and result.simulation_metrics
     ]
     df = pd.DataFrame(measurement_data)
     return df
@@ -210,7 +213,7 @@ def to_df_simulation_detailed(suite_results: SuiteResults) -> pd.DataFrame:
             "uid_timestamp": suite_results.metadata.uid_timestamp,
         }
         for result in suite_results.results
-        if result.simulation_metrics
+        if not result.failed and result.simulation_metrics
     ]
     df = pd.DataFrame(measurement_data)
     df["uid_timestamp"] = pd.to_datetime(df["uid_timestamp"], utc=True)
