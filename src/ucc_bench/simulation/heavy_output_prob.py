@@ -5,6 +5,7 @@ The implementation differs from other metrics that calculate an expected value b
 it is a metric on the distribution of measurement results.
 """
 
+from typing import Optional
 from qiskit import QuantumCircuit
 from qiskit_aer import AerSimulator
 import numpy as np
@@ -31,7 +32,7 @@ def get_heavy_bitstrings(circuit: QuantumCircuit) -> Set[str]:
 
 
 def estimate_heavy_output_prob(
-    circuit: QuantumCircuit, simulator: AerSimulator
+    circuit: QuantumCircuit, simulator: Optional[AerSimulator]
 ) -> float:
     heavy_bitstrings = get_heavy_bitstrings(circuit)
     if simulator is None:
