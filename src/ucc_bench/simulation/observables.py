@@ -17,7 +17,6 @@ import numpy as np
 from ..registry import register
 from ..results import SimulationMetrics
 
-NUM_SHOTS = 1024
 # ----------------------------------------------------
 # Simulation functions to calculate expectation values
 # ----------------------------------------------------
@@ -25,7 +24,11 @@ NUM_SHOTS = 1024
 
 def simulate_density_matrix(circuit: QuantumCircuit, simulator: AerSimulator):
     """Simulates the given quantum circuit using the passed simulator and returns the density matrix."""
-    return simulator.run(circuit, shots=NUM_SHOTS).result().data()["density_matrix"]
+    return (
+        simulator.run(circuit, method="density_matrix")
+        .result()
+        .data()["density_matrix"]
+    )
 
 
 def calc_expectation_value(

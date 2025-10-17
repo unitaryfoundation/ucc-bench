@@ -123,20 +123,23 @@ def test_run_task_backend_passes(tmp_path: Path):
 
 # Parameterize over number of qubits and corresponding device
 @pytest.mark.parametrize(
-    "n, device_name",
+    "device_name",
     [
-        (5, "ibm_fake_manila"),
-        (7, "ibm_fake_jakarta"),
+        "ibm_fake_manila",  # 5 qubits
+        "ibm_fake_jakarta",  # 7 qubits
+        "ibm_fake_melbourne",  # 15 qubits
     ],
 )
-def test_run_task_backend_noise(tmp_path: Path, n: int, device_name: str):
+def test_run_task_backend_noise(tmp_path: Path, device_name: str):
+    target_device = registry.register.get_target_device(device_name)
+    num_qubits = target_device.num_qubits
     qasm = f"""
-OPENQASM 2.0;
-include \"qelib1.inc\";
-qreg q[{n}];
-h q[0];
-cx q[0],q[1];
-"""
+    OPENQASM 2.0;
+    include \"qelib1.inc\";
+    qreg q[{num_qubits}];
+    h q[0];
+    cx q[0],q[1];
+    """
     qasm_file = tmp_path / "simple.qasm"
     qasm_file.write_text(qasm)
 
@@ -148,12 +151,10 @@ cx q[0],q[1];
     )
     bench.resolved_qasm_file = qasm_file
 
-    target_device_id = device_name
-
     result = run_task(
         QiskitCompiler(),
         bench,
-        target_device=registry.register.get_target_device(target_device_id),
-        target_device_id=target_device_id,
+        target_device=target_device,
+        target_device_id=device_name,
     )
     assert result.simulation_metrics.compiled_noisy is not None
