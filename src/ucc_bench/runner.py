@@ -108,7 +108,9 @@ def run_task(
             noise_model = create_depolarizing_noise_model(
                 raw_circuit_qiskit, compiled_circuit_qiskit
             )
-            simulator = AerSimulator(method="statevector", noise_model=noise_model)
+            simulator = AerSimulator(
+                method="statevector", noise_model=noise_model, max_parallel_threads=1
+            )
 
         if register.has_observable(benchmark.simulate.measurement):
             observable = register.get_observable(benchmark.simulate.measurement)
