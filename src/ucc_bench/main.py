@@ -86,6 +86,12 @@ def main() -> None:
         help="Timestamp of commit of UCC being tested. This is used to track the version of UCC being benchmarked.",
     )
 
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="If set, the run of the benchmark suite will fail if any individual benchmark fails.",
+    )
+
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -106,6 +112,7 @@ def main() -> None:
         only_compiler=args.only_compiler,
         only_benchmark=args.only_benchmark,
         only_target_device=args.only_target_device,
+        strict=args.strict,
     )
     run_end = datetime.now()
 
