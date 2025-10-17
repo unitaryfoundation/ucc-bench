@@ -8,6 +8,7 @@ use in the benchmarking framework. The observables should be defined as function
 in the circuit as an argument and return a Qiskit Operator representing the observable to measure.
 """
 
+from typing import Union
 from math import sqrt
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Operator, Statevector, SparsePauliOp
@@ -28,7 +29,7 @@ def simulate_density_matrix(circuit: QuantumCircuit, simulator: AerSimulator):
 
 
 def calc_expectation_value(
-    observable: Operator,
+    observable: Union[Operator, SparsePauliOp],
     uncompiled_circuit: QuantumCircuit,
     compiled_circuit: QuantumCircuit,
     simulator: AerSimulator,
@@ -75,7 +76,7 @@ def generate_computational_basis_observable(
 
 
 @register.observable("ghz_state_projector")
-def generate_ghz_state_projector(num_qubits: int) -> Operator:
+def generate_ghz_state_projector(num_qubits: int) -> SparsePauliOp:
     """Generates the projector for the GHZ state |0...0> + |1...1>."""
     ghz_state = Statevector.from_label("0" * num_qubits) + Statevector.from_label(
         "1" * num_qubits
