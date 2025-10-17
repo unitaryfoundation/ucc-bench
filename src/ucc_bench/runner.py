@@ -130,8 +130,10 @@ def run_task(
             )
             simulation_metrics.measurement_id = output_metric._id
         else:
-            # No valid measurement found; handle as needed
-            pass
+            # No valid measurement found; raise an explicit error
+            raise ValueError(
+                f"Unknown measurement type '{benchmark.simulate.measurement}' for benchmark '{benchmark.id}'."
+            )
 
     print(
         f"Completed benchmark '{benchmark.id}' with compiler '{compiler.id()}' for target device '{target_device_id}'"
