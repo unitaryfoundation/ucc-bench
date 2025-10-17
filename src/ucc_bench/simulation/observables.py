@@ -82,8 +82,8 @@ def calc_expectation_value(
 @register.observable("computational_basis")
 def generate_computational_basis_observable(
     num_qubits: int,
-) -> Operator:
-    return Operator.from_label("Z" * num_qubits)
+) -> SparsePauliOp:
+    return SparsePauliOp.from_list([("Z" * num_qubits, 1.0)])
 
 
 @register.observable("ghz_state_projector")
@@ -93,7 +93,7 @@ def generate_ghz_state_projector(num_qubits: int) -> Operator:
         "1" * num_qubits
     )
     ghz_state /= np.sqrt(2)
-    return ghz_state.to_operator()
+    return SparsePauliOp.from_operator(ghz_state.to_operator())
 
 
 @register.observable("uniform_superposition_projector")
