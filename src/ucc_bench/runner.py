@@ -1,3 +1,4 @@
+import sys
 import traceback
 from typing import List, Optional
 from datetime import datetime
@@ -157,19 +158,33 @@ def run_task(
     )
 
 
-def configure_worker_logging(log_level):
+def configure_worker_logging(log_config: dict):
     """
-    Configure logging for worker processes.
+    Configure logging for worker processes based on config from main process.
     """
-    logging.basicConfig(
-        level=log_level,
-        format="%(asctime)s [%(levelname)s] %(module)s [%(processName)s]: %(message)s",
-    )
+    # Use a more detailed format for workers to see which process logged
+    log_format = "%(asctime)s [%(levelname)s] %(module)s [%(processName)s]: %(message)s"
+
+    config_kwargs = {
+        "level": log_config.get("level", "WARNING"),
+        "format": log_format,
+    }
+
+    if "stderr" in log_config and log_config["stderr"]:
+        config_kwargs["stream"] = sys.stderr
+    elif "filename" in log_config:
+        config_kwargs["filename"] = log_config.get("filename")
+        config_kwargs["filemode"] = "a"
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
+
+    logging.basicConfig(**config_kwargs)
 
 
 def run_suite(
     suite: BenchmarkSuite,
     num_parallel: int,
+    log_config: dict = None,
     only_compiler: Optional[str] = None,
     only_benchmark: Optional[str] = None,
     only_target_device: Optional[str] = None,
@@ -189,7 +204,7 @@ def run_suite(
     with ProcessPoolExecutor(
         max_workers=num_parallel,
         initializer=configure_worker_logging,
-        initargs=(logging.getLogger().level,),
+        initargs=(log_config,),
     ) as executor:
         for compiler in suite.compilers:
             if only_compiler and compiler.id != only_compiler:
