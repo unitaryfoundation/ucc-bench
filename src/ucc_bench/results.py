@@ -98,6 +98,26 @@ class SuiteResults(BaseModel):
         return {result.compiler.id: result.compiler.version for result in self.results}
 
 
+def out_path(
+    root_dir: Path,
+    runner_name: str,
+    suite_id: str,
+    uid_timestamp: datetime,
+    uid: str,
+    file_suffix: str,
+) -> Path:
+    """
+    Get the root output path for the benchmark results.
+    """
+    return (
+        root_dir
+        / runner_name
+        / suite_id
+        / uid_timestamp.strftime("%Y%m%d")
+        / f"{uid_timestamp.strftime('%Y%m%d%H%M%S')}.{uid}.{file_suffix}"
+    )
+
+
 def out_path_for_results(
     suite_results: SuiteResults, root_dir: Path, file_suffix: str
 ) -> Path:
@@ -107,15 +127,14 @@ def out_path_for_results(
     The output directory is organized by slowly varying dimensions for easier loading
     and comparison, so will be in the path {out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.{file_suffix}
     """
-    uid_timestamp = suite_results.metadata.uid_timestamp
-    out_dir = (
-        root_dir
-        / suite_results.metadata.runner_name
-        / suite_results.suite_specification.id
-        / uid_timestamp.strftime("%Y%m%d")
-        / f"{uid_timestamp.strftime('%Y%m%d%H%M%S')}.{suite_results.metadata.uid}.{file_suffix}"
+    return out_path(
+        root_dir,
+        suite_results.metadata.runner_name,
+        suite_results.suite_specification.id,
+        suite_results.metadata.uid_timestamp,
+        suite_results.metadata.uid,
+        file_suffix,
     )
-    return out_dir
 
 
 def save_results_json(suite_results: SuiteResults, root_dir: Path) -> None:

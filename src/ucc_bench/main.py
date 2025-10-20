@@ -13,6 +13,7 @@ from ucc_bench.results import (
     SuiteResults,
     RunnerSpecs,
     Metadata,
+    out_path,
     save_results_json,
     save_results_csv,
 )
@@ -64,6 +65,16 @@ def main() -> None:
         help="Logging level for the application. Options: DEBUG, INFO, WARNING, ERROR, CRITICAL. Defaults to 'WARNING'.",
     )
     parser.add_argument(
+        "--log-file",
+        help="Path to save the log file. If not provided, defaults to 'ucc_bench_run.log' next to the result files.",
+        default=None,
+    )
+    parser.add_argument(
+        "--log-stderr",
+        action="store_true",
+        help="Force logging to stderr instead of a file.",
+    )
+    parser.add_argument(
         "--only_compiler",
         help="Run benchmarks only for the specified compiler.",
     )
@@ -94,21 +105,51 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=args.log_level.upper(),
-        format="%(asctime)s [%(levelname)s] %(module)s: %(message)s",
-    )
-
     suite = BenchmarkSuite.load_toml(args.spec_path)
+    uid_timestamp = args.uid_timestamp or datetime.now()
+    uid = args.uid or str(uuid.uuid4())
 
+    # Configure logging
+    log_level = args.log_level.upper()
+    log_format = "%(asctime)s [%(levelname)s] %(module)s: %(message)s"
+
+    log_config = {
+        "level": log_level,
+        "format": log_format,
+    }
+
+    if args.log_stderr:
+        log_config["stream"] = sys.stderr
+
+    elif args.log_file:
+        log_config["filename"] = args.log_file
+        log_config["filemode"] = "w"
+
+    else:
+        log_filename = out_path(
+            Path(args.out), args.runner_name, suite.id, uid_timestamp, uid, "log"
+        )
+        log_filename.parent.mkdir(parents=True, exist_ok=True)
+        log_config["filename"] = str(log_filename)
+        log_config["filemode"] = "w"
+    logging.basicConfig(**log_config)
+
+    if "stream" in log_config:
+        log_config.pop("stream")
+        log_config["stderr"] = True
+
+    ### Run the benchmark suite
     run_start = datetime.now()
     num_parallel = (
         int(args.parallel) if args.parallel else psutil.cpu_count(logical=False)
     )
     print(f"Running benchmark suite '{suite.id}' with {num_parallel} parallel tasks")
+    print(f"Saving log to {log_config.get('filename', 'stdout')}")
+
     benchmark_results = run_suite(
         suite,
         num_parallel,
+        log_config=log_config,
         only_compiler=args.only_compiler,
         only_benchmark=args.only_benchmark,
         only_target_device=args.only_target_device,
@@ -119,8 +160,8 @@ def main() -> None:
     results = SuiteResults(
         suite_specification=suite,
         metadata=Metadata(
-            uid=args.uid or str(uuid.uuid4()),
-            uid_timestamp=args.uid_timestamp or datetime.now(),
+            uid=uid,
+            uid_timestamp=uid_timestamp,
             run_start=run_start,
             run_end=run_end,
             runner_name=args.runner_name,
@@ -132,7 +173,9 @@ def main() -> None:
         ),
         results=benchmark_results,
     )
-    logger.info(f"Finished running benchmark suite '{suite.id}'")
+    logger.info(
+        f"Finished running benchmark suite '{suite.id}', log in '{log_config.get('filename', 'stdout')}'"
+    )
 
     save_results_json(results, Path(args.out))
     save_results_csv(results, Path(args.out))
