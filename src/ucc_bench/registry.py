@@ -103,6 +103,7 @@ class Registry:
 
             # The first parameter is considered the problem size argument.
             size_param_name = params[0].name
+            assert size_param_name == "N"
             spec = GeneratorSpec(id=id, func=func, size_param=size_param_name)
 
             for p in params:
