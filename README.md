@@ -2,7 +2,7 @@
 
 ## Overview
 
-`ucc-bench` is a command-line utility designed to benchmark and compare the performance of various quantum compilers, with a particular focus on the [`ucc` compiler](https://github.com/unitaryfoundation/ucc). It allows users to define benchmark suites consisting of quantum circuits (provided as QASM files) and run them against a configurable set of compilers (e.g., UCC, Qiskit, Cirq, PyTket).
+`ucc-bench` is a command-line utility designed to benchmark and compare the performance of various quantum compilers, with a particular focus on the [`ucc` compiler](https://github.com/unitaryfoundation/ucc). It allows users to define benchmark suites consisting of quantum circuits (provided as QASM files or generated at runtime) and run them against a configurable set of compilers (e.g., UCC, Qiskit, Cirq, PyTket).
 
 The suite measures key performance indicators such as compilation time and the number of multi-qubit gates in the compiled circuits. Optionally, it can simulate the circuits (both original and compiled versions) under idealized and noisy conditions (using a depolarizing noise model) to evaluate the impact of compilation on execution fidelity.
 
@@ -29,7 +29,7 @@ See the [`uv` docs](https://docs.astral.sh/uv/) for information on installing `u
 ## Usage (Running a benchmark suite)
 
 Benchmarks are defined as a TOML file. The top-level `benchmarks` directory contains
-benchmark specifications. Today that includes `compilation_benchmarks.toml`, `layout_benchmarks.toml`, and `simulation_benchmarks.toml`.
+benchmark specifications. Today that includes `compilation_benchmarks.toml`, `layout_benchmarks.toml`, and `simulation_benchmarks.toml` as initial examples.
 
 Benchmark suites are run using the `ucc-bench` utility (which is an entry to `ucc_bench.main:main`). To
 see invocation options, you can run the command below
@@ -177,14 +177,32 @@ file to indicate a change occured, as the results may no longer be comparable to
 Currently, the only place this version is referenced is in the post comments PR, as diffing may not be meaningful.
 But in the future, other reporting workflows may need to handle changes to benchmarks.
 
-As an example, suppose you want to add a new circuit to an existing benchmark. You would
+##### Adding a new QASM based circuit
+As an example, suppose you have a new QASM circuit you want to add to an existing benchmark. You would
 1. Add the QASM for that circuit to the corresponding benchmarks/circuits directory. If you have a python script that you used to generate the circuit, add that to the benchmarks/scripts directory.
-2. Edit the corresponding benchmarks `.toml` file to add a a new stanze for the benchmark, e.g.
+2. Edit the corresponding benchmarks `.toml` file to add a a new stanza for the benchmark, e.g.
 ```toml
 [[benchmarks]]
 id = "my_new_benchmark"
 description = "New Benchmark"
 qasm_file = "circuits/path_to/new_benchmark.qasm"
+```
+
+##### Adding a new generated circuit
+Alternatively, you might have a new circuit that you will generate algorithmically at runtime. To do this, you would
+1. Add the code for generating the circuit the `generators.py` module of `ucc-bench`. The interface would be like
+```python
+@register.generator("my-circuit")
+def my_circuit(N:int, **kwargs) -> QuantumCircuit:
+    pass
+```
+where `N` is the number of qubits and sets the problem size, and then `kwargs` can be any additional configuration parameters.
+2. Edit the corresponding benchmarks `.toml` file to add a a new stanza for the benchmark, e.g.
+```toml
+[[benchmarks]]
+id = "my_new_benchmark"
+description = "New Benchmark"
+generator = { name = "my-circuit", params = { N = 50 } }
 ```
 
 ## Standard UCC Benchmark Results
