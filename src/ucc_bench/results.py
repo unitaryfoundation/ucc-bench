@@ -155,25 +155,6 @@ def save_results_json(suite_results: SuiteResults, root_dir: Path) -> None:
 
 
 def to_df_timing(suite_results: SuiteResults) -> pd.DataFrame:
-    """Return a DataFrame of the timing results from the benchmark suite."""
-    timing_data = [
-        {
-            "compiler": result.compiler.id,
-            "benchmark_id": result.benchmark_id,
-            "target_device_id": result.target_device_id,
-            "raw_multiq_gates": result.compilation_metrics.raw_multiq_gates,
-            "compile_time_ms": result.compilation_metrics.compilation_time_ms,
-            "compiled_multiq_gates": result.compilation_metrics.compiled_multiq_gates,
-        }
-        for result in suite_results.results
-        if not result.failed
-    ]
-    # Create a Pandas DataFrame and write it to a CSV file
-    df = pd.DataFrame(timing_data)
-    return df
-
-
-def to_df_timing_detailed(suite_results: SuiteResults) -> pd.DataFrame:
     """Return a DataFrame of the timing results from the benchmark suite with
     detailed data about compiler version and timestamps."""
     timing_data = [
@@ -186,6 +167,9 @@ def to_df_timing_detailed(suite_results: SuiteResults) -> pd.DataFrame:
             "compiled_multiq_gates": result.compilation_metrics.compiled_multiq_gates,
             "compiler_version": result.compiler.version,
             "uid_timestamp": suite_results.metadata.uid_timestamp,
+            "num_qubits": result.benchmark_spec.num_qubits()
+            if result.benchmark_spec and result.benchmark_spec.num_qubits()
+            else None,
         }
         for result in suite_results.results
         if not result.failed
@@ -208,35 +192,18 @@ def to_df_simulation(suite_results: SuiteResults) -> pd.DataFrame:
             "compiled_ideal": result.simulation_metrics.compiled_ideal,
             "uncompiled_noisy": result.simulation_metrics.uncompiled_noisy,
             "compiled_noisy": result.simulation_metrics.compiled_noisy,
-        }
-        for result in suite_results.results
-        if not result.failed and result.simulation_metrics
-    ]
-    df = pd.DataFrame(measurement_data)
-    return df
-
-
-def to_df_simulation_detailed(suite_results: SuiteResults) -> pd.DataFrame:
-    """Return a DataFrame of the simulation results from the benchmark suite."""
-
-    measurement_data = [
-        {
-            "compiler": result.compiler.id,
-            "benchmark_id": result.benchmark_id,
-            "target_device_id": result.target_device_id,
-            "measurement_id": result.simulation_metrics.measurement_id,
-            "uncompiled_ideal": result.simulation_metrics.uncompiled_ideal,
-            "compiled_ideal": result.simulation_metrics.compiled_ideal,
-            "uncompiled_noisy": result.simulation_metrics.uncompiled_noisy,
-            "compiled_noisy": result.simulation_metrics.compiled_noisy,
             "compiler_version": result.compiler.version,
             "uid_timestamp": suite_results.metadata.uid_timestamp,
+            "num_qubits": result.benchmark_spec.num_qubits()
+            if result.benchmark_spec and result.benchmark_spec.num_qubits()
+            else None,
         }
         for result in suite_results.results
         if not result.failed and result.simulation_metrics
     ]
     df = pd.DataFrame(measurement_data)
-    df["uid_timestamp"] = pd.to_datetime(df["uid_timestamp"], utc=True)
+    if len(df) > 0:
+        df["uid_timestamp"] = pd.to_datetime(df["uid_timestamp"], utc=True)
     return df
 
 
@@ -298,12 +265,12 @@ class SuiteResultsDatabase:
         """
         return self._suite_results_by_uid.get(uid, None)
 
-    def get_latest(self) -> SuiteResults:
+    def get_latest(self) -> Optional[SuiteResults]:
         """
         Return the results with the most recent uid timestamp.
         """
         if len(self._suite_results_time_ordered) == 0:
-            raise ValueError("No benchmark results were found")
+            return None
         latest_result = self._suite_results_time_ordered[-1]
         return latest_result
 

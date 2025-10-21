@@ -121,6 +121,16 @@ class BenchmarkSpec(BaseModel):
     resolved_qasm_file: Optional[Path] = None
     simulate: Optional[SimulationSpec] = None
 
+    def num_qubits(self) -> Optional[int]:
+        """
+        Return the number of qubits in the benchmark circuit.
+        Only returns a value if the circuit is generated via a generator spec.
+        """
+        if self.generator is not None:
+            return self.generator.params.get("N", 0)
+        else:
+            return None
+
 
 class BenchmarkSuite(BaseModel):
     """

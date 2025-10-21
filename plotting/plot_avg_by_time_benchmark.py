@@ -5,8 +5,8 @@ import matplotlib
 from pathlib import Path
 from ucc_bench.results import (
     SuiteResultsDatabase,
-    to_df_timing_detailed,
-    to_df_simulation_detailed,
+    to_df_timing,
+    to_df_simulation,
 )
 
 from shared import calculate_abs_relative_error, get_compiler_colormap
@@ -229,6 +229,7 @@ def patch_legacy_data(df, root_dir, runner_name):
     df_legacy["benchmark_id"] = df_legacy["circuit_name"]
     df_legacy["uid_timestamp"] = pd.to_datetime(df_legacy["date"], utc=True)
     df_legacy["target_device_id"] = None
+    df_legacy["num_qubits"] = None
     df_legacy = df_legacy[df.columns]
     df_legacy.sort_values("uid_timestamp", inplace=True)
 
@@ -244,7 +245,7 @@ def plot_compilation_over_time(root_dir, runner_name):
         root_dir, runner_name, "compilation_benchmarks"
     )
     timing_results = timing_results_db.get_versions_changed()
-    df = pd.concat((to_df_timing_detailed(d) for d in timing_results))
+    df = pd.concat((to_df_timing(d) for d in timing_results))
 
     df = patch_legacy_data(df, root_dir, runner_name)
     df = df[df["uid_timestamp"] > "2024-12-16"]
@@ -340,7 +341,7 @@ def plot_simulation_over_time(root_dir, runner_name):
         print("No simulation benchmark data found.")
         return
 
-    df = pd.concat((to_df_simulation_detailed(d) for d in sim_results))
+    df = pd.concat((to_df_simulation(d) for d in sim_results))
     df = df[df["uid_timestamp"] > "2025-06-01"]
 
     # Compute relative errors

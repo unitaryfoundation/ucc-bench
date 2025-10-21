@@ -142,12 +142,12 @@ def test_unoptimization_preserves_unitary_and_introduces_complexity():
 @pytest.fixture(scope="module")
 def registered_generators():
     @register.generator("dummy_gen")
-    def dummy_gen(n, alpha=1, beta=2):
-        return QuantumCircuit(n)
+    def dummy_gen(N, alpha=1, beta=2):
+        return QuantumCircuit(N)
 
     @register.generator("required_param_gen")
-    def required_param_gen(n, gamma):
-        return QuantumCircuit(n)
+    def required_param_gen(N, gamma):
+        return QuantumCircuit(N)
 
     yield  # --- tests run here ---
 
@@ -157,7 +157,7 @@ def registered_generators():
 @pytest.mark.usefixtures("registered_generators")
 class TestGeneratorSpecs:
     def test_generatorspec_valid(self):
-        spec = GeneratorSpec(name="dummy_gen", params={"n": 3, "alpha": 5, "beta": 10})
+        spec = GeneratorSpec(name="dummy_gen", params={"N": 3, "alpha": 5, "beta": 10})
         # Should not raise
         assert spec.name == "dummy_gen"
         assert spec.params["alpha"] == 5
@@ -171,11 +171,11 @@ class TestGeneratorSpecs:
         with pytest.raises(
             ValueError, match="Unknown parameter\(s\) for generator 'dummy_gen': foo"
         ):
-            GeneratorSpec(name="dummy_gen", params={"n": 3, "foo": 1})
+            GeneratorSpec(name="dummy_gen", params={"N": 3, "foo": 1})
 
     def test_generatorspec_missing_required_param(self):
         with pytest.raises(
             ValueError,
-            match="Missing required parameter for generator 'required_param_gen': n",
+            match="Missing required parameter for generator 'required_param_gen': N",
         ):
             GeneratorSpec(name="required_param_gen", params={})
