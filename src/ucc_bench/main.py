@@ -85,7 +85,7 @@ def main() -> None:
 
     parser.add_argument(
         "--only_target_device",
-        help="Run only the specified target device.",
+        help="Run benchmarks which match only the specified target device.",
     )
 
     parser.add_argument(
