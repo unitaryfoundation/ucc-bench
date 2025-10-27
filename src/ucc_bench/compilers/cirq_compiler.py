@@ -5,8 +5,6 @@ import warnings
 from ..registry import register
 from qiskit.providers import Backend
 
-from cirq.contrib.qasm_import import circuit_from_qasm
-
 
 class BenchmarkTargetGateset(cirq.TwoQubitCompilationTargetGateset):
     """Target gateset for compiling circuits for benchmarking.
@@ -106,9 +104,6 @@ class CirqCompiler(BaseCompiler[cirq.Circuit]):
     @classmethod
     def version(cls) -> str:
         return cirq.__version__
-
-    def qasm_to_native(self, qasm: str) -> cirq.Circuit:
-        return circuit_from_qasm(qasm)
 
     def compile(
         self, circuit: cirq.Circuit, target_device: Optional[Backend] = None
