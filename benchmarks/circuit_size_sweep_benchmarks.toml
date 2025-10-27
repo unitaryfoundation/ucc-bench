@@ -170,51 +170,51 @@ name = "square_heisenberg"
 N = 64
 
 [[benchmarks]]
-id = "prep_select_N128"
-description = "prep_select circuit (N=128)"
+id = "prep_select_N121"
+description = "prep_select circuit (N=121)"
 
 [benchmarks.generator]
 name = "prep_select"
 
 [benchmarks.generator.params]
-N = 128
+N = 121
 
 [[benchmarks]]
-id = "qcnn_N128"
-description = "qcnn circuit (N=128)"
+id = "qcnn_N121"
+description = "qcnn circuit (N=121)"
 
 [benchmarks.generator]
 name = "qcnn"
 
 [benchmarks.generator.params]
-N = 128
+N = 121
 
 [[benchmarks]]
-id = "qft_N128"
-description = "qft circuit (N=128)"
+id = "qft_N121"
+description = "qft circuit (N=121)"
 
 [benchmarks.generator]
 name = "qft"
 
 [benchmarks.generator.params]
-N = 128
+N = 121
 
 [[benchmarks]]
-id = "qv_N128"
-description = "qv circuit (N=128)"
+id = "qv_N121"
+description = "qv circuit (N=121)"
 
 [benchmarks.generator]
 name = "qv"
 
 [benchmarks.generator.params]
-N = 128
+N = 121
 
 [[benchmarks]]
-id = "square_heisenberg_N128"
-description = "square_heisenberg circuit (N=128)"
+id = "square_heisenberg_N121"
+description = "square_heisenberg circuit (N=121)"
 
 [benchmarks.generator]
 name = "square_heisenberg"
 
 [benchmarks.generator.params]
-N = 128
+N = 121
