@@ -204,8 +204,8 @@ def run_suite(
     future_to_context = {}
 
     generated_circuit_cache = {}
-    logging.info(f"Preparing to run benchmark suite '{suite.id}'")
-    logging.info("Generating circuits for benchmarks with generators")
+    logger.info(f"Preparing to run benchmark suite '{suite.id}'")
+    logger.info("Generating circuits for benchmarks with generators")
     for benchmark in suite.benchmarks:
         if only_benchmark and benchmark.id != only_benchmark:
             continue
@@ -214,22 +214,28 @@ def run_suite(
             generated_circuit = benchmark.generator.generate_circuit()
             end_gen = perf_counter()
             duration_gen = end_gen - start_gen
-            logging.info(
+            logger.info(
                 f"Generated circuit for benchmark '{benchmark.id}' in {duration_gen:.4f} seconds."
             )
-            start_qasm = perf_counter()
-            generated_circuit_cache[benchmark.id] = dumps(
-                qiskit_transpile(
-                    generated_circuit, basis_gates=DEFAULT_GATESET, optimization_level=0
-                )
+
+            logger.info(
+                f"Generated circuit has {generated_circuit.num_nonlocal_gates()} multi-qubit gates."
             )
+            start_qasm = perf_counter()
+            converted = qiskit_transpile(
+                generated_circuit, basis_gates=DEFAULT_GATESET, optimization_level=0
+            )
+            generated_circuit_cache[benchmark.id] = dumps(converted)
             end_qasm = perf_counter()
             duration_gen = end_qasm - start_qasm
-            logging.info(
+            logger.info(
                 f"Converted generated circuit to QASM for benchmark '{benchmark.id}' in {duration_gen:.4f} seconds."
             )
             logger.info(
                 f"Generated circuit is {len(generated_circuit_cache[benchmark.id]) / 1e6} megabytes."
+            )
+            logger.info(
+                f"Converted circuit has {generated_circuit.num_nonlocal_gates()} multi-qubit gates."
             )
 
     # Ensure that the multiprocessing module uses the 'spawn' method for creating new processes
