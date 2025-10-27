@@ -52,7 +52,7 @@ jobs:
         run: bash .github/scripts/run_benchmarks_pr.sh ucc $RUNNER_LABEL ${{ github.event.client_payload.commit_hash }} ${{ github.event.client_payload.pr_number }} comment.json
 
       - name: Save PR comment as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: comment.json
           path: comment.json
