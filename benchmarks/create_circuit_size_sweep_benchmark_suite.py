@@ -22,7 +22,7 @@ target_path = Path(__file__).parent / "circuit_size_sweep_benchmarks.toml"
 # Include all known compilers
 compilers = [CompilerSpec(id=c) for c in register.get_compilers()]
 
-sizes = [4, 16, 64, 128]  # , 256, 512] Even at 256, something was using 15-20gb of RAM!
+sizes = [4, 16, 64, 121]
 
 benchmarks = []
 for N in sizes:
