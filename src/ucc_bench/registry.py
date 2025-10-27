@@ -34,7 +34,6 @@ class GeneratorSpec:
 
     id: str
     func: Callable[..., QuantumCircuit]
-    size_param: str  # The name of the first parameter, e.g., 'n' for number of qubits
     params: Dict[str, ParameterSpec] = field(default_factory=dict)
 
     def validate_params(self, provided_params: Dict[str, Any]):
@@ -101,10 +100,9 @@ class Registry:
                     "parameter for problem size."
                 )
 
-            # The first parameter is considered the problem size argument.
-            size_param_name = params[0].name
-            assert size_param_name == "N"
-            spec = GeneratorSpec(id=id, func=func, size_param=size_param_name)
+            # The first parameter must be "N", the problem size
+            assert params[0].name == "N"
+            spec = GeneratorSpec(id=id, func=func)
 
             for p in params:
                 if p.kind not in (
