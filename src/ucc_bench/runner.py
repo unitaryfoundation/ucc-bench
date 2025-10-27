@@ -199,6 +199,22 @@ def run_suite(
 ) -> List[BenchmarkResult]:
     """
     Run an entire benchmark suite against all compilers specified in the suite and return the results.
+
+    Args:
+        suite: The benchmark suite to run.
+        num_parallel: The number of parallel worker processes to use.
+        log_config: Optional logging configuration dictionary.
+        only_compiler: If specified, only the compiler with this id will have benchmarks run.
+        only_benchmark: If specified, only the benchmark with this id will be run.
+        only_target_device: If specified, only the target device with this id will be used.
+        strict: If True, any error in a task will raise an exception and stop the suite.
+                If False, errors will be logged and the suite will continue.
+    Returns:
+        A list of BenchmarkResult objects for all completed benchmarks.
+
+    Note:
+        The "only_" filters can be used for debugging specific parts of a suite by restricting which
+        benchmark configuration is run.
     """
     results = []
     future_to_context = {}
