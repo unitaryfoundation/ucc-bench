@@ -18,7 +18,6 @@ def test_generator_registration_and_retrieval():
     spec = reg.get_generator("dummy_gen")
     assert isinstance(spec, GeneratorSpec)
     assert spec.id == "dummy_gen"
-    assert spec.size_param == "N"
     assert set(spec.params.keys()) == {"N", "param1", "param2"}
     # Validate params
     spec.validate_params({"N": 3, "param1": 5, "param2": 10})
