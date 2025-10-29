@@ -3,10 +3,56 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import UnitaryGate
 from qiskit.quantum_info import SparsePauliOp
 from qiskit.circuit.library import PauliEvolutionGate
-
 import scipy
+from mqt.bench.benchmarks import get_benchmark_catalog
+from mqt.bench import get_benchmark, BenchmarkLevel
+from .registry import register, Registry
 
-from .registry import register
+
+# Register all MQT benchmarks as generators at import time
+def register_mqt_benchmarks(reg: Registry = register):
+    """Register MQT benchmarks as circuit generators.
+
+    Each MQT benchmark will be available under the id "mqt:<benchmark_name>", and can be
+    configured for a number of qubits N and a benchmark level via the `level` parameter.
+
+    At this time, no other configuration options for MQT benchmarks are supported.
+    """
+    for _name, _desc in get_benchmark_catalog().items():
+
+        def _make_mqt_wrapper(bench_name: str, bench_desc: str):
+            def _wrapper(N: int, level: str = "alg"):
+                """
+                MQT benchmark adapter.
+
+                Benchmark: {bench_name}
+
+                {bench_desc}
+
+                Parameters:
+                    N (int): Number of qubits
+                    Use the `level` kwarg to choose the MQT BenchmarkLevel as a string where
+                        - 'alg' maps to BenchmarkLevel.ALG (default)
+                        - 'indep' maps to BenchmarkLevel.INDEP
+                """.format(bench_name=bench_name, bench_desc=bench_desc)
+                if level == "alg":
+                    mqt_level = BenchmarkLevel.ALG
+                elif level == "indep":
+                    mqt_level = BenchmarkLevel.INDEP
+                else:
+                    raise ValueError(f"Benchmark level: {level} not supported")
+                return get_benchmark(bench_name, mqt_level, circuit_size=N)
+
+            # Give the function a stable python identifier (handy for debugging)
+            _wrapper.__name__ = f"mqt_{bench_name.replace('-', '_')}"
+            return _wrapper
+
+        wrapper = _make_mqt_wrapper(_name, _desc)
+        reg.generator(f"mqt:{_name}")(wrapper)
+
+
+# Call the registration function at import time
+register_mqt_benchmarks()
 
 
 @register.generator("prep_select")
