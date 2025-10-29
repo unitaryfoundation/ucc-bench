@@ -2,6 +2,7 @@ import pytest
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Operator
 from ucc_bench.registry import Registry, GeneratorSpec
+from ucc_bench.generators import register_mqt_benchmarks
 from qiskit_ibm_runtime.fake_provider import FakeQuebec
 
 
@@ -89,3 +90,21 @@ def test_target_device_registration_and_retrieval():
     assert reg.get_target_device("sim1") is backend
     with pytest.raises(ValueError):
         reg.add_target_device("sim1", backend)
+
+
+def test_register_mqt_benchmarks():
+    reg = Registry()
+    register_mqt_benchmarks(reg)
+
+    # Check that a known MQT benchmark is registered
+    assert reg.has_generator("mqt:ghz")
+
+    # Retrieve the generator and validate parameters
+    spec = reg.get_generator("mqt:ghz")
+    assert isinstance(spec, GeneratorSpec)
+    assert "N" in spec.params
+    spec.validate_params({"N": 3})
+
+    # Invalid level parameter
+    with pytest.raises(ValueError):
+        spec.func(N=3, level="invalid_level")
