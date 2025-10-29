@@ -15,6 +15,7 @@ This repository houses both the code to run the benchmarks, the specification fi
 
 And here you can see progress over time, with new package versions labeled for each compiler:
 ![alt text](results/ucc-benchmarks-8-core-U22.04/avg_compiler_benchmarks_over_time.png)
+
 ## Running or Development
 
 At this time, `ucc-bench` is not published as a python package as it is very specific to the `ucc` project.
@@ -26,22 +27,15 @@ $ uv sync
 
 See the [`uv` docs](https://docs.astral.sh/uv/) for information on installing `uv`. Note that this will skip installing optional dependency groups. At this time that is `pyqpanda3`, which is not supported on macos intel chips. To install `pyqpanda3` as part of setup, call `uv sync --all-groups`.
 
-## Usage (Running a benchmark suite)
+## Usage
+Run `uv run ucc-bench -h` to see a list of available sub-commands (also outlined in the sections below).
 
-Benchmarks are defined as a TOML file. The top-level `benchmarks` directory contains
-benchmark specifications. Today that includes `compilation_benchmarks.toml`, `layout_benchmarks.toml`, and `simulation_benchmarks.toml` as initial examples.
+### `ucc-bench run` Running a benchmark suite
 
-Benchmark suites are run using the `ucc-bench` utility (which is an entry to `ucc_bench.main:main`). To
-see invocation options, you can run the command below
-
-```bash
-$ uv run ucc-bench -h
-```
-
-To run the benchmarks locally
+To run the benchmarks locally, call
 
 ```bash
-$ uv run ucc-bench <path_to/specification.toml>
+$ uv run ucc-bench run <path_to/specification.toml>
 ```
 
 which by default will generate the results to the `.local_results` directory and parallelize using the number of cores available on your machine. If you did not install the optional `pyqpanda3` dependency mentioned above, this run will fail on benchmark specifications that include the `pyqpanda3` compiler.
@@ -49,7 +43,7 @@ which by default will generate the results to the `.local_results` directory and
 You can instead restrict a suite to only run a specific compiler and/or a specific benchmark circuit. This is also useful for debugging.
 
 ```bash
-$ uv run ucc-bench <path_to/specification.toml> --only_compiler <compiler_id> --only_benchmark <benchmark_id>
+uv run ucc-bench run <path_to/specification.toml> --only_compiler <compiler_id> --only_benchmark <benchmark_id>
 ```
 
 By default, the results are stored as JSON files in path `{out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.json`.
@@ -60,7 +54,18 @@ When run as a GitHub action for the standard results, we expect this to be the G
 
 By default, if an individual benchmark in the suite fails for some reason, an error will be printed but the remaining benchmarks will run and save their results. To fail the entire run on a single benchmark failure, set the `--strict` flag.
 
+> [!NOTE]
+> An earlier version of `ucc-bench` did not use subcommands. For now, you can still invoke as `uv run ucc-bench <spec.toml>` but is deprecated; please migrate to `ucc-bench run <spec.toml>`.
+
+### `ucc-bench list` - List Available Components
+
+The benchmark configuration files may specify known compilers, target devices, observables, output metrics, etc. For example, when adding a compiler to the benchmark specification, you reference it via it's registered name (e.g. `ucc`).
+
+To know what options are available for each category and the names, you can can run `ucc-bench list` to print them to stdout. See the help option for the `list` subcommand to see ways to filter that output to a specific component type.
+
 ### Common Workflows
+
+The sections below outline common workflows around creating, updating and extending benchmark capabilities.
 
 #### Adding a New Compiler
 To make a new compiler available for benchmarking:
