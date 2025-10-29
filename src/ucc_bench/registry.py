@@ -211,6 +211,12 @@ class Registry:
     def get_observable(self, id: str) -> Callable[[int], Operator]:
         return self._observables[id]
 
+    def get_observables(self) -> list[str]:
+        """
+        Returns a list of all registered observable ids.
+        """
+        return sorted(list(self._observables.keys()))
+
     def output_metric(self, id: str):
         """
         Decorator to register a function that calculates an output metric.
@@ -239,6 +245,12 @@ class Registry:
     ) -> Callable[[QuantumCircuit, QuantumCircuit, AerSimulator], float]:
         return self._output_metric[id]
 
+    def get_output_metrics(self) -> list[str]:
+        """
+        Returns a list of all registered output metric ids.
+        """
+        return sorted(list(self._output_metric.keys()))
+
     def add_target_device(self, id: str, t: Backend):
         """
         Add a given target device to the registry associated with the given id.
@@ -254,6 +266,12 @@ class Registry:
 
     def get_target_device(self, id: str) -> Backend:
         return self._target_devices[id]
+
+    def get_target_devices(self) -> list[str]:
+        """
+        Returns a list of all registered target device ids.
+        """
+        return sorted(list(self._target_devices.keys()))
 
 
 # Instance to use to registry the above items
