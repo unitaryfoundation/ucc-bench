@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -1974,7 +1974,7 @@ wheels = [
 [[package]]
 name = "ucc"
 version = "0.4.10"
-source = { git = "https://github.com/unitaryfoundation/ucc?rev=9b7ffd1e559b4fa077fc3e29942ec719b48011dc#9b7ffd1e559b4fa077fc3e29942ec719b48011dc" }
+source = { git = "https://github.com/unitaryfoundation/ucc?rev=b78cc252ef59ac55600b288b66cfa7fee50b8e15#b78cc252ef59ac55600b288b66cfa7fee50b8e15" }
 dependencies = [
     { name = "cirq-core" },
     { name = "ply" },
@@ -2031,7 +2031,7 @@ requires-dist = [
     { name = "seaborn", specifier = ">=0.13.2" },
     { name = "tabulate", specifier = ">=0.9.0" },
     { name = "tomlkit", specifier = ">=0.13.3" },
-    { name = "ucc", git = "https://github.com/unitaryfoundation/ucc?rev=9b7ffd1e559b4fa077fc3e29942ec719b48011dc" },
+    { name = "ucc", git = "https://github.com/unitaryfoundation/ucc?rev=b78cc252ef59ac55600b288b66cfa7fee50b8e15" },
 ]
 
 [package.metadata.requires-dev]
