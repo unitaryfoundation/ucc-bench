@@ -1,0 +1,872 @@
+{
+  "suite_specification": {
+    "spec_path": "benchmarks/compilation_benchmarks.toml",
+    "spec_version": "1.0",
+    "suite_version": "0.1",
+    "id": "compilation_benchmarks",
+    "description": "Base set of quantum compiler benchmarks for UCC project",
+    "compilers": [
+      {
+        "id": "ucc"
+      },
+      {
+        "id": "pytket-peep"
+      },
+      {
+        "id": "qiskit-default"
+      },
+      {
+        "id": "cirq"
+      },
+      {
+        "id": "pyqpanda3"
+      }
+    ],
+    "benchmarks": [
+      {
+        "id": "qaoa",
+        "description": "Quantum Approximate Optimization Algorithm of Barabási–Albert graph",
+        "qasm_file": "circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      },
+      {
+        "id": "qv",
+        "description": "Quantum Volume",
+        "qasm_file": "circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      },
+      {
+        "id": "qft",
+        "description": "Quantum Fourier Transform",
+        "qasm_file": "circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      },
+      {
+        "id": "square_heisenberg",
+        "description": "Heisenberg spin model on square lattice",
+        "qasm_file": "circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      },
+      {
+        "id": "prep_select",
+        "description": "Prepare and grover select all 1s state",
+        "qasm_file": "circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": null
+      },
+      {
+        "id": "qcnn",
+        "description": "Quantum Convolutional Neural Network",
+        "qasm_file": "circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": null
+      }
+    ],
+    "target_devices": []
+  },
+  "metadata": {
+    "uid": "366d9b25ba0c8b3f0d4da4a0636786c6e8841544",
+    "uid_timestamp": "2025-10-30T21:30:55Z",
+    "run_start": "2025-10-30T21:31:24.848673",
+    "run_end": "2025-10-30T21:40:06.273413",
+    "runner_name": "ucc-benchmarks-8-core-U22.04",
+    "runner_specs": {
+      "os": "Linux",
+      "cpu": "x86_64",
+      "ram_gb": 31.34630584716797,
+      "physical_cores": 4
+    },
+    "runner_version": "0.1.0",
+    "runner_args": [
+      "/home/runner/work/ucc-bench/ucc-bench/.venv/bin/ucc-bench",
+      "./benchmarks/compilation_benchmarks.toml",
+      "--uid",
+      "366d9b25ba0c8b3f0d4da4a0636786c6e8841544",
+      "--uid_time",
+      "2025-10-30T21:30:55Z",
+      "--log_level",
+      "INFO",
+      "-o",
+      "./results",
+      "--runner_name",
+      "ucc-benchmarks-8-core-U22.04",
+      "--strict",
+      "--log-stderr",
+      "--ucc_hash",
+      "4c8725b4b2bee19401a5d1d387a539e7df1639a6",
+      "--ucc_time",
+      "2025-10-30T21:30:20Z"
+    ],
+    "ucc_hash": "4c8725b4b2bee19401a5d1d387a539e7df1639a6",
+    "ucc_timestamp": "2025-10-30T21:30:20Z"
+  },
+  "results": [
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.11"
+      },
+      "benchmark_id": "square_heisenberg",
+      "run_start": "2025-10-30T21:31:27.784715",
+      "run_end": "2025-10-30T21:31:27.868068",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 83.3472909999955,
+        "raw_multiq_gates": 2160,
+        "compiled_multiq_gates": 540
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "square_heisenberg",
+        "description": "Heisenberg spin model on square lattice",
+        "qasm_file": "circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.11"
+      },
+      "benchmark_id": "qaoa",
+      "run_start": "2025-10-30T21:31:27.724454",
+      "run_end": "2025-10-30T21:31:27.921204",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 196.72346899994864,
+        "raw_multiq_gates": 1176,
+        "compiled_multiq_gates": 1176
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qaoa",
+        "description": "Quantum Approximate Optimization Algorithm of Barabási–Albert graph",
+        "qasm_file": "circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.11"
+      },
+      "benchmark_id": "qcnn",
+      "run_start": "2025-10-30T21:31:27.950156",
+      "run_end": "2025-10-30T21:31:27.992630",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 42.46920899993256,
+        "raw_multiq_gates": 388,
+        "compiled_multiq_gates": 388
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qcnn",
+        "description": "Quantum Convolutional Neural Network",
+        "qasm_file": "circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.11"
+      },
+      "benchmark_id": "qft",
+      "run_start": "2025-10-30T21:31:27.844379",
+      "run_end": "2025-10-30T21:31:28.441221",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 596.8369559999473,
+        "raw_multiq_gates": 10050,
+        "compiled_multiq_gates": 2740
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qft",
+        "description": "Quantum Fourier Transform",
+        "qasm_file": "circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.11"
+      },
+      "benchmark_id": "prep_select",
+      "run_start": "2025-10-30T21:31:28.107303",
+      "run_end": "2025-10-30T21:31:29.333609",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 1226.301506000027,
+        "raw_multiq_gates": 9744,
+        "compiled_multiq_gates": 9702
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "prep_select",
+        "description": "Prepare and grover select all 1s state",
+        "qasm_file": "circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "ucc",
+        "version": "0.4.11"
+      },
+      "benchmark_id": "qv",
+      "run_start": "2025-10-30T21:31:29.330235",
+      "run_end": "2025-10-30T21:31:31.073602",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 1743.360288999952,
+        "raw_multiq_gates": 15000,
+        "compiled_multiq_gates": 14856
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qv",
+        "description": "Quantum Volume",
+        "qasm_file": "circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.10.2"
+      },
+      "benchmark_id": "qaoa",
+      "run_start": "2025-10-30T21:31:28.539399",
+      "run_end": "2025-10-30T21:31:39.570925",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 11031.520993999948,
+        "raw_multiq_gates": 1176,
+        "compiled_multiq_gates": 1176
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qaoa",
+        "description": "Quantum Approximate Optimization Algorithm of Barabási–Albert graph",
+        "qasm_file": "circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.10.2"
+      },
+      "benchmark_id": "square_heisenberg",
+      "run_start": "2025-10-30T21:31:32.073488",
+      "run_end": "2025-10-30T21:31:40.261534",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 8188.040193999996,
+        "raw_multiq_gates": 2160,
+        "compiled_multiq_gates": 540
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "square_heisenberg",
+        "description": "Heisenberg spin model on square lattice",
+        "qasm_file": "circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.10.2"
+      },
+      "benchmark_id": "qcnn",
+      "run_start": "2025-10-30T21:31:40.547083",
+      "run_end": "2025-10-30T21:31:45.080557",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 4533.468161999963,
+        "raw_multiq_gates": 388,
+        "compiled_multiq_gates": 388
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qcnn",
+        "description": "Quantum Convolutional Neural Network",
+        "qasm_file": "circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "2.2.2"
+      },
+      "benchmark_id": "qaoa",
+      "run_start": "2025-10-30T21:31:45.204569",
+      "run_end": "2025-10-30T21:31:45.242065",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 37.49181900002441,
+        "raw_multiq_gates": 1176,
+        "compiled_multiq_gates": 1176
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qaoa",
+        "description": "Quantum Approximate Optimization Algorithm of Barabási–Albert graph",
+        "qasm_file": "circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "2.2.2"
+      },
+      "benchmark_id": "qv",
+      "run_start": "2025-10-30T21:31:46.926549",
+      "run_end": "2025-10-30T21:31:50.050378",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 3123.824865000074,
+        "raw_multiq_gates": 15000,
+        "compiled_multiq_gates": 14854
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qv",
+        "description": "Quantum Volume",
+        "qasm_file": "circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "2.2.2"
+      },
+      "benchmark_id": "qft",
+      "run_start": "2025-10-30T21:31:50.374341",
+      "run_end": "2025-10-30T21:31:50.481755",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 107.41058799999337,
+        "raw_multiq_gates": 10050,
+        "compiled_multiq_gates": 3570
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qft",
+        "description": "Quantum Fourier Transform",
+        "qasm_file": "circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "2.2.2"
+      },
+      "benchmark_id": "square_heisenberg",
+      "run_start": "2025-10-30T21:31:50.535617",
+      "run_end": "2025-10-30T21:31:50.643838",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 108.21767900006307,
+        "raw_multiq_gates": 2160,
+        "compiled_multiq_gates": 540
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "square_heisenberg",
+        "description": "Heisenberg spin model on square lattice",
+        "qasm_file": "circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "2.2.2"
+      },
+      "benchmark_id": "prep_select",
+      "run_start": "2025-10-30T21:31:50.767052",
+      "run_end": "2025-10-30T21:31:51.093589",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 326.53414599997177,
+        "raw_multiq_gates": 9744,
+        "compiled_multiq_gates": 9708
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "prep_select",
+        "description": "Prepare and grover select all 1s state",
+        "qasm_file": "circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "qiskit-default",
+        "version": "2.2.2"
+      },
+      "benchmark_id": "qcnn",
+      "run_start": "2025-10-30T21:31:51.133917",
+      "run_end": "2025-10-30T21:31:51.152741",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 18.820462000007865,
+        "raw_multiq_gates": 388,
+        "compiled_multiq_gates": 388
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qcnn",
+        "description": "Quantum Convolutional Neural Network",
+        "qasm_file": "circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.6.1"
+      },
+      "benchmark_id": "qaoa",
+      "run_start": "2025-10-30T21:31:52.489793",
+      "run_end": "2025-10-30T21:31:57.671366",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 5181.569400000058,
+        "raw_multiq_gates": 1176,
+        "compiled_multiq_gates": 1176
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qaoa",
+        "description": "Quantum Approximate Optimization Algorithm of Barabási–Albert graph",
+        "qasm_file": "circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.10.2"
+      },
+      "benchmark_id": "qft",
+      "run_start": "2025-10-30T21:31:32.219771",
+      "run_end": "2025-10-30T21:32:21.631165",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 49411.38687500006,
+        "raw_multiq_gates": 10050,
+        "compiled_multiq_gates": 4498
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qft",
+        "description": "Quantum Fourier Transform",
+        "qasm_file": "circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.6.1"
+      },
+      "benchmark_id": "qft",
+      "run_start": "2025-10-30T21:32:37.413757",
+      "run_end": "2025-10-30T21:33:10.604683",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 33190.920079000076,
+        "raw_multiq_gates": 10050,
+        "compiled_multiq_gates": 4648
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qft",
+        "description": "Quantum Fourier Transform",
+        "qasm_file": "circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.6.1"
+      },
+      "benchmark_id": "square_heisenberg",
+      "run_start": "2025-10-30T21:33:21.479618",
+      "run_end": "2025-10-30T21:33:28.222632",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 6743.009002000008,
+        "raw_multiq_gates": 2160,
+        "compiled_multiq_gates": 540
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "square_heisenberg",
+        "description": "Heisenberg spin model on square lattice",
+        "qasm_file": "circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.10.2"
+      },
+      "benchmark_id": "prep_select",
+      "run_start": "2025-10-30T21:31:42.499358",
+      "run_end": "2025-10-30T21:33:50.010260",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 127510.89590599998,
+        "raw_multiq_gates": 9744,
+        "compiled_multiq_gates": 9698
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "prep_select",
+        "description": "Prepare and grover select all 1s state",
+        "qasm_file": "circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.6.1"
+      },
+      "benchmark_id": "qcnn",
+      "run_start": "2025-10-30T21:33:54.751305",
+      "run_end": "2025-10-30T21:33:57.332266",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 2580.9568320000835,
+        "raw_multiq_gates": 388,
+        "compiled_multiq_gates": 388
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qcnn",
+        "description": "Quantum Convolutional Neural Network",
+        "qasm_file": "circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "pyqpanda3",
+        "version": "0.3.1"
+      },
+      "benchmark_id": "qaoa",
+      "run_start": "2025-10-30T21:33:58.055363",
+      "run_end": "2025-10-30T21:33:58.092131",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 36.76346100007777,
+        "raw_multiq_gates": 1176,
+        "compiled_multiq_gates": 1176
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qaoa",
+        "description": "Quantum Approximate Optimization Algorithm of Barabási–Albert graph",
+        "qasm_file": "circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qaoa_barabasi_albert_N100_3reps_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "pyqpanda3",
+        "version": "0.3.1"
+      },
+      "benchmark_id": "qv",
+      "run_start": "2025-10-30T21:33:59.970075",
+      "run_end": "2025-10-30T21:34:00.525653",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 555.5716199999097,
+        "raw_multiq_gates": 15000,
+        "compiled_multiq_gates": 14856
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qv",
+        "description": "Quantum Volume",
+        "qasm_file": "circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "pyqpanda3",
+        "version": "0.3.1"
+      },
+      "benchmark_id": "qft",
+      "run_start": "2025-10-30T21:34:02.210489",
+      "run_end": "2025-10-30T21:34:02.346267",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 135.77293599996665,
+        "raw_multiq_gates": 10050,
+        "compiled_multiq_gates": 2740
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qft",
+        "description": "Quantum Fourier Transform",
+        "qasm_file": "circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qft_N100_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "pyqpanda3",
+        "version": "0.3.1"
+      },
+      "benchmark_id": "square_heisenberg",
+      "run_start": "2025-10-30T21:34:02.558565",
+      "run_end": "2025-10-30T21:34:02.587908",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 29.337398999928155,
+        "raw_multiq_gates": 2160,
+        "compiled_multiq_gates": 540
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "square_heisenberg",
+        "description": "Heisenberg spin model on square lattice",
+        "qasm_file": "circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/square_heisenberg_N100_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "pyqpanda3",
+        "version": "0.3.1"
+      },
+      "benchmark_id": "prep_select",
+      "run_start": "2025-10-30T21:34:02.827657",
+      "run_end": "2025-10-30T21:34:02.943566",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 115.90302000001884,
+        "raw_multiq_gates": 9744,
+        "compiled_multiq_gates": 9702
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "prep_select",
+        "description": "Prepare and grover select all 1s state",
+        "qasm_file": "circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "pyqpanda3",
+        "version": "0.3.1"
+      },
+      "benchmark_id": "qcnn",
+      "run_start": "2025-10-30T21:34:03.389356",
+      "run_end": "2025-10-30T21:34:03.406853",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 17.494016000000556,
+        "raw_multiq_gates": 388,
+        "compiled_multiq_gates": 388
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qcnn",
+        "description": "Quantum Convolutional Neural Network",
+        "qasm_file": "circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/ucc/qcnn_N100_7layers_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.6.1"
+      },
+      "benchmark_id": "prep_select",
+      "run_start": "2025-10-30T21:33:47.393820",
+      "run_end": "2025-10-30T21:34:47.584492",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 60190.666311999965,
+        "raw_multiq_gates": 9744,
+        "compiled_multiq_gates": 9712
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "prep_select",
+        "description": "Prepare and grover select all 1s state",
+        "qasm_file": "circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/ucc/prep_select_N25_ghz_basis_rz_rx_ry_h_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "pytket-peep",
+        "version": "2.10.2"
+      },
+      "benchmark_id": "qv",
+      "run_start": "2025-10-30T21:31:55.757342",
+      "run_end": "2025-10-30T21:35:34.754374",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 218997.02593400003,
+        "raw_multiq_gates": 15000,
+        "compiled_multiq_gates": 14856
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qv",
+        "description": "Quantum Volume",
+        "qasm_file": "circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    },
+    {
+      "compiler": {
+        "id": "cirq",
+        "version": "1.6.1"
+      },
+      "benchmark_id": "qv",
+      "run_start": "2025-10-30T21:34:06.265780",
+      "run_end": "2025-10-30T21:37:49.745691",
+      "failed": false,
+      "compilation_metrics": {
+        "compilation_time_ms": 223479.904552,
+        "raw_multiq_gates": 15000,
+        "compiled_multiq_gates": 14856
+      },
+      "simulation_metrics": null,
+      "target_device_id": null,
+      "benchmark_spec": {
+        "id": "qv",
+        "description": "Quantum Volume",
+        "qasm_file": "circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm",
+        "generator": null,
+        "resolved_qasm_file": "benchmarks/circuits/benchpress/qv_N100_12345_basis_rz_rx_ry_cx.qasm",
+        "simulate": null
+      }
+    }
+  ],
+  "compiler_versions": {
+    "ucc": "0.4.11",
+    "pytket-peep": "2.10.2",
+    "qiskit-default": "2.2.2",
+    "cirq": "1.6.1",
+    "pyqpanda3": "0.3.1"
+  }
+}
