@@ -41,7 +41,7 @@ class UCCDDDCompiler(BaseCompiler[QuantumCircuit]):
         ddd_circuits = ddd_construct_circuits(
             compiled,
             rule=ddd_rules.xx,
-            num_trials=1,
+            num_trials=1, # one circuit = no post-processing
         )
         return ddd_circuits[0]
 
