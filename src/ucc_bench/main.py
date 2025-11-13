@@ -66,7 +66,7 @@ def _configure_run_logging(args, suite: BenchmarkSuite, uid_timestamp, uid) -> d
     return log_config
 
 
-def _run_command(args) -> int:
+def _execute_command(args) -> int:
     """Execute the benchmark run command."""
     suite = BenchmarkSuite.load_toml(args.spec_path)
     uid_timestamp = args.uid_timestamp or datetime.now()
@@ -261,7 +261,8 @@ def _build_parser() -> argparse.ArgumentParser:
 
     # Run subcommand
     run_parser = subparsers.add_parser(
-        "run", help="Run a benchmark suite defined in a TOML specification file."
+        "execute",
+        help="Execute a benchmark suite defined in a TOML specification file.",
     )
     run_parser.add_argument(
         "spec_path", help="Path to the TOML file specifying the benchmark suite to run."
@@ -285,7 +286,7 @@ def main() -> None:
     parser = _build_parser()
 
     command_funcs = {
-        "run": _run_command,
+        "execute": _execute_command,
         "list": _list_command,
     }
 
@@ -303,11 +304,11 @@ def main() -> None:
     ):
         print(
             "WARNING: Implicit run mode is deprecated and will be removed in a future release. "
-            "Please use 'ucc-bench run <spec_path>'.",
+            "Please use 'ucc-bench execute <spec_path>'.",
             file=sys.stderr,
         )
-        # Prepend 'run' to trigger the run subcommand
-        argv.insert(0, "run")
+        # Prepend 'execute' to trigger the execute subcommand
+        argv.insert(0, "execute")
 
     args = parser.parse_args(argv)
     func = command_funcs.get(args.command)

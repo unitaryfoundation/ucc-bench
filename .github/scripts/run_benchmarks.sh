@@ -69,7 +69,7 @@ fi
 run_bench() {
   local config_file="$1"
   echo "Running benchmark: $config_file"
-  uv run ucc-bench run "$config_file" \
+  uv run ucc-bench execute "$config_file" \
     --uid "$commit_hash" \
     --uid_time "$uid_time" \
     --log_level INFO \

@@ -30,12 +30,12 @@ See the [`uv` docs](https://docs.astral.sh/uv/) for information on installing `u
 ## Usage
 Run `uv run ucc-bench -h` to see a list of available sub-commands (also outlined in the sections below).
 
-### `ucc-bench run` Running a benchmark suite
+### `ucc-bench execute` Execute a benchmark suite
 
-To run the benchmarks locally, call
+To execute the benchmarks locally, call
 
 ```bash
-$ uv run ucc-bench run <path_to/specification.toml>
+$ uv run ucc-bench execute <path_to/specification.toml>
 ```
 
 which by default will generate the results to the `.local_results` directory and parallelize using the number of cores available on your machine. If you did not install the optional `pyqpanda3` dependency mentioned above, this run will fail on benchmark specifications that include the `pyqpanda3` compiler.
@@ -43,7 +43,7 @@ which by default will generate the results to the `.local_results` directory and
 You can instead restrict a suite to only run a specific compiler and/or a specific benchmark circuit. This is also useful for debugging.
 
 ```bash
-uv run ucc-bench run <path_to/specification.toml> --only_compiler <compiler_id> --only_benchmark <benchmark_id>
+uv run ucc-bench execute <path_to/specification.toml> --only_compiler <compiler_id> --only_benchmark <benchmark_id>
 ```
 
 By default, the results are stored as JSON files in path `{out_dir}/{runner_name}/{suite_id}/{uid_date}/{uid}.json`.
@@ -55,7 +55,7 @@ When run as a GitHub action for the standard results, we expect this to be the G
 By default, if an individual benchmark in the suite fails for some reason, an error will be printed but the remaining benchmarks will run and save their results. To fail the entire run on a single benchmark failure, set the `--strict` flag.
 
 > [!NOTE]
-> An earlier version of `ucc-bench` did not use subcommands. For now, you can still invoke as `uv run ucc-bench <spec.toml>` but is deprecated; please migrate to `ucc-bench run <spec.toml>`.
+> An earlier version of `ucc-bench` did not use subcommands. For now, you can still invoke as `uv run ucc-bench <spec.toml>` but is deprecated; please migrate to `uv run ucc-bench execute <spec.toml>`.
 
 ### `ucc-bench list` - List Available Components
 
