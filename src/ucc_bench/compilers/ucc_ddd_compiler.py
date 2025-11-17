@@ -1,17 +1,17 @@
-from .base_compiler import BaseCompiler
+from typing import Optional
+
+import cirq
+from mitiq import __version__ as mitiq_version
+from mitiq.ddd import construct_circuits as ddd_construct_circuits
+from mitiq.ddd import rules as ddd_rules
+from qbraid import transpile as qb_transpile
 from qiskit import QuantumCircuit
 from qiskit.providers import Backend
-from typing import Optional
-from qbraid import transpile as qb_transpile
-
 from ucc import __version__ as ucc_version
 from ucc import compile as ucc_compile
 
 from ..registry import register
-
-from mitiq import __version__ as mitiq_version
-from mitiq.ddd import construct_circuits as ddd_construct_circuits
-from mitiq.ddd import rules as ddd_rules
+from .base_compiler import BaseCompiler
 
 
 @register.compiler("ucc-ddd")
@@ -38,9 +38,13 @@ class UCCDDDCompiler(BaseCompiler[QuantumCircuit]):
                 target_gateset={"rx", "ry", "rz", "h", "cx"},
             )
 
+        def hh_rule(slack_length):
+            return ddd_rules.repeated_rule(
+                    slack_length, [cirq.H, cirq.H]
+                )
         ddd_circuits = ddd_construct_circuits(
             compiled,
-            rule=ddd_rules.xx,
+            rule=hh_rule,
             num_trials=1,  # one circuit = no post-processing
         )
         return ddd_circuits[0]
