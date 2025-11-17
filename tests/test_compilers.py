@@ -4,6 +4,7 @@ from ucc_bench.compilers import (
     CirqCompiler,
     PytketPeepCompiler,
     UCCCompiler,
+    UCCDDDCompiler,
     PyQPanda3Compiler,
     PYQPANDA3_AVAILABLE,
 )
@@ -37,6 +38,7 @@ compiler_fixtures = [
     (CirqCompiler, cirq.Circuit, "cirq"),
     (PytketPeepCompiler, PytketCircuit, "pytket-peep"),
     (UCCCompiler, QuantumCircuit, "ucc"),
+    (UCCDDDCompiler, QuantumCircuit, "ucc-ddd"),
 ]
 
 if PYQPANDA3_AVAILABLE:
