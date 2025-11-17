@@ -10,4 +10,4 @@ from .pyqpanda3_compiler import (
     PYQPANDA3_AVAILABLE as PYQPANDA3_AVAILABLE,
 )
 
-DEFAULT_GATESET = {"rx", "ry", "rz", "h", "cx"}
+DEFAULT_GATESET = {"id", "rx", "ry", "rz", "h", "cx"}
