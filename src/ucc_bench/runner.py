@@ -10,7 +10,7 @@ from .compilers import BaseCompiler, DEFAULT_GATESET
 from .results import BenchmarkResult, CompilerInfo, CompilationMetrics
 from .registry import register
 from .simulation.observables import calc_expectation_value
-from .simulation.noise_models import create_depolarizing_noise_model
+from .simulation.noise_models import create_depolarizing_noise_model, create_mixed_noise_model
 from qbraid import transpile
 from qiskit import transpile as qiskit_transpile
 from time import perf_counter, process_time
@@ -114,7 +114,7 @@ def run_task(
             )
         else:
             # Use the standard depolarizing noise model if no target device
-            noise_model = create_depolarizing_noise_model(
+            noise_model = create_mixed_noise_model(
                 raw_circuit_qiskit, compiled_circuit_qiskit
             )
             simulator = AerSimulator(
