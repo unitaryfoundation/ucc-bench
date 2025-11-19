@@ -5,6 +5,7 @@ from datetime import datetime
 import logging
 from logging import LoggerAdapter
 from concurrent.futures import ProcessPoolExecutor
+
 from .suite import BenchmarkSuite, BenchmarkSpec
 from .compilers import BaseCompiler, DEFAULT_GATESET
 from .results import BenchmarkResult, CompilerInfo, CompilationMetrics
@@ -18,7 +19,7 @@ import multiprocessing
 from qiskit.transpiler import Target
 from qiskit_aer import AerSimulator
 from qiskit_aer.noise import NoiseModel
-from .utils import validate_circuit_gates
+from .utils import validate_circuit_gates, strip_measurements
 from concurrent.futures import as_completed
 from qiskit.qasm3 import dumps
 
@@ -123,13 +124,26 @@ def run_task(
 
         if register.has_observable(benchmark.simulate.measurement):
             observable = register.get_observable(benchmark.simulate.measurement)
-            simulation_metrics = calc_expectation_value(
-                observable(raw_circuit_qiskit.num_qubits),
-                raw_circuit_qiskit,
-                compiled_circuit_qiskit,
-                simulator,
-            )
-            simulation_metrics.measurement_id = observable._id
+            # If an output metric is registered, use it
+            if register.has_output_metric(observable._id):
+                output_metric = register.get_output_metric(observable._id)
+                simulation_metrics = output_metric(
+                    raw_circuit_qiskit,
+                    compiled_circuit_qiskit,
+                    simulator,
+                )
+                simulation_metrics.measurement_id = observable._id
+            else:
+                # When calculating expectation values, strip measurements first
+                strip_measurements(raw_circuit_qiskit)
+                strip_measurements(compiled_circuit_qiskit)
+                simulation_metrics = calc_expectation_value(
+                    observable(raw_circuit_qiskit.num_qubits),
+                    raw_circuit_qiskit,
+                    compiled_circuit_qiskit,
+                    simulator,
+                )
+                simulation_metrics.measurement_id = observable._id
         elif register.has_output_metric(benchmark.simulate.measurement):
             output_metric = register.get_output_metric(benchmark.simulate.measurement)
             simulation_metrics = output_metric(

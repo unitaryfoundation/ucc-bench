@@ -1,3 +1,60 @@
+from typing import Union
+from math import sqrt
+from qiskit import QuantumCircuit, ClassicalRegister
+from qiskit.quantum_info import Operator, Statevector, SparsePauliOp
+from qiskit_aer import AerSimulator
+import numpy as np
+from qiskit.result import Counts
+from ..registry import register
+from ..results import SimulationMetrics
+
+
+def calc_computational_basis_expectation(
+    uncompiled_circuit: QuantumCircuit,
+    compiled_circuit: QuantumCircuit,
+    simulator: AerSimulator,
+) -> SimulationMetrics:
+    # Ensure classical bits and measurement
+    def ensure_classical_bits_and_measurement(circuit):
+        num_qubits = circuit.num_qubits
+        if circuit.num_clbits < num_qubits:
+            cr = ClassicalRegister(num_qubits - circuit.num_clbits)
+            circuit.add_register(cr)
+        if not any(instr[0].name == "measure" for instr in circuit.data):
+            circuit.measure(range(num_qubits), range(num_qubits))
+
+    ensure_classical_bits_and_measurement(uncompiled_circuit)
+    ensure_classical_bits_and_measurement(compiled_circuit)
+
+    shots = 1024
+    ideal_result = simulator.run(uncompiled_circuit, shots=shots).result()
+    ideal_counts = ideal_result.get_counts()
+    noisy_result = simulator.run(compiled_circuit, shots=shots).result()
+    noisy_counts = noisy_result.get_counts()
+
+    def z_expectation(counts: Counts, num_qubits: int):
+        total = 0
+        shots = sum(counts.values())
+        for bitstring, count in counts.items():
+            val = 1 if bitstring.count("1") % 2 == 0 else -1
+            total += val * count
+        return total / shots if shots > 0 else 0.0
+
+    uncompiled_ideal = z_expectation(ideal_counts, uncompiled_circuit.num_qubits)
+    compiled_noisy = z_expectation(noisy_counts, compiled_circuit.num_qubits)
+
+    import math
+
+    return SimulationMetrics(
+        uncompiled_ideal=uncompiled_ideal,
+        compiled_ideal=math.nan,
+        uncompiled_noisy=math.nan,
+        compiled_noisy=compiled_noisy,
+    )
+
+
+register.output_metric("computational_basis")(calc_computational_basis_expectation)
+
 """
 This module provides functionality calculating expectation values of compiled circuits
 with and without noise. It has some common functions for calculating these values given an
@@ -7,15 +64,6 @@ Users can also register their own observables using the `@register.observable` d
 use in the benchmarking framework. The observables should be defined as functions that take the number of qubits
 in the circuit as an argument and return a Qiskit Operator representing the observable to measure.
 """
-
-from typing import Union
-from math import sqrt
-from qiskit import QuantumCircuit
-from qiskit.quantum_info import Operator, Statevector, SparsePauliOp
-from qiskit_aer import AerSimulator
-import numpy as np
-from ..registry import register
-from ..results import SimulationMetrics
 
 # ----------------------------------------------------
 # Simulation functions to calculate expectation values
