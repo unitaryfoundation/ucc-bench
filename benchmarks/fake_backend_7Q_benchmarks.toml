@@ -32,13 +32,6 @@ generator.name = "mqt:qaoa"
 generator.params.N = 7
 
 [[benchmarks]]
-id = "mqt:qft_N7"
-description = "mqt:qft circuit (N=7)"
-simulate.measurement = "uniform_superposition_projector"
-generator.name = "mqt:qft"
-generator.params.N = 7
-
-[[benchmarks]]
 id = "prep_select_N7"
 description = "prep_select circuit (N=7)"
 simulate.measurement = "prep_select_all_ones"

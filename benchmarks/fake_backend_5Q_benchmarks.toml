@@ -58,15 +58,6 @@ generator.params.N = 5
 
 
 [[benchmarks]]
-id = "qft_N5"
-description = "qft circuit (N=5)"
-simulate.measurement = "uniform_superposition_projector"
-generator.name = "qft"
-generator.params.N = 5
-
-
-
-[[benchmarks]]
 id = "qv_N5"
 description = "qv circuit (N=5)"
 simulate.measurement = "heavy_output"
