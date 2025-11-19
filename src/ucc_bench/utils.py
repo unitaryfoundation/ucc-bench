@@ -37,13 +37,3 @@ def validate_circuit_gates(circuit, allowed_gates=None):
         )
 
     return qc
-
-
-# Statevector-based simulation
-def strip_measurements(circuit):
-    # Remove measurement instructions and classical bits
-    circuit.data = [instr for instr in circuit.data if instr[0].name != "measure"]
-    if circuit.num_clbits > 0:
-        # Remove all classical registers
-        circuit._clbits = []
-        circuit.cregs = []

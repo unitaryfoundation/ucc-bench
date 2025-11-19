@@ -19,7 +19,7 @@ import multiprocessing
 from qiskit.transpiler import Target
 from qiskit_aer import AerSimulator
 from qiskit_aer.noise import NoiseModel
-from .utils import validate_circuit_gates, strip_measurements
+from .utils import validate_circuit_gates
 from concurrent.futures import as_completed
 from qiskit.qasm3 import dumps
 
@@ -134,9 +134,6 @@ def run_task(
                 )
                 simulation_metrics.measurement_id = observable._id
             else:
-                # When calculating expectation values, strip measurements first
-                strip_measurements(raw_circuit_qiskit)
-                strip_measurements(compiled_circuit_qiskit)
                 simulation_metrics = calc_expectation_value(
                     observable(raw_circuit_qiskit.num_qubits),
                     raw_circuit_qiskit,
