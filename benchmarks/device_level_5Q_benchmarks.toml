@@ -1,0 +1,102 @@
+# Version of the specification language/format, to manage future changes
+spec_version = "1.0"
+# Version of this particular benchmark suite, to manage any important changes
+suite_version = "0.1"
+# Unique identifier for this benchmark suite
+id = "device_level_benchmarks"
+# Human readable description
+description = "Compiler benchmarks running in small quantum device emulators."
+
+# --------- Compilers ----------
+# For now, restricting to qiskit derived compilers to work with the same target-device options
+[[compilers]]
+id = "ucc"
+[[compilers]]
+id = "qiskit-default"
+
+# --------- Target Devices ----------
+[[target_devices]]
+# 5 qubits
+id = "ibm_fake_manila"
+
+
+# --------- Benchmarks ----------
+[[benchmarks]]
+id = "mqt:hhl_N5"
+description = "mqt:hhl circuit (N=5)"
+
+[benchmarks.generator]
+name = "mqt:hhl"
+
+[benchmarks.generator.params]
+N = 5
+
+[[benchmarks]]
+id = "mqt:qaoa_N5"
+description = "mqt:qaoa circuit (N=5)"
+
+[benchmarks.generator]
+name = "mqt:qaoa"
+
+[benchmarks.generator.params]
+N = 5
+
+[[benchmarks]]
+id = "mqt:qft_N5"
+description = "mqt:qft circuit (N=5)"
+
+[benchmarks.generator]
+name = "mqt:qft"
+
+[benchmarks.generator.params]
+N = 5
+
+[[benchmarks]]
+id = "mqt:wstate_N5"
+description = "mqt:wstate circuit (N=5)"
+
+[benchmarks.generator]
+name = "mqt:wstate"
+
+[benchmarks.generator.params]
+N = 5
+
+[[benchmarks]]
+id = "prep_select_N5"
+description = "prep_select circuit (N=5)"
+
+[benchmarks.generator]
+name = "prep_select"
+
+[benchmarks.generator.params]
+N = 5
+
+[[benchmarks]]
+id = "qcnn_N5"
+description = "qcnn circuit (N=5)"
+
+[benchmarks.generator]
+name = "qcnn"
+
+[benchmarks.generator.params]
+N = 5
+
+[[benchmarks]]
+id = "qft_N5"
+description = "qft circuit (N=5)"
+
+[benchmarks.generator]
+name = "qft"
+
+[benchmarks.generator.params]
+N = 5
+
+[[benchmarks]]
+id = "qv_N5"
+description = "qv circuit (N=5)"
+
+[benchmarks.generator]
+name = "qv"
+
+[benchmarks.generator.params]
+N = 5
