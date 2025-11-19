@@ -151,14 +151,25 @@ def generate_square_heisenberg_observable(num_qubits):
 
 @register.observable("qaoa")
 def generate_qaoa_observable(num_qubits):
-    """Generates the problem Hamiltonian as the observable for the QAOA
-    benchmarking circuits, based on the binary encoding described in
-    Franz G. Fuchs, Herman Øie Kolden, Niels Henrik Aase, and Giorgio
-    Sartor "Efficient encoding of the weighted MAX k-CUT on a quantum computer
-    using QAOA". (2020) arXiv 2009.01095 (https://arxiv.org/abs/2009.01095).
-    The weights of the edges between vertices and of the resulting unitary
-    evolution come from the 10-vertex Barabasi-Albert graph in Fig 4(c)
-    of the paper.
+    """Generate the problem Hamiltonian observable for QAOA benchmarks.
+
+    Notes
+    -----
+    The original reference graph (Fuchs et al. 2020, arXiv:2009.01095) uses a
+    10-vertex Barabasi-Albert instance. The hard-coded edge list below encodes
+    that graph. Some benchmark suites in this project request QAOA circuits
+    with fewer than 10 qubits (e.g. N=5 or N=7). In those cases, the original
+    edge list contains vertex indices that exceed ``num_qubits - 1`` which
+    previously caused an ``IndexError: list assignment index out of range``.
+
+    To make the observable generation work for ``num_qubits < 10`` we filter
+    out edges that touch vertices outside the available range.
+
+    If fewer than 2 valid vertices remain after filtering (i.e. ``num_qubits < 2``)
+    we raise a ValueError because no meaningful 2-local ZZ Hamiltonian can be
+    constructed.
+        TODO: In general, we should define an observable for QAOA which allows an arbitrary number of qubits and generates the corresponding graph structure.
+
     """
     pauli_strings = []
     # Weights of edges between vertices and of the resulting unitary evolution
@@ -188,15 +199,20 @@ def generate_qaoa_observable(num_qubits):
         (7, 9, 4.265),
         (8, 9, 1.690),
     ]
-    for i, j, _ in weighted_edges:
-        # Start with identity string
+    if num_qubits < 2:
+        raise ValueError(
+            f"QAOA observable requires at least 2 qubits; got num_qubits={num_qubits}"
+        )
+    # Filter edges to those within the available qubit index range
+    filtered_edges = [
+        (i, j, w) for (i, j, w) in weighted_edges if i < num_qubits and j < num_qubits
+    ]
+    for i, j, weight in filtered_edges:
         pauli_string = ["I"] * num_qubits
-        # Place Z operators on the chosen qubits
         pauli_string[i] = "Z"
         pauli_string[j] = "Z"
-        # Convert to PauliSumOp
         pauli_strings.append("".join(pauli_string))
-    coeffs = [weight for _, _, weight in weighted_edges]
+    coeffs = [weight for _, _, weight in filtered_edges]
     observable = SparsePauliOp(pauli_strings, coeffs)
     return observable
 
