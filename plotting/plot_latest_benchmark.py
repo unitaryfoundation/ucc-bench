@@ -139,9 +139,16 @@ def main():
 
     # --- Plot Compilation Benchmarks ---
     if args.plot in ["all", "compilation"]:
-        db = SuiteResultsDatabase.from_root(
-            args.root_dir, args.runner_name, "compilation_benchmarks"
-        )
+        # If runner_name matches a known suite, use it directly
+        suite_dir = args.root_dir / args.runner_name
+        if (suite_dir / "compilation_benchmarks").exists():
+            db = SuiteResultsDatabase.from_root(
+                args.root_dir, args.runner_name, "compilation_benchmarks"
+            )
+        else:
+            db = SuiteResultsDatabase.from_root(
+                args.root_dir, args.runner_name, args.runner_name
+            )
 
         suite_results = db.from_uid(args.uid) if args.uid else db.get_latest()
         if suite_results is None:
@@ -164,18 +171,35 @@ def main():
 
     # --- Plot Simulation Benchmarks ---
     if args.plot in ["all", "simulation"]:
+        suite_dir = args.root_dir / args.runner_name
+        # Use the suite name as the keyword for database and CSV lookup
         db = SuiteResultsDatabase.from_root(
-            args.root_dir, args.runner_name, "simulation_benchmarks"
+            args.root_dir, args.runner_name, args.runner_name
         )
-
         suite_results = db.from_uid(args.uid) if args.uid else db.get_latest()
-        if suite_results is None:
-            print(f"No simulation data found for UID {args.uid}")
-            sys.exit(1)
+        if suite_results is not None:
+            latest_date = suite_results.metadata.uid_timestamp.strftime("%Y-%m-%d")
+            df = to_df_simulation(suite_results)
+        else:
+            # Fallback: load latest simulation.csv directly
+            import glob
+            import os
 
-        latest_date = suite_results.metadata.uid_timestamp.strftime("%Y-%m-%d")
-
-        df = to_df_simulation(suite_results)
+            csv_dir = str(suite_dir)
+            csv_files = glob.glob(
+                os.path.join(csv_dir, "**", "*.simulation.csv"), recursive=True
+            )
+            if not csv_files:
+                print(f"No simulation CSV files found in {csv_dir}")
+                sys.exit(1)
+            latest_csv = max(csv_files, key=os.path.getmtime)
+            print(f"Loading simulation data from {latest_csv}")
+            df = pd.read_csv(latest_csv)
+            # Try to extract date from filename or column
+            if "uid_timestamp" in df.columns:
+                latest_date = str(df["uid_timestamp"].iloc[0]).split()[0]
+            else:
+                latest_date = "unknown"
 
         file_ext = "pdf" if args.pdf else "png"
         out_path = (
