@@ -39,7 +39,7 @@ class UCCDDDCompiler(BaseCompiler[QuantumCircuit]):
             )
 
         def hh_rule(slack_length):
-            return ddd_rules.repeated_rule(
+            return ddd_rules.general_rule(
                     slack_length, [cirq.H, cirq.H]
                 )
         ddd_circuits = ddd_construct_circuits(
