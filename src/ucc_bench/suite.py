@@ -120,6 +120,7 @@ class BenchmarkSpec(BaseModel):
     generator: Optional[GeneratorSpec] = None
     resolved_qasm_file: Optional[Path] = None
     simulate: Optional[SimulationSpec] = None
+    decompose_initial_gateset: bool = True
 
     def num_qubits(self) -> Optional[int]:
         """

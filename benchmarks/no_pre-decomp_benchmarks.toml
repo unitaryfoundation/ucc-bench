@@ -19,9 +19,11 @@ id = "shor18"
 description = "mqt:shor circuit (N=18)"
 generator.name = "mqt:shor"
 generator.params.N = 18
+decompose_initial_gateset = false
 
 [[benchmarks]]
 id = "randomcircuit8"
 description = "mqt:randomcircuit circuit (N=8)"
 generator.name = "mqt:randomcircuit"
 generator.params.N = 8
+decompose_initial_gateset = false
