@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 import pandas as pd
 import matplotlib.pyplot as plt
-from ucc_bench.results import SuiteResultsDatabase, to_df_timing, to_df_simulation
+from ucc_bench.results import SuiteResultsDatabase, to_df_simulation
 
 from shared import calculate_abs_relative_error, get_compiler_colormap
 
@@ -138,28 +138,39 @@ def main():
     args = parser.parse_args()
 
     # --- Plot Compilation Benchmarks ---
+
     if args.plot in ["all", "compilation"]:
-        db = SuiteResultsDatabase.from_root(
-            args.root_dir, args.runner_name, "compilation_benchmarks"
+        import glob
+        import os
+
+        suite_dir = args.root_dir / args.runner_name
+        # Search for all compilation CSVs in all subdirectories
+        csv_files = glob.glob(
+            os.path.join(str(suite_dir), "**", "*.compilation.csv"), recursive=True
         )
-
-        suite_results = db.from_uid(args.uid) if args.uid else db.get_latest()
-        if suite_results is None:
-            print(f"No compilation data found for UID {args.uid}")
+        if not csv_files:
+            print(f"No compilation CSV files found in {suite_dir}")
             sys.exit(1)
-
-        latest_date = suite_results.metadata.uid_timestamp.strftime("%Y-%m-%d")
-
-        df = to_df_timing(suite_results)
+        latest_csv = max(csv_files, key=os.path.getmtime)
+        print(f"Loading compilation data from {latest_csv}")
+        df = pd.read_csv(latest_csv)
+        # Try to extract date from filename or column
+        if "uid_timestamp" in df.columns:
+            latest_date = str(df["uid_timestamp"].iloc[0]).split()[0]
+        else:
+            latest_date = "unknown"
+        # Convert compile_time_ms to seconds if present
         if "compile_time_ms" in df.columns:
             df["compile_time"] = df["compile_time_ms"] / 1000.0
-
         file_ext = "pdf" if args.pdf else "png"
         out_path = (
             args.root_dir
             / args.runner_name
             / f"latest_compiler_benchmarks_by_circuit.{file_ext}"
         )
+        print(f"Successfully loaded compilation data for {args.runner_name}.")
+        print(f"DataFrame shape: {df.shape}")
+        print(f"Compilers found: {sorted(df['compiler'].unique())}")
         plot_compilation(df, latest_date, out_path, args.pdf)
 
     # --- Plot Simulation Benchmarks ---
