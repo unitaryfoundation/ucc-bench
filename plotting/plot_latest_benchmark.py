@@ -9,6 +9,93 @@ from ucc_bench.results import SuiteResultsDatabase, to_df_timing, to_df_simulati
 from shared import calculate_abs_relative_error, get_compiler_colormap
 
 
+def generate_all_in_one_plots(
+    df: pd.DataFrame,
+    plot_configs: list[dict],
+    latest_date: str,
+    out_path: Path,
+    use_pdf: bool = False,
+    show_raw_gates: bool = False,
+):
+    """Generate all-in-one plots with all circuits in a single plot.
+
+    Creates grouped bar charts where all benchmarks are shown in one plot,
+    with bars grouped by benchmark and colored by compiler.
+    """
+    # Configure matplotlib for LaTeX output if PDF export is requested
+    if use_pdf:
+        plt.rcParams.update(
+            {
+                "text.usetex": True,
+                "font.family": "serif",
+            }
+        )
+
+    benchmarks = sorted(df["benchmark_id"].unique())
+    compilers = sorted(df["compiler"].unique())
+    color_map = get_compiler_colormap()
+
+    # Create separate figures for each metric
+    for config in plot_configs:
+        fig, ax = plt.subplots(figsize=(12, 6))
+
+        # Prepare data for grouped bar chart
+        x = np.arange(len(benchmarks))
+        width = 0.8 / len(compilers)  # Width of bars, adjusted for number of compilers
+
+        # Create bars for each compiler
+        for i, compiler in enumerate(compilers):
+            values = []
+            for benchmark in benchmarks:
+                row = df[(df["benchmark_id"] == benchmark) & (df["compiler"] == compiler)]
+                if not row.empty:
+                    values.append(row[config["y_col"]].values[0])
+                else:
+                    values.append(np.nan)  # Use NaN to skip missing data
+
+            offset = (i - (len(compilers) - 1) / 2) * width
+            ax.bar(
+                x + offset,
+                values,
+                width,
+                label=compiler,
+                color=color_map.get(compiler, "#4C72B0"),
+            )
+
+        # Set x-axis labels
+        if show_raw_gates:
+            # Create two-line labels: benchmark name + raw gate count
+            labels = []
+            for benchmark in benchmarks:
+                # Get raw gate count (should be same for all compilers for a given benchmark)
+                sample_row = df[df["benchmark_id"] == benchmark].iloc[0]
+                raw_gates = int(sample_row["raw_multiq_gates"])
+                labels.append(f"{benchmark}\n({raw_gates} gates)")
+        else:
+            labels = benchmarks
+
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, rotation=30, ha="right")
+        ax.set_ylabel(config["ylabel"])
+        ax.set_title(f"{config['title']} (Date: {latest_date})", fontsize=16)
+        ax.legend(title="Compiler", bbox_to_anchor=(1.05, 1), loc="upper left")
+
+        if config.get("use_log_scale", True):
+            ax.set_yscale("log")
+            # Reduce busyness of log scale
+            ax.tick_params(axis="y", which="minor", length=0)
+            ax.yaxis.set_major_locator(plt.LogLocator(base=10, numticks=4))
+
+        plt.tight_layout()
+        metric_name = config["y_col"].replace("_", "-")
+        metric_out_path = (
+            out_path.parent / f"{out_path.stem}_{metric_name}{out_path.suffix}"
+        )
+        print(f"Saving plot to {metric_out_path}")
+        fig.savefig(metric_out_path, dpi=300, bbox_inches="tight")
+        plt.close(fig)
+
+
 def generate_subplots(
     df: pd.DataFrame,
     plot_configs: list[dict],
@@ -104,7 +191,27 @@ def plot_compilation(
         df_comp["compiled_multiq_gates"] / df_comp["raw_multiq_gates"]
     )
 
-    plot_configs = [
+    # All-in-one plots (replacing gate counts with compiled ratio)
+    all_in_one_configs = [
+        {
+            "y_col": "compile_time",
+            "title": "Compiler Performance",
+            "ylabel": "Compile Time (s)",
+            "use_log_scale": True,
+        },
+        {
+            "y_col": "compiled_ratio",
+            "title": "Compiled Gate Ratio",
+            "ylabel": "Compiled Gates / Raw Gates",
+            "use_log_scale": False,
+        },
+    ]
+    generate_all_in_one_plots(
+        df_comp, all_in_one_configs, latest_date, out_path, use_pdf, show_raw_gates=True
+    )
+
+    # Subplot versions (additional plots with all metrics)
+    subplot_configs = [
         {
             "y_col": "compile_time",
             "title": "Compiler Performance",
@@ -124,7 +231,9 @@ def plot_compilation(
             "use_log_scale": False,
         },
     ]
-    generate_subplots(df_comp, plot_configs, latest_date, out_path, use_pdf)
+    # Save subplots with different filename to avoid overwriting
+    subplot_out_path = out_path.parent / f"{out_path.stem}_subplots{out_path.suffix}"
+    generate_subplots(df_comp, subplot_configs, latest_date, subplot_out_path, use_pdf)
 
 
 def plot_simulation(
