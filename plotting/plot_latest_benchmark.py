@@ -117,7 +117,6 @@ def generate_subplots(
         )
 
     benchmarks = sorted(df["benchmark_id"].unique())
-    compilers = df["compiler"].unique()
     n_benchmarks = len(benchmarks)
     ncols = 3
     nrows = 2
