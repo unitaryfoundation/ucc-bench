@@ -248,7 +248,27 @@ def plot_simulation(
         df_sim["compiled_noisy"], df_sim["uncompiled_noisy"]
     )
 
-    plot_configs = [
+    # All-in-one plots
+    all_in_one_configs = [
+        {
+            "y_col": "rel_err_ideal",
+            "title": "Observable Error (Noiseless Sim)",
+            "ylabel": "Absolute Relative Error",
+            "use_log_scale": True,
+        },
+        {
+            "y_col": "rel_err_noisy",
+            "title": "Observable Error (Noisy Sim)",
+            "ylabel": "Absolute Relative Error",
+            "use_log_scale": True,
+        },
+    ]
+    generate_all_in_one_plots(
+        df_sim, all_in_one_configs, latest_date, out_path, use_pdf, show_raw_gates=False
+    )
+
+    # Subplot versions (additional plots)
+    subplot_configs = [
         {
             "y_col": "rel_err_ideal",
             "title": "Observable Error (Noiseless Sim)",
@@ -260,7 +280,9 @@ def plot_simulation(
             "ylabel": "Absolute Relative Error",
         },
     ]
-    generate_subplots(df_sim, plot_configs, latest_date, out_path, use_pdf)
+    # Save subplots with different filename to avoid overwriting
+    subplot_out_path = out_path.parent / f"{out_path.stem}_subplots{out_path.suffix}"
+    generate_subplots(df_sim, subplot_configs, latest_date, subplot_out_path, use_pdf)
 
 
 def main():
