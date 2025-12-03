@@ -120,15 +120,25 @@ def generate_subplots(
 
     benchmarks = sorted(df["benchmark_id"].unique())
     n_benchmarks = len(benchmarks)
-    ncols = 3
-    nrows = 2
 
-    # Ensure we don't have more benchmarks than subplots
-    if n_benchmarks > nrows * ncols:
-        raise ValueError(
-            f"Too many benchmarks ({n_benchmarks}) for fixed {nrows}x{ncols} grid. "
-            f"Maximum supported: {nrows * ncols}"
-        )
+    # Calculate grid size dynamically based on number of benchmarks
+    # Prefer 3 columns for readability, but adjust as needed
+    if n_benchmarks <= 3:
+        ncols = n_benchmarks
+        nrows = 1
+    elif n_benchmarks <= 6:
+        ncols = 3
+        nrows = 2
+    elif n_benchmarks <= 9:
+        ncols = 3
+        nrows = 3
+    elif n_benchmarks <= 12:
+        ncols = 4
+        nrows = 3
+    else:
+        # For more benchmarks, calculate optimal grid
+        ncols = int(np.ceil(np.sqrt(n_benchmarks)))
+        nrows = int(np.ceil(n_benchmarks / ncols))
 
     # Create separate figures for each metric
     for config in plot_configs:
