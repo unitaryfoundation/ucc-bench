@@ -47,7 +47,9 @@ def generate_all_in_one_plots(
         for i, compiler in enumerate(compilers):
             values = []
             for benchmark in benchmarks:
-                row = df[(df["benchmark_id"] == benchmark) & (df["compiler"] == compiler)]
+                row = df[
+                    (df["benchmark_id"] == benchmark) & (df["compiler"] == compiler)
+                ]
                 if not row.empty:
                     values.append(row[config["y_col"]].values[0])
                 else:
