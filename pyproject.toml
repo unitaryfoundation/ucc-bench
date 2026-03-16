@@ -37,7 +37,7 @@ dev = [
     "ruff>=0.11.2",
 ]
 pyqpanda3 = [
-    "pyqpanda3<0.3.2", #pin to version that was failing circuit equivalence
+    "pyqpanda3<0.3.5", #pin to version that was failing circuit equivalence
 ]
 
 [tool.uv.sources]
