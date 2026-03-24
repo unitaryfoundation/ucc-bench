@@ -43,25 +43,45 @@ def test_validate_valid_suite():
 
 
 def test_validate_unregistered_compiler():
+    """Unknown compiler ids are caught when loading a TOML for execution,
+    but *not* when deserializing stored results (so old data still loads)."""
     with TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
         qasm_file = temp_path / "valid.qasm"
         qasm_file.touch()
 
+        # Building the model directly should succeed (result deserialization path)
+        suite = BenchmarkSuite(
+            spec_path=temp_path / "suite.toml",
+            spec_version="1.0",
+            suite_version="1.0",
+            id="suite1",
+            description="A suite with unregistered compiler",
+            compilers=[CompilerSpec(id="unknown_compiler")],
+            benchmarks=[
+                BenchmarkSpec(
+                    id="bench1", description="Benchmark 1", qasm_file=qasm_file
+                )
+            ],
+        )
+        assert suite is not None
+
+        # But loading via load_toml should reject the unknown compiler
+        toml_path = temp_path / "suite.toml"
+        toml_path.write_text(
+            'spec_version = "1.0"\n'
+            'suite_version = "1.0"\n'
+            'id = "suite1"\n'
+            'description = "bad"\n'
+            "[[compilers]]\n"
+            'id = "unknown_compiler"\n'
+            "[[benchmarks]]\n"
+            'id = "bench1"\n'
+            'description = "Benchmark 1"\n'
+            f'qasm_file = "{qasm_file}"\n'
+        )
         with pytest.raises(ValueError, match="Unknown compiler id: unknown_compiler"):
-            BenchmarkSuite(
-                spec_path=temp_path / "suite.toml",
-                spec_version="1.0",
-                suite_version="1.0",
-                id="suite1",
-                description="A suite with unregistered compiler",
-                compilers=[CompilerSpec(id="unknown_compiler")],
-                benchmarks=[
-                    BenchmarkSpec(
-                        id="bench1", description="Benchmark 1", qasm_file=qasm_file
-                    )
-                ],
-            )
+            BenchmarkSuite.load_toml(str(toml_path))
 
 
 def test_validate_invalid_qasm_file_path():
@@ -92,26 +112,48 @@ def test_validate_invalid_qasm_file_path():
 
 
 def test_validate_unregistered_target_device():
+    """Unknown target device ids are caught when loading a TOML for execution,
+    but *not* when deserializing stored results."""
     with TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
         qasm_file = temp_path / "valid.qasm"
         qasm_file.touch()
 
+        # Building the model directly should succeed (result deserialization path)
+        suite = BenchmarkSuite(
+            spec_path=temp_path / "suite.toml",
+            spec_version="1.0",
+            suite_version="1.0",
+            id="suite1",
+            description="A suite with unregistered target",
+            compilers=[CompilerSpec(id="ucc")],
+            target_devices=[TargetDeviceSpec(id="unknown_target")],
+            benchmarks=[
+                BenchmarkSpec(
+                    id="bench1", description="Benchmark 1", qasm_file=qasm_file
+                )
+            ],
+        )
+        assert suite is not None
+
+        # But loading via load_toml should reject the unknown target device
+        toml_path = temp_path / "suite.toml"
+        toml_path.write_text(
+            'spec_version = "1.0"\n'
+            'suite_version = "1.0"\n'
+            'id = "suite1"\n'
+            'description = "bad"\n'
+            "[[compilers]]\n"
+            'id = "ucc"\n'
+            "[[target_devices]]\n"
+            'id = "unknown_target"\n'
+            "[[benchmarks]]\n"
+            'id = "bench1"\n'
+            'description = "Benchmark 1"\n'
+            f'qasm_file = "{qasm_file}"\n'
+        )
         with pytest.raises(ValueError, match="Unknown target device: unknown_target"):
-            BenchmarkSuite(
-                spec_path=temp_path / "suite.toml",
-                spec_version="1.0",
-                suite_version="1.0",
-                id="suite1",
-                description="A suite with unregistered target",
-                compilers=[CompilerSpec(id="ucc")],
-                target_devices=[TargetDeviceSpec(id="unknown_target")],
-                benchmarks=[
-                    BenchmarkSpec(
-                        id="bench1", description="Benchmark 1", qasm_file=qasm_file
-                    )
-                ],
-            )
+            BenchmarkSuite.load_toml(str(toml_path))
 
 
 def test_unoptimization_preserves_unitary_and_introduces_complexity():

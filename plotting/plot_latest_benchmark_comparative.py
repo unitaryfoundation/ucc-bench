@@ -85,7 +85,8 @@ def create_scatter_plot(
     annotate_baseline: bool = False,
 ):
     """Creates a single comparative scatter plot on a given Axes object."""
-    color_map = get_compiler_colormap()
+    data_compilers = sorted(df["compiler"].unique())
+    color_map = get_compiler_colormap(data_compilers)
     marker_map = get_compiler_markers()
 
     baseline_data = df[df["compiler"] == baseline_compiler].set_index("benchmark_id")[
