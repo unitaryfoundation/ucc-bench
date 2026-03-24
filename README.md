@@ -25,7 +25,7 @@ Instead, users interested should clone this repository, and setup an environment
 $ uv sync
 ```
 
-See the [`uv` docs](https://docs.astral.sh/uv/) for information on installing `uv`. Note that this will skip installing optional dependency groups. At this time that is `pyqpanda3`, which is not supported on macos intel chips. To install `pyqpanda3` as part of setup, call `uv sync --all-groups`.
+See the [`uv` docs](https://docs.astral.sh/uv/) for information on installing `uv`. Note that this will skip installing optional dependency groups.
 
 ## Usage
 Run `uv run ucc-bench -h` to see a list of available sub-commands (also outlined in the sections below).
@@ -38,7 +38,7 @@ To execute the benchmarks locally, call
 $ uv run ucc-bench execute <path_to/specification.toml>
 ```
 
-which by default will generate the results to the `.local_results` directory and parallelize using the number of cores available on your machine. If you did not install the optional `pyqpanda3` dependency mentioned above, this run will fail on benchmark specifications that include the `pyqpanda3` compiler.
+which by default will generate the results to the `.local_results` directory and parallelize using the number of cores available on your machine.
 
 You can instead restrict a suite to only run a specific compiler and/or a specific benchmark circuit. This is also useful for debugging.
 

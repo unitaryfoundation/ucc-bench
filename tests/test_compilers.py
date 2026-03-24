@@ -4,8 +4,6 @@ from ucc_bench.compilers import (
     CirqCompiler,
     PytketPeepCompiler,
     UCCCompiler,
-    PyQPanda3Compiler,
-    PYQPANDA3_AVAILABLE,
 )
 from ucc_bench.compilers.cirq_compiler import BenchmarkTargetGateset
 
@@ -38,11 +36,6 @@ compiler_fixtures = [
     (PytketPeepCompiler, PytketCircuit, "pytket-peep"),
     (UCCCompiler, QuantumCircuit, "ucc"),
 ]
-
-if PYQPANDA3_AVAILABLE:
-    from pyqpanda3.core import QProg
-
-    compiler_fixtures.append((PyQPanda3Compiler, QProg, "pyqpanda3"))
 
 
 @pytest.mark.parametrize(
