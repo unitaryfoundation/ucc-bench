@@ -10,8 +10,13 @@ def calculate_abs_relative_error(
     return ((series1 - series2) / (series2 + eps)).abs()
 
 
-def get_compiler_colormap() -> dict[str, tuple]:
-    """Returns a dictionary mapping compiler names to unique colors."""
-    compilers = register.get_compilers()
-    colormap = sns.color_palette("colorblind", n_colors=len(compilers))
+def get_compiler_colormap(extra_compilers: list[str] | None = None) -> dict[str, tuple]:
+    """Returns a dictionary mapping compiler names to unique colors.
+
+    Includes all currently registered compilers plus any additional names
+    passed via *extra_compilers* (e.g. retired compilers found in historical
+    result data).
+    """
+    compilers = sorted(set(register.get_compilers()) | set(extra_compilers or []))
+    colormap = sns.color_palette("colorblind", n_colors=max(len(compilers), 1))
     return {compiler: colormap[i] for i, compiler in enumerate(compilers)}

@@ -30,7 +30,8 @@ def generate_plot(
     circuit_names = sorted(df["benchmark_id"].unique())
     x_positions = range(len(circuit_names))
     circuit_name_to_index = {name: i for i, name in enumerate(circuit_names)}
-    color_map = get_compiler_colormap()
+    compilers = sorted(df["compiler"].unique())
+    color_map = get_compiler_colormap(compilers)
 
     num_plots = len(plot_configs)
     fig, axes = plt.subplots(1, num_plots, figsize=(7 * num_plots, 7), squeeze=False)

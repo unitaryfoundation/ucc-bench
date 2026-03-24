@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List, Optional, Dict, Any
 from qiskit import QuantumCircuit
 from pydantic import BaseModel
-from pydantic import Field, model_validator, field_validator
+from pydantic import Field, model_validator
 
 
 from .registry import register
@@ -19,23 +19,9 @@ class CompilerSpec(BaseModel):
 
     id: str
 
-    @field_validator("id", mode="after")
-    @classmethod
-    def is_valid_compiler(cls, value: str) -> str:
-        if not register.has_compiler(value):
-            raise ValueError(f"Unknown compiler id: {value}")
-        return value
-
 
 class SimulationSpec(BaseModel):
     measurement: str
-
-    @field_validator("measurement", mode="after")
-    @classmethod
-    def is_valid_measurement(cls, value: str) -> str:
-        if not register.has_observable(value) and not register.has_output_metric(value):
-            raise ValueError(f"Unknown measurement id: {value}")
-        return value
 
 
 class TargetDeviceSpec(BaseModel):
@@ -47,13 +33,6 @@ class TargetDeviceSpec(BaseModel):
     """
 
     id: str
-
-    @field_validator("id", mode="after")
-    @classmethod
-    def is_valid_target_device(cls, value: str) -> str:
-        if not register.has_target_device(value):
-            raise ValueError(f"Unknown target device: {value}")
-        return value
 
 
 class GeneratorSpec(BaseModel):
@@ -157,11 +136,36 @@ class BenchmarkSuite(BaseModel):
 
     @classmethod
     def load_toml(cls, path: str) -> "BenchmarkSuite":
-        """Load a specification from a TOML file at the specified path."""
+        """Load a specification from a TOML file at the specified path.
+
+        Unlike deserializing stored results, loading a TOML spec for execution
+        validates that all referenced compilers, target devices, measurements,
+        and generators are currently registered.
+        """
         with open(path, "rb") as f:
             raw = tomllib.load(f)
             raw["spec_path"] = Path(path)
-            return BenchmarkSuite.model_validate(raw)
+            suite = BenchmarkSuite.model_validate(raw)
+
+        # Validate that all referenced registry items exist. These checks
+        # live here rather than on the Pydantic models so that historical
+        # result JSON files (which embed the suite spec) can still be
+        # deserialized after a compiler/device/measurement is retired.
+        for compiler in suite.compilers:
+            if not register.has_compiler(compiler.id):
+                raise ValueError(f"Unknown compiler id: {compiler.id}")
+
+        for target_device in suite.target_devices:
+            if not register.has_target_device(target_device.id):
+                raise ValueError(f"Unknown target device: {target_device.id}")
+
+        for benchmark in suite.benchmarks:
+            if benchmark.simulate:
+                m = benchmark.simulate.measurement
+                if not register.has_observable(m) and not register.has_output_metric(m):
+                    raise ValueError(f"Unknown measurement id: {m}")
+
+        return suite
 
     @model_validator(mode="after")
     def check_ids_unique(self):
