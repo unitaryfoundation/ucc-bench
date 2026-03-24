@@ -78,7 +78,7 @@ def test_validate_unregistered_compiler():
             "[[benchmarks]]\n"
             'id = "bench1"\n'
             'description = "Benchmark 1"\n'
-            f'qasm_file = "{qasm_file}"\n'
+            f'qasm_file = "{qasm_file.as_posix()}"\n'
         )
         with pytest.raises(ValueError, match="Unknown compiler id: unknown_compiler"):
             BenchmarkSuite.load_toml(str(toml_path))
@@ -150,7 +150,7 @@ def test_validate_unregistered_target_device():
             "[[benchmarks]]\n"
             'id = "bench1"\n'
             'description = "Benchmark 1"\n'
-            f'qasm_file = "{qasm_file}"\n'
+            f'qasm_file = "{qasm_file.as_posix()}"\n'
         )
         with pytest.raises(ValueError, match="Unknown target device: unknown_target"):
             BenchmarkSuite.load_toml(str(toml_path))
@@ -206,18 +206,22 @@ class TestGeneratorSpecs:
         assert spec.params["beta"] == 10
 
     def test_generatorspec_unknown_generator(self):
+        """Unknown generators are caught by validate_against_registry, not at construction."""
+        spec = GeneratorSpec(name="not_a_gen", params={})
         with pytest.raises(ValueError, match="Unknown generator name: 'not_a_gen'"):
-            GeneratorSpec(name="not_a_gen", params={})
+            spec.validate_against_registry()
 
     def test_generatorspec_unknown_param(self):
+        spec = GeneratorSpec(name="dummy_gen", params={"N": 3, "foo": 1})
         with pytest.raises(
             ValueError, match="Unknown parameter\(s\) for generator 'dummy_gen': foo"
         ):
-            GeneratorSpec(name="dummy_gen", params={"N": 3, "foo": 1})
+            spec.validate_against_registry()
 
     def test_generatorspec_missing_required_param(self):
+        spec = GeneratorSpec(name="required_param_gen", params={})
         with pytest.raises(
             ValueError,
             match="Missing required parameter for generator 'required_param_gen': N",
         ):
-            GeneratorSpec(name="required_param_gen", params={})
+            spec.validate_against_registry()
