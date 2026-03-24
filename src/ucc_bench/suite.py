@@ -47,23 +47,20 @@ class GeneratorSpec(BaseModel):
     name: str
     params: Dict[str, Any] = {}
 
-    @model_validator(mode="after")
-    def validate_generator_and_params(self):
+    def validate_against_registry(self):
         """
         Validates that the generator exists in the registry and that
         the provided parameters match the generator's function signature.
+
+        Called from BenchmarkSuite.load_toml() rather than as a Pydantic
+        validator so that historical result JSON files can still be
+        deserialized after a generator is retired.
         """
         if not register.has_generator(self.name):
             raise ValueError(f"Unknown generator name: '{self.name}'")
 
-        # Now validate the parameters against the registered generator's signature
         registry_spec = register.get_generator(self.name)
-        try:
-            registry_spec.validate_params(self.params)
-        except ValueError as e:
-            # Re-raise the validation error from the registry so pydantic can catch it.
-            raise e
-        return self
+        registry_spec.validate_params(self.params)
 
     def uid(self) -> str:
         """Generate a unique identifier for this generator spec based on its name and parameters."""
@@ -164,6 +161,8 @@ class BenchmarkSuite(BaseModel):
                 m = benchmark.simulate.measurement
                 if not register.has_observable(m) and not register.has_output_metric(m):
                     raise ValueError(f"Unknown measurement id: {m}")
+            if benchmark.generator:
+                benchmark.generator.validate_against_registry()
 
         return suite
 
