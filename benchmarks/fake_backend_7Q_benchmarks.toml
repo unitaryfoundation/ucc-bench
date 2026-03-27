@@ -1,0 +1,62 @@
+# Version of the specification language/format, to manage future changes
+spec_version = "1.0"
+# Version of this particular benchmark suite, to manage any important changes
+suite_version = "0.1"
+# Unique identifier for this benchmark suite
+id = "fake_backend_7Q_benchmarks"
+# Human readable description
+description = "Compiler benchmarks running in small quantum device emulators."
+
+# --------- Compilers ----------
+# For now, restricting to qiskit derived compilers to work with the same target-device options
+[[compilers]]
+id = "ucc"
+[[compilers]]
+id = "qiskit-default"
+
+# --------- Target Devices ----------
+[[target_devices]]
+# 7 qubits
+id = "ibm_fake_jakarta"
+
+
+# --------- Benchmarks ----------
+# Change all these to N=7 versions of the existing 5Q benchmarks
+
+# --------- Benchmarks ----------
+[[benchmarks]]
+id = "mqt:qaoa_N7"
+description = "mqt:qaoa circuit (N=7)"
+simulate.measurement = "qaoa"
+generator.name = "mqt:qaoa"
+generator.params.N = 7
+
+[[benchmarks]]
+id = "prep_select_N7"
+description = "prep_select circuit (N=7)"
+simulate.measurement = "prep_select_all_ones"
+generator.name = "prep_select"
+generator.params.N = 7
+
+[[benchmarks]]
+id = "qcnn_N7"
+description = "qcnn circuit (N=7)"
+simulate.measurement = "qcnn"
+generator.name = "qcnn"
+generator.params.N = 7
+
+[[benchmarks]]
+id = "qft_N7"
+description = "qft circuit (N=7)"
+simulate.measurement = "uniform_superposition_projector"
+generator.name = "qft"
+generator.params.N = 7
+
+[[benchmarks]]
+id = "qv_N7"
+description = "qv circuit (N=7)"
+simulate.measurement = "heavy_output"
+generator.name = "qv"
+generator.params.N = 7
+
+
