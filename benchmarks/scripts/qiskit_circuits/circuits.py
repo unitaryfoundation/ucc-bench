@@ -249,7 +249,7 @@ def encode_bit_flip(circuit, state, ancillas) -> QuantumCircuit:
     return circuit
 
 
-def measure_syndrome_bit(circuit, qreg_data, qreg_measure, creg_measure):
+def measure_syndrome_bit(circuit, qreg_data, qreg_measure, creg_syndrome):
     """
     Measure the syndrome by measuring the parity.
     We reset our ancilla qubits after measuring the stabilizer
@@ -264,10 +264,10 @@ def measure_syndrome_bit(circuit, qreg_data, qreg_measure, creg_measure):
     circuit.cx(qreg_data[0], qreg_measure[1])
     circuit.cx(qreg_data[2], qreg_measure[1])
     circuit.barrier(*qreg_data, *qreg_measure)
-    circuit.measure(qreg_measure, creg_measure)
-    with circuit.if_test((creg_measure[0], 1)):
+    circuit.measure(qreg_measure, creg_syndrome)
+    with circuit.if_test((creg_syndrome[0], 1)):
         circuit.x(qreg_measure[0])
-    with circuit.if_test((creg_measure[1], 1)):
+    with circuit.if_test((creg_syndrome[1], 1)):
         circuit.x(qreg_measure[1])
     circuit.barrier(*qreg_data, *qreg_measure)
     return circuit
@@ -316,9 +316,7 @@ def qec_bitflip_code(apply_correction=True, measure_all=False) -> QuantumCircuit
     circuit = initialize_qubits(circuit, qreg_data)
 
     circuit = encode_bit_flip(circuit, state_data, ancillas_data)
-    circuit = measure_syndrome_bit(
-        circuit, qreg_data, qreg_measure, creg_measure, creg_syndrome
-    )
+    circuit = measure_syndrome_bit(circuit, qreg_data, qreg_measure, creg_syndrome)
 
     if apply_correction:
         circuit = apply_correction_bit(circuit, qreg_data, creg_syndrome)
