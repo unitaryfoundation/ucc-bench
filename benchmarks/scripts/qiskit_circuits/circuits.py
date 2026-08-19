@@ -300,13 +300,12 @@ def qec_bitflip_code(apply_correction=True, measure_all=False) -> QuantumCircuit
     qreg_measure = QuantumRegister(2)
     creg_data = ClassicalRegister(3, name="data")
     creg_syndrome = ClassicalRegister(2, name="syndrome")
-    creg_measure = ClassicalRegister(2, name="measure")
     state_data = qreg_data[0]
     ancillas_data = qreg_data[1:]
 
-    circuit = QuantumCircuit(
-        qreg_data, qreg_measure, creg_data, creg_syndrome, creg_measure
-    )
+    circuit = QuantumCircuit(qreg_data, qreg_measure, creg_syndrome)
+    if measure_all:
+        circuit.add_register(creg_data)
 
     # Reset the state and ancilla qubits to ensure a clean start
     circuit.reset(state_data)

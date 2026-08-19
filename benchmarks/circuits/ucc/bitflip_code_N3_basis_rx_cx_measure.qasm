@@ -1,8 +1,6 @@
 OPENQASM 3.0;
 include "stdgates.inc";
-bit[3] data;
 bit[2] syndrome;
-bit[2] measure_0;
 qubit[3] q0;
 qubit[2] q1;
 reset q0[0];
