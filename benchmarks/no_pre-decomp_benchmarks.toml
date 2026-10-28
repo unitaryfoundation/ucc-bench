@@ -1,0 +1,29 @@
+spec_version = "1.0"
+suite_version = "0.1"
+id = "no_pre-decomp_benchmarks"
+description = "Run mqt:shor with N=18 and mqt:randomcircuit with N=8 without any pre-decomposition"
+
+[[compilers]]
+id = "ucc"
+[[compilers]]
+id = "pytket-peep"
+[[compilers]]
+id = "qiskit-default"
+[[compilers]]
+id = "cirq"
+[[compilers]]
+id = "pyqpanda3"
+
+[[benchmarks]]
+id = "shor18"
+description = "mqt:shor circuit (N=18)"
+generator.name = "mqt:shor"
+generator.params.N = 18
+decompose_initial_gateset = false
+
+[[benchmarks]]
+id = "randomcircuit8"
+description = "mqt:randomcircuit circuit (N=8)"
+generator.name = "mqt:randomcircuit"
+generator.params.N = 8
+decompose_initial_gateset = false

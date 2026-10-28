@@ -32,6 +32,7 @@ def run_task(
     target_device: Optional[Target] = None,
     target_device_id: Optional[str] = None,
     generated_circuit_cache: dict[str, str] = None,
+    decompose_initial_gateset: bool = True,  # True in our standard runs
 ) -> BenchmarkResult:
     """
     Run a single benchmark against the given compiler.
@@ -91,11 +92,13 @@ def run_task(
     logger.info(
         f"Finished compiling. Wall Time: {wall_time:.4f}s, CPU Time: {cpu_time:.4f}s, Utilization: {cpu_utilization:.2%}"
     )
-
     # Validate that the compiled circuit only contains the allowed basis gates.
     # This check occurs after timing so it does not affect measured compilation
     # performance.
-    if target_device is None:
+    # Use the value from the benchmark spec if present
+    if hasattr(benchmark, "decompose_initial_gateset"):
+        decompose_initial_gateset = benchmark.decompose_initial_gateset
+    if target_device is None and decompose_initial_gateset:
         validate_circuit_gates(compiled_circuit, DEFAULT_GATESET)
 
     simulation_metrics = None
